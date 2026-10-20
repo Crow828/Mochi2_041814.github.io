@@ -2142,7 +2142,8 @@ t.textContent = msg; t.className = 'cc-toast'; void t.offsetWidth; t.className =
 clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'cc-toast'; }, 2000);
 }
 function openPage(pg) {
-if (pg && ['page-tongpin','page-shenshou','page-water','page-pomo'].includes(pg.id)) return;
+const policyKey = pg && ({'page-tongpin':'sync','page-shenshou':'reach','page-water':'water','page-pomo':'pomo'})[pg.id];
+if (policyKey && !window.mochiFeatures.enabled(policyKey)) return;
 document.querySelectorAll('.page').forEach(p => p.hidden = true);
 pg.hidden = false;
 requestAnimationFrame(() => {
@@ -2184,43 +2185,11 @@ const waterApp = makeApp('water', '喝水', '<svg viewBox="0 0 24 24" fill="none
 const eatApp = makeApp('eat', '吃什么', '<svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5v7c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-7"/><path d="M5.7 2.5v8.3"/><path d="M8.3 2.5v8.3"/><path d="M7 11.5v10"/><path d="M21 15V2.5a5 5 0 00-5 5v5.5c0 1.1.9 2 2 2h3z"/><path d="M21 15v6.5"/></svg>');
 const piggyApp = makeApp('piggy', '存钱罐', '<svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7h6"/><path d="M5 13.5C5 10.4 8.1 8 12 8s7 2.4 7 5.5c0 1.6-.9 3.1-2.3 4.1V20h-2.4l-.4-1.2a9.3 9.3 0 01-3.8 0L9.7 20H7.3v-2.4C5.9 16.6 5 15.1 5 13.5z"/><circle cx="9.3" cy="12.7" r=".55" fill="#111111" stroke="none"/><path d="M18.8 12.3l1.7-.9"/></svg>');
 const pomoApp = makeApp('pomo', '番茄钟', '<svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.8" r="7.2"/><path d="M12 6.6V4.6"/><path d="M12 6.6C10.6 5.4 9 5.3 7.8 6.1"/><path d="M12 6.6c1.4-1.2 3-1.3 4.2-.5"/></svg>');
-const pagesBox = document.getElementById('desktop-pages');
-const st0 = curStore();
-let layArr = null;
-try { if (st0) layArr = JSON.parse(st0.get('desk-layout') || 'null'); } catch (e) {}
-const hasLayout = Array.isArray(layArr);
-const alreadyInLay = hasLayout && layArr.some(p => (p || []).includes('app-eat'));
-let placed = false;
-if (hasLayout && !alreadyInLay && pagesBox) {
-const curCnt = pagesBox.querySelectorAll('.page-slide').length;
-if (curCnt < 5) {
-const slide = document.createElement('div');
-slide.className = 'page-slide desk-page';
-slide.dataset.desk = String(curCnt);
-const grid = document.createElement('div');
-grid.className = 'app-grid';
-grid.setAttribute('data-app', 'tp-page');
-grid.appendChild(eatApp);
-slide.appendChild(grid);
-pagesBox.appendChild(slide);
-try {
-st0.set('desk-page-count', String(curCnt + 1));
-layArr.push(['app-eat']);
-st0.set('desk-layout', JSON.stringify(layArr));
-} catch (e) {}
-try { if (window.deskRebuild) window.deskRebuild(); } catch (e) {}
-placed = true;
-}
-}
-if (!placed) {
-const p2Grid = document.querySelector('.app-grid.p2-grid');
-const p3g = document.querySelector('.app-grid.p3-grid');
-if (p2Grid) {
-} else if (p3g) {   }
-if (p3g) {  p3g.appendChild(eatApp);   }
-else if (p2Grid) {  p2Grid.appendChild(eatApp);   }
+const appGrid = document.querySelector('.app-grid.p2-grid');
+[tpApp, ssApp, waterApp, eatApp, piggyApp, pomoApp].forEach(function (app) {
+if (appGrid && window.mochiFeatures.appVisible(app.dataset.app)) appGrid.appendChild(app);
+});
 try { if (window.applyDeskLayout) window.applyDeskLayout(); } catch (e) {}
-}
 const DEF_STATUS = ['在听雨', '在看你写东西', '没睡，在发呆', '刚路过你身边', '在想你', '在发呆', '在看你', '在等你看我'];
 const tpPage = document.createElement('div');
 tpPage.className = 'page'; tpPage.id = 'page-tongpin'; tpPage.hidden = true;
@@ -2244,7 +2213,7 @@ function tpPick() { const a = tpPool(); const el = document.getElementById('tp-s
 let knock = 0, knockTimer = null;
 function tpResetKnock() { knock = 0; document.querySelectorAll('#tp-knock .tp-dot').forEach(d => d.classList.remove('on')); }
 function tpKnock() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('sync')) return;
 if (editingNow()) return;
 const dots = document.querySelectorAll('#tp-knock .tp-dot');
 if (knock < dots.length) dots[knock].classList.add('on');
@@ -2276,7 +2245,7 @@ document.getElementById('tp-back').addEventListener('click', () => backHome(tpPa
 let tpFlowTimer = null;
 function tpPickFade() { const el = document.getElementById('tp-status'); if (!el) { tpPick(); return; } el.classList.add('fade'); setTimeout(() => { tpPick(); el.classList.remove('fade'); }, 400); }
 function tpStartFlow() {
-return; /* Disabled in this personal version. */ clearTimeout(tpFlowTimer); const tick = () => { tpPickFade(); tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }; tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }
+if (!window.mochiFeatures.enabled('sync')) return; clearTimeout(tpFlowTimer); const tick = () => { tpPickFade(); tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }; tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }
 function tpStopFlow() { clearTimeout(tpFlowTimer); tpFlowTimer = null; }
 new MutationObserver(() => { if (tpPage.hidden) tpStopFlow(); else { tpPick(); tpStartFlow(); } }).observe(tpPage, { attributes: true, attributeFilter: ['hidden'] });
 document.getElementById('tp-refresh').addEventListener('click', () => { if (editingNow()) return; tpPick(); });
@@ -2309,7 +2278,7 @@ const SS_FEEL = [
 ];
 function ssSendOn() { const s = curStore(); try { return s.get('shenshou-send-chat') !== '0'; } catch (e) { return true; } }
 function ssTry() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('reach')) return;
 if (editingNow()) return;
 const hint = document.getElementById('ss-hint'); if (hint) hint.textContent = '正在伸手…';
 const glow = document.getElementById('ss-glow'); if (glow) glow.classList.add('reach');
@@ -2335,7 +2304,7 @@ setTimeout(() => { if (glow) glow.classList.remove('dim'); }, 1200);
 }, 700);
 }
 function ssMaybePassive() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('reach')) return;
 const s = curStore(); if (!s) return;
 let last = 0; try { last = parseInt(s.get('shenshou-last-visit') || '0', 10) || 0; } catch (e) {}
 const gap = Date.now() - last;
@@ -2467,7 +2436,7 @@ if (!grp || !Array.isArray(grp[1]) || !grp[1].length || !window.isDefaultCardOff
 return grp[1].every(c => window.isDefaultCardOff('water', c));
 } catch (e) { return false; }
 }
-const WATER_REMINDERS_ENABLED = false; // Personal version: water reminders are disabled.
+const WATER_REMINDERS_ENABLED = window.mochiFeatures.enabled('water'); // Personal version: water reminders are disabled.
 function waterTaChatSend() {
 if (!WATER_REMINDERS_ENABLED) return false;
 if (waterChatGroupAllOff()) return false;
@@ -3070,7 +3039,7 @@ if (spark) spark.classList.toggle('on', pomoRunning && pomoMode === 'focus');
 function pomoStopTick() { clearInterval(pomoTickTimer); pomoTickTimer = null; pomoDisarmNotify(); }
 let pomoNotifyTimer = null;
 function pomoArmNotify() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
 pomoDisarmNotify();
 if (!pomoRunning) return;
 const delay = pomoEndAt - Date.now();
@@ -3086,7 +3055,7 @@ pomoNotify('番茄钟 · ' + POMO_MODES[mode].name + '结束', mode === 'focus' 
 }
 function pomoDisarmNotify() { if (pomoNotifyTimer) { clearTimeout(pomoNotifyTimer); pomoNotifyTimer = null; } }
 function pomoStartTick() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
 pomoStopTick();
 pomoTickTimer = setInterval(() => {
 if (!pomoRunning) return;
@@ -3098,7 +3067,7 @@ pomoArmNotify();
 function pomoShowMsg(txt) { const el = document.getElementById('pomo-msg'); if (el) { el.classList.add('fade'); setTimeout(() => { el.textContent = '\u201c' + txt + '\u201d'; el.classList.remove('fade'); }, 200); } }
 function pomoIdleAt(m) { if (pmpActive()) pmpDetach(); pomoRunning = false; pomoRemainMs = 0; pomoEndAt = 0; pomoStopTick(); pomoMode = m; pomoRender(); }
 function pomoComplete() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
 vibrate([120, 60, 120]);
 if (pomoBellOn()) { try { if (window.playBuiltinSfx) window.playBuiltinSfx('ring-warm', false); } catch (e) {} }
 if (document.visibilityState !== 'visible') {

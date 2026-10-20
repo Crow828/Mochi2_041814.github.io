@@ -71,7 +71,7 @@
   // app-memo，随后的 applyDeskLayout 重应用会把节点挪到配置的位置。
   (function placeMemo() {
     const p3 = document.querySelector('.app-grid.p3-grid');
-    if (p3) p3.appendChild(memoApp); else { const p2 = document.querySelector('.app-grid.p2-grid'); if (p2) p2.appendChild(memoApp); }
+    if (window.mochiFeatures.appVisible('memo')) { const target = p3 || document.querySelector('.app-grid.p2-grid'); if (target) target.appendChild(memoApp); }
     try { if (window.applyDeskLayout) window.applyDeskLayout(); } catch (e) {}
   })();
 

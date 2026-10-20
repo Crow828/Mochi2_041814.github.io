@@ -1,6 +1,6 @@
 (function () { try {
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('drift')) return; // Data stays intact while disabled.
 const KEY = 'drift-data';
 const page = document.getElementById('page-drift');
 if (!page) return;

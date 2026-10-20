@@ -17,7 +17,7 @@
 //   一个」改为「首次打开该桌面的此间才种」——老版会在用户从没碰过的桌面凭空造出以联系
 //   人命名的梦角，是「不同联系人数据串了/全是一个联系人名字」观感的另一半来源。
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('cjian')) return; // Data stays intact while disabled.
 
   const G = 'xy-home-v2';
   const ROSTER_KEY = 'cjian-roster';

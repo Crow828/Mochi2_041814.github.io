@@ -9768,7 +9768,7 @@ bindAdjDrag(headTop, false); // #1534：拖标题行移动面板（与桌面美�
   // 默认开）——闸门收在 addFish/addWork 入口，关掉后所有加分来源（60 秒自动累计、
   // 点击摸鱼按钮、番茄钟补偿、抓包奖励）一并停止写入；已有数值保留只停止增长
   function fishWorkOn(key) {
-return false; // Personal version: fish/work accrual disabled.
+if (!window.mochiFeatures.enabled('fish')) return false;
     try {
       const v = window.replyCfg ? window.replyCfg()[key] : undefined;
       return v === undefined ? true : v === 1;

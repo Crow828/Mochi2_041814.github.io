@@ -410,8 +410,8 @@ try { const v = window.activeStore().get('dcf-enabled'); return v === null ? tru
 }
 function dcfEnableSet(on) { try { window.activeStore().set('dcf-enabled', on ? '1' : '0'); } catch (e) {} }
 window.dcfEnabled = dcfEnabled;
-const PERSONAL_DISABLED_DCF = ["garden","cjian","sync","reach","room","water","pomo","fish","drift"];
-const PERSONAL_LOCKED_DCF = ["garden","cjian","sync","reach","room","water","pomo","fish","drift","piggy"];
+const PERSONAL_DISABLED_DCF = window.mochiFeatures.disabledProbabilityKeys();
+const PERSONAL_LOCKED_DCF = window.mochiFeatures.lockedProbabilityKeys();
 function dcfVal(k) {
 if (PERSONAL_DISABLED_DCF.includes(k)) return 0;
 if ((FUNC_KEYS.indexOf(k) >= 0 || k === 'checkin' || k === 'pomo' || k === 'care' || k === 'memo' || k === 'ask') && !dcfEnabled()) return 0;

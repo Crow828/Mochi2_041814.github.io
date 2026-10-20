@@ -2542,7 +2542,8 @@ if (ckRefresh) {
     clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'cc-toast'; }, 2000);
   }
   function openPage(pg) {
-if (pg && ['page-tongpin','page-shenshou','page-water','page-pomo'].includes(pg.id)) return;
+const policyKey = pg && ({'page-tongpin':'sync','page-shenshou':'reach','page-water':'water','page-pomo':'pomo'})[pg.id];
+if (policyKey && !window.mochiFeatures.enabled(policyKey)) return;
     document.querySelectorAll('.page').forEach(p => p.hidden = true);
     pg.hidden = false;
     // tabs.js 的 syncChrome 在初始 .page hidden 变化时触发，本页不在 FULL_PAGES 会显示 tabbar；
@@ -2592,49 +2593,12 @@ if (pg && ['page-tongpin','page-shenshou','page-water','page-pomo'].includes(pg.
   // 同频/伸手进第二页 p2-grid 追加其后；喝水移至第三页 p3-grid，排在本页静态图标之后），
   // 吃什么/存钱罐/番茄钟同样留第三页 p3-grid；
   // 若用户已装修（desk-layout 存在）且布局未含本图标 → 放新的一页，避免破坏自定义布局。
-  const pagesBox = document.getElementById('desktop-pages');
-  const st0 = curStore();
-  let layArr = null;
-  try { if (st0) layArr = JSON.parse(st0.get('desk-layout') || 'null'); } catch (e) {}
-  const hasLayout = Array.isArray(layArr);
-  const alreadyInLay = hasLayout && layArr.some(p => (p || []).includes('app-eat'));
-  let placed = false;
-  if (hasLayout && !alreadyInLay && pagesBox) {
-    const curCnt = pagesBox.querySelectorAll('.page-slide').length;
-    if (curCnt < 5) {
-      const slide = document.createElement('div');
-      slide.className = 'page-slide desk-page';
-      slide.dataset.desk = String(curCnt);
-      const grid = document.createElement('div');
-      grid.className = 'app-grid';
-      grid.setAttribute('data-app', 'tp-page');
-         grid.appendChild(eatApp);  
-      slide.appendChild(grid);
-      pagesBox.appendChild(slide);
-      try {
-        st0.set('desk-page-count', String(curCnt + 1));
-        layArr.push(['app-eat']);
-        st0.set('desk-layout', JSON.stringify(layArr));
-      } catch (e) {}
-      try { if (window.deskRebuild) window.deskRebuild(); } catch (e) {}
-      placed = true;
-    }
-  }
-  if (!placed) {
-    const p2Grid = document.querySelector('.app-grid.p2-grid');
-    const p3g = document.querySelector('.app-grid.p3-grid');
-    if (p2Grid) {
-      // 第二排顺序：花园 此间 同频 伸手（花园/此间为模板静态图标，同频/伸手追加其后）
-       
-    } else if (p3g) {   }
-    if (p3g) {  p3g.appendChild(eatApp);   }
-    else if (p2Grid) {  p2Grid.appendChild(eatApp);   }
-    // 重应用布局：personalize.js 的 applyDeskLayout 在本文件之前执行过一次，那时图标未注入被跳过；
-    // 此处图标已在 DOM，重应用可把图标按 desk-layout 移到用户装修过的目标页（alreadyInLay 时生效）。
-    try { if (window.applyDeskLayout) window.applyDeskLayout(); } catch (e) {}
-  }
-
-  // ---- 同频页 ----
+  // Desktop entries follow the same registry as runtime behavior and probability controls.
+  const appGrid = document.querySelector('.app-grid.p2-grid');
+  [tpApp, ssApp, waterApp, eatApp, piggyApp, pomoApp].forEach(function (app) {
+    if (appGrid && window.mochiFeatures.appVisible(app.dataset.app)) appGrid.appendChild(app);
+  });
+  try { if (window.applyDeskLayout) window.applyDeskLayout(); } catch (e) {}
   const DEF_STATUS = ['在听雨', '在看你写东西', '没睡，在发呆', '刚路过你身边', '在想你', '在发呆', '在看你', '在等你看我'];
   const tpPage = document.createElement('div');
   tpPage.className = 'page'; tpPage.id = 'page-tongpin'; tpPage.hidden = true;
@@ -2660,7 +2624,7 @@ if (pg && ['page-tongpin','page-shenshou','page-water','page-pomo'].includes(pg.
   let knock = 0, knockTimer = null;
   function tpResetKnock() { knock = 0; document.querySelectorAll('#tp-knock .tp-dot').forEach(d => d.classList.remove('on')); }
   function tpKnock() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('sync')) return;
     if (editingNow()) return;
     const dots = document.querySelectorAll('#tp-knock .tp-dot');
     if (knock < dots.length) dots[knock].classList.add('on');
@@ -2694,7 +2658,7 @@ return; /* Disabled in this personal version. */
   let tpFlowTimer = null;
   function tpPickFade() { const el = document.getElementById('tp-status'); if (!el) { tpPick(); return; } el.classList.add('fade'); setTimeout(() => { tpPick(); el.classList.remove('fade'); }, 400); }
   function tpStartFlow() {
-return; /* Disabled in this personal version. */ clearTimeout(tpFlowTimer); const tick = () => { tpPickFade(); tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }; tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }
+if (!window.mochiFeatures.enabled('sync')) return; clearTimeout(tpFlowTimer); const tick = () => { tpPickFade(); tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }; tpFlowTimer = setTimeout(tick, 20000 + Math.random() * 20000); }
   function tpStopFlow() { clearTimeout(tpFlowTimer); tpFlowTimer = null; }
   new MutationObserver(() => { if (tpPage.hidden) tpStopFlow(); else { tpPick(); tpStartFlow(); } }).observe(tpPage, { attributes: true, attributeFilter: ['hidden'] });
   document.getElementById('tp-refresh').addEventListener('click', () => { if (editingNow()) return; tpPick(); });
@@ -2730,7 +2694,7 @@ return; /* Disabled in this personal version. */ clearTimeout(tpFlowTimer); cons
   ];
   function ssSendOn() { const s = curStore(); try { return s.get('shenshou-send-chat') !== '0'; } catch (e) { return true; } }
   function ssTry() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('reach')) return;
     if (editingNow()) return;
     const hint = document.getElementById('ss-hint'); if (hint) hint.textContent = '正在伸手…';
     const glow = document.getElementById('ss-glow'); if (glow) glow.classList.add('reach');
@@ -2758,7 +2722,7 @@ return; /* Disabled in this personal version. */
   }
   // 他主动碰你：进页面时按概率 / 久未进去后高概率，留一道光痕 + 一句悄悄话
   function ssMaybePassive() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('reach')) return;
     const s = curStore(); if (!s) return;
     let last = 0; try { last = parseInt(s.get('shenshou-last-visit') || '0', 10) || 0; } catch (e) {}
     const gap = Date.now() - last;
@@ -2902,7 +2866,7 @@ return; /* Disabled in this personal version. */
       return grp[1].every(c => window.isDefaultCardOff('water', c));
     } catch (e) { return false; }
   }
-  const WATER_REMINDERS_ENABLED = false; // Personal version: water reminders are disabled.
+  const WATER_REMINDERS_ENABLED = window.mochiFeatures.enabled('water'); // Personal version: water reminders are disabled.
 function waterTaChatSend() {
 if (!WATER_REMINDERS_ENABLED) return false;
     if (waterChatGroupAllOff()) return false;
@@ -3575,7 +3539,7 @@ if (!WATER_REMINDERS_ENABLED) return;
   // 同样受节流影响但与 tick 解耦，谁先到点谁先提醒（都有防重守卫）。
   let pomoNotifyTimer = null;
   function pomoArmNotify() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
     pomoDisarmNotify();
     if (!pomoRunning) return;
     const delay = pomoEndAt - Date.now();
@@ -3591,7 +3555,7 @@ return; /* Disabled in this personal version. */
   }
   function pomoDisarmNotify() { if (pomoNotifyTimer) { clearTimeout(pomoNotifyTimer); pomoNotifyTimer = null; } }
   function pomoStartTick() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
     pomoStopTick();
     pomoTickTimer = setInterval(() => {
       if (!pomoRunning) return;
@@ -3603,7 +3567,7 @@ return; /* Disabled in this personal version. */
   function pomoShowMsg(txt) { const el = document.getElementById('pomo-msg'); if (el) { el.classList.add('fade'); setTimeout(() => { el.textContent = '\u201c' + txt + '\u201d'; el.classList.remove('fade'); }, 200); } }
   function pomoIdleAt(m) { if (pmpActive()) pmpDetach(); pomoRunning = false; pomoRemainMs = 0; pomoEndAt = 0; pomoStopTick(); pomoMode = m; pomoRender(); }
   function pomoComplete() {
-return; /* Disabled in this personal version. */
+if (!window.mochiFeatures.enabled('pomo')) return;
     vibrate([120, 60, 120]);
     // 结束铃声：倒计时到点响一声内置温馨铃（Web Audio 合成、零存储；固定播不跟随联系人音效设置——
     // 番茄钟是闹钟类功能，消息音效静音时也应出声提醒）。AudioContext 已由全局手势解锁，定时器触发可播。

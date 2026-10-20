@@ -1,6 +1,6 @@
 (function () { try {
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('cjian')) return; // Data stays intact while disabled.
 const G = 'xy-home-v2';
 const ROSTER_KEY = 'cjian-roster';
 const STATE_KEY = 'cjian-state';

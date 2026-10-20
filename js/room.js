@@ -1,6 +1,6 @@
 (function () { try {
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('room')) return; // Data stays intact while disabled.
 const KEY = 'room-data';
 const page = document.getElementById('page-room');
 if (!page) return;

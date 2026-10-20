@@ -1,6 +1,6 @@
 (function () { try {
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('garden')) return; // Data stays intact while disabled.
 var s = window.activeStore();
 var page = document.getElementById("page-garden");
 if (!s || !page) return;

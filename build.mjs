@@ -113,7 +113,7 @@ function minifyCss(code) {
 
 // ===== 按顺序拼接样式 / 脚本（顺序即生效顺序） =====
 const cssFiles = ['base.css', 'home.css', 'chat-main.css', 'chat-pages.css', 'market.css', 'group-chat.css', 'setting.css', 'tabbar.css', 'dark.css', 'garden.css', 'memo.css', 'memo-arc.css', 'room.css', 'drift-bottle.css', 'applock.css', 'feature-data.css', 'display-tune.css'];
-const jsFiles = ['device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'garden.js', 'room.js', 'drift-bottle.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data.js', 'pwa.js', 'cjian.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js'];
+const jsFiles = ['feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'garden.js', 'room.js', 'drift-bottle.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data.js', 'pwa.js', 'cjian.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js'];
 
 // ===== PERF-PLAN 阶段 1：JS 外置化（2026-09-18）=====
 // 首开「3.8MB 内联 JS 主线程整段解析执行」是 iOS/中低端安卓卡顿的结构性大头
@@ -135,7 +135,7 @@ const jsFiles = ['device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.
 // · ta-ask/records/p2-features 等当年「保守留 core」的顾虑随 D2 消失：全 defer 下执行
 //   顺序=jsFiles 原序，与单包一致，不存在「core 先行、ext 整体后移」的次序漂移。
 // 改这份清单必须同步看 PERF-PLAN §2 的分级规则与 tools/verify-ext-boot.mjs 裁决门。
-const CORE_KEEP_INLINE = { 'device.js': 1, 'pwa.js': 1 };
+const CORE_KEEP_INLINE = { 'feature-policy.js': 1, 'device.js': 1, 'pwa.js': 1 };
 const extFiles = jsFiles.filter(f => !CORE_KEEP_INLINE[f]);
 const extSet = new Set(extFiles);
 const coreFiles = jsFiles.filter(f => !extSet.has(f));
@@ -397,7 +397,7 @@ const FIX_SENTINELS = [
   {"name":"Personal: preset cards do not require a password","file":"js/card-lock.js","needle":"function isOpen() { return true; }"},
   {"name":"Personal: startup quiz disabled","file":"js/applock.js","needle":"function qaEnabled() { return false; }"},
   {"name":"Personal: default layout has two pages","file":"js/personalize.js","needle":"if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;"},
-  {"name":"Personal: inactive probability categories retained","file":"js/default-cards.js","needle":"const PERSONAL_DISABLED_DCF = [\"garden\",\"cjian\",\"sync\",\"reach\",\"room\",\"water\",\"pomo\",\"fish\",\"drift\"];"},
+  {"name":"Personal: inactive probability categories retained","file":"js/default-cards.js","needle":"const PERSONAL_DISABLED_DCF = window.mochiFeatures.disabledProbabilityKeys();"},
   {"name":"Personal: disabled categories return zero","file":"js/default-cards.js","needle":"if (PERSONAL_DISABLED_DCF.includes(k)) return 0;"},
   {"name":"Personal: iOS PWA top safe area","file":"css/base.css","needle":"padding-top: max(env(safe-area-inset-top, 0px), var(--mochi-safe-top, 0px)) !important;"},
   // ==== 2026-10-01 #1541 用户报「为什么添加联系人 桌面无反应」——探针实证：添加链路全绿，主因＝#1250 存储修复引导（300ms 内）／备份提醒抢开全站单例弹窗把「新建联系人」输入框连操作面板一起顶掉＋新桌面未写 lbl-partner 切过去与默认桌面视觉无差（切了等于没切）====

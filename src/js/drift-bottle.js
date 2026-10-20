@@ -17,7 +17,7 @@
 // 数据按联系人桌面隔离：activeStore() 键 drift-data，IndexedDB 镜像兜底（room/garden 同款）。
 // 入口接线全部在本文件内完成（more-drift 按钮 / 返回键），不改 chat.js。
 (function () {
-return; // Personal version: this feature is disabled; stored data is preserved.
+if (!window.mochiFeatures.enabled('drift')) return; // Data stays intact while disabled.
 
   const KEY = 'drift-data';
   const page = document.getElementById('page-drift');

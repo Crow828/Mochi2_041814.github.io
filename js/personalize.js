@@ -7882,7 +7882,7 @@ function dayVal(k) { return parseInt(store.get(k) || '0', 10) || 0; }
 function todayMine() { return dayVal('day-fish-' + fishDayKey()); }
 function todayTa() { return dayVal('day-fish-ta-' + fishDayKey()); }
 function fishWorkOn(key) {
-return false; // Personal version: fish/work accrual disabled.
+if (!window.mochiFeatures.enabled('fish')) return false;
 try {
 const v = window.replyCfg ? window.replyCfg()[key] : undefined;
 return v === undefined ? true : v === 1;

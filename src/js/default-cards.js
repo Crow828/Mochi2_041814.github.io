@@ -531,8 +531,8 @@
   }
   function dcfEnableSet(on) { try { window.activeStore().set('dcf-enabled', on ? '1' : '0'); } catch (e) {} }
   window.dcfEnabled = dcfEnabled;
-  const PERSONAL_DISABLED_DCF = ["garden","cjian","sync","reach","room","water","pomo","fish","drift"];
-const PERSONAL_LOCKED_DCF = ["garden","cjian","sync","reach","room","water","pomo","fish","drift","piggy"];
+  const PERSONAL_DISABLED_DCF = window.mochiFeatures.disabledProbabilityKeys();
+const PERSONAL_LOCKED_DCF = window.mochiFeatures.lockedProbabilityKeys();
 function dcfVal(k) {
 if (PERSONAL_DISABLED_DCF.includes(k)) return 0;
     // v3.42.x #422：总开关同时覆盖新增的「发到聊天型」功能（checkin/pomo/care/memo/ask）——关总开关即
