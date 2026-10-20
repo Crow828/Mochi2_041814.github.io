@@ -252,28 +252,26 @@ if (dirty) run(); // 强刷回写
 .catch(function () { /* 保留本地兜底 */ });
 })();
 (function () {
-// Personal deployment: enter directly, then run onboarding after stored data is ready.
 const splash = document.getElementById('splash');
 if (splash) splash.remove();
 let entered = false;
 let poll;
 function enterWhenReady() {
-  if (entered || !window.__mochiDataReady) return;
-  entered = true;
-  clearInterval(poll);
-  document.removeEventListener('mochi-restore-done', enterWhenReady);
-  if (window.hydrateLibScopes && ((navigator.deviceMemory || 8) > 4)) {
-    setTimeout(function () {
-      try { Promise.resolve(window.hydrateLibScopes(['own'])).catch(function () {}); } catch (e) {}
-    }, 1500);
-  }
-  try { if (window.mochiContactEntryFlow) window.mochiContactEntryFlow(); } catch (e) {}
+if (entered || !window.__mochiDataReady) return;
+entered = true;
+clearInterval(poll);
+document.removeEventListener('mochi-restore-done', enterWhenReady);
+if (window.hydrateLibScopes && ((navigator.deviceMemory || 8) > 4)) {
+setTimeout(function () {
+try { Promise.resolve(window.hydrateLibScopes(['own'])).catch(function () {}); } catch (e) {}
+}, 1500);
+}
+try { if (window.mochiContactEntryFlow) window.mochiContactEntryFlow(); } catch (e) {}
 }
 document.addEventListener('mochi-restore-done', enterWhenReady);
 poll = setInterval(enterWhenReady, 300);
 enterWhenReady();
 })();
-
 function renderSplashSections(container, sections, opt) {
 if (!container || !Array.isArray(sections)) return;
 const collapsible = !!(opt && opt.collapsible);
@@ -426,22 +424,20 @@ wrap.classList.toggle('is-collapsed');
 buildSplashToc(nl);
 document.dispatchEvent(new Event('mochi-notice-rendered'));
 });
+(function () {
+function moveApps() {
+const target = document.querySelector('.app-grid.p2-grid');
+if (!target) return;
+['eat', 'market', 'giftbox', 'period', 'memo'].forEach(function (id) {
+const app = document.querySelector('.app[data-app="' + id + '"]');
+if (app && app.parentNode !== target) target.appendChild(app);
+});
+}
+function schedule() { moveApps(); setTimeout(moveApps, 300); }
+document.addEventListener('DOMContentLoaded', schedule);
+document.addEventListener('mochi-restore-done', schedule);
+document.addEventListener('contact-switched', schedule);
+if (document.readyState !== 'loading') schedule();
+})();
 if (window.__mochiLoaded) window.__mochiLoaded.push("clock.js");
 } catch (__e) { if (window.__mochiErrLoaded) window.__mochiErrLoaded.push("clock.js"); try { console.error("[JS] clock.js", __e && __e.message || __e); } catch (x) {} if (window.__jsErrors) window.__jsErrors.push("[clock.js] " + String(__e && __e.message || __e)); } })();
-
-// Personal desktop layout: remaining utility apps belong to page two.
-(function () {
-  function moveApps() {
-    const target = document.querySelector('.app-grid.p2-grid');
-    if (!target) return;
-    ['eat', 'market', 'giftbox', 'period', 'memo'].forEach(function (id) {
-      const app = document.querySelector('.app[data-app="' + id + '"]');
-      if (app && app.parentNode !== target) target.appendChild(app);
-    });
-  }
-  function schedule() { moveApps(); setTimeout(moveApps, 300); }
-  document.addEventListener('DOMContentLoaded', schedule);
-  document.addEventListener('mochi-restore-done', schedule);
-  document.addEventListener('contact-switched', schedule);
-  if (document.readyState !== 'loading') schedule();
-})();

@@ -391,7 +391,15 @@ console.log('已复制 PWA 文件 → ' + pwaFiles.join(', ') + '（sw 缓存版
 // 删除型修复（移除某功能/入口）：加 { absent: true }，表示 needle 出现在产物中才报警
 // （防止并行会话/旧缓冲把已移除的代码改回来）。
 // 维护：新增关键修复时在此登记一行 { name, file, needle }（needle 为产物中的特征串）。
+// Retired 11 upstream rules for deliberately removed startup gates and old layout.
 const FIX_SENTINELS = [
+  {"name":"Personal: startup enters after stored data is ready","file":"js/clock.js","needle":"if (entered || !window.__mochiDataReady) return;"},
+  {"name":"Personal: preset cards do not require a password","file":"js/card-lock.js","needle":"function isOpen() { return true; }"},
+  {"name":"Personal: startup quiz disabled","file":"js/applock.js","needle":"function qaEnabled() { return false; }"},
+  {"name":"Personal: default layout has two pages","file":"js/personalize.js","needle":"if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;"},
+  {"name":"Personal: inactive probability categories retained","file":"js/default-cards.js","needle":"const PERSONAL_DISABLED_DCF = [\"garden\",\"cjian\",\"sync\",\"reach\",\"room\",\"water\",\"pomo\",\"fish\",\"drift\"];"},
+  {"name":"Personal: disabled categories return zero","file":"js/default-cards.js","needle":"if (PERSONAL_DISABLED_DCF.includes(k)) return 0;"},
+  {"name":"Personal: iOS PWA top safe area","file":"css/base.css","needle":"padding-top: max(env(safe-area-inset-top, 0px), var(--mochi-safe-top, 0px)) !important;"},
   // ==== 2026-10-01 #1541 用户报「为什么添加联系人 桌面无反应」——探针实证：添加链路全绿，主因＝#1250 存储修复引导（300ms 内）／备份提醒抢开全站单例弹窗把「新建联系人」输入框连操作面板一起顶掉＋新桌面未写 lbl-partner 切过去与默认桌面视觉无差（切了等于没切）====
   { name: '#1541a 自绘弹层占用探测判据（fixed·可见·拦点击·面积过半·z≥80；删或改判据＝引导/备份提醒又开始顶用户正在操作的层，或反过来被桌面问候小卡永久卡死不弹）', file: 'js/device.js', needle: 'rc.width * rc.height < vw * vh * 0.5' },
   { name: '#1541b 存储修复引导开弹前让路自绘弹层（只查 modal-mask＝联系人管理面板里点添加又被引导顶掉）', file: 'js/storage-guide.js', needle: "window.mochiOverlayBusy()) { setTimeout(proceed, 2500); return; }" },
@@ -754,7 +762,6 @@ const FIX_SENTINELS = [
   { name: '#134 拖拽落点排除整组图标网格（app-grid 本身不再作为 dragged）', file: 'js/personalize.js', needle: "dragged.classList.contains('app-grid')) return null;" },
   { name: '#135 idb open() 兜底落地超时（open 挂起→idbRestore 永不完成→开屏卡死，iPad 7 Edge）', file: 'js/idb.js', needle: "reject(new Error('idb open hang'))" },
   { name: '#135 idb open() onblocked 处理（版本升级被旧连接阻塞时永不落地同上）', file: 'js/idb.js', needle: 'req.onblocked' },
-  { name: '#135 开屏 20s 硬保险丝 readyForced（数据未就绪也放行进入，开屏永不死锁）', file: 'js/clock.js', needle: 'readyForced' },
   { name: '#137 miniSafeTop 三级探测链（env 探针→差值→59px 兜底，通话小框永不落进系统状态栏区）', file: 'js/call.js', needle: 'if (!top) top = 59;' },
   { name: '#137 小框显示时抬升 liftMiniIntoSafeArea（5 处显示点统一校正旧坐标）', file: 'js/call.js', needle: 'function liftMiniIntoSafeArea()' },
   { name: '#147 壁纸常驻图层（进出桌面只切 opacity 不清空/重设 backgroundImage，修 iOS 反复主线程解码大图巨卡）', file: 'js/personalize.js', needle: 'const setBgLayerImage = (data) => {' },
@@ -914,7 +921,6 @@ const FIX_SENTINELS = [
   { name: '大备份下载长命 blob URL（anchorDownload 保留到 pagehide/5 分钟才释放，修小米14U Edge 导出「点了下载没反应/没下载完」）', file: 'js/data-backup.js', needle: "addEventListener('pagehide', function h()" },
   { name: 'IDB 连接级错误判定加宽 + iOS 回前台主动重建连接（connLost 补 UnknownError/InternalError/TransactionInactiveError，修 iPhone 16 Pro Safari「存储异常」弹窗每会话必现）', file: 'js/idb.js', needle: 'armFgIdbReset' },
   { name: '开屏数据未就绪不放行（idbRestore 12s 保险丝改派发 mochi-restore-slow 不设 __mochiDataReady，修"没加载完就进入数据不全"）', file: 'js/idb.js', needle: 'mochi-restore-slow' },
-  { name: '开屏「仍要进入」逃生口（splash-force-enter，数据超时未就绪时显示，进入提示数据可能不全）', file: 'js/clock.js', needle: 'splash-force-enter' },
   { name: '导出兜底读 memoryCache（idbGetCached，Safari IDB 挂起时导出朋友圈/聊天记录权威值不丢）', file: 'js/idb.js', needle: 'idbGetCached' },
   { name: '#118 邀请TA .ti-type 固定 92px 同行 ta-ask（添加表单 1 行排版，修 select 独占一行 + input 换行的 2 行「变形」布局）', file: 'css/chat-pages.css', needle: '.ti-type { flex:0 0 auto; width:92px' },
   { name: '#118 邀请TA .tc-input.ce-box 合成层保护（will-change:transform，搜索/批量导入/邀请话术输入 全 tc-input 输入框防「字出界」，小米15Pro Chrome 既往实测复现族）', file: 'css/chat-pages.css', needle: '.tc-input.ce-box { will-change: transform' },
@@ -953,7 +959,6 @@ const FIX_SENTINELS = [
   { name: '应用锁/开屏问答门根键进 migrateLegacy 排除清单（applock-* 全局根键不被迁进 default 并删根键，否则锁设置每次刷新被搬走=锁失效）', file: 'js/contacts.js', needle: "'applock-qa-en', 'applock-qalist', 'applock-qaskip'," },
   { name: '应用锁设置页开关行（template.html #applock-en，防并行会话把设置入口改丢）', file: 'template.html', needle: 'id="applock-en"' },
   { name: '开屏问答门（applock.js 问答题门禁，防并行会话删除——隐私门即失效）', file: 'js/applock.js', needle: 'applock-qaskip' },
-  { name: '开屏问答门设置行（template.html #applock-qa-en，防并行会话把入口改丢）', file: 'template.html', needle: 'id="applock-qa-en"' },
   { name: '#319 cardlock-state 进 migrateLegacy 排除清单（解锁状态全局根键不被迁进 default 并删根键，否则输对密码刷新后闸门仍全锁）', file: 'js/contacts.js', needle: "'cardlock-state'," },
   { name: '#319 card-lock 存量自愈（被误迁进 default 的解锁状态启动时搬回根键，老用户不用重输密码）', file: 'js/card-lock.js', needle: "localStorage.getItem('xy-home-v2:default:cardlock-state')" },
   { name: '#389 cardlock 解锁状态走 xyStore（写日志+IDB+每键标记+自愈链，修 Edge/荣耀杀进程回滚 localStorage 解锁态退回 locked→密码框重弹，多机型同因零机型分支）', file: 'js/card-lock.js', needle: "addEventListener('mochi-wrj-heal'" },
@@ -992,7 +997,6 @@ const FIX_SENTINELS = [
   { name: '#92 字卡库离页/切作用域/切桌面冲刷（flushCcSave：200KB 大键只走异步 IDB + 120ms 防抖，刷新重进即丢公用/专享表情包上传，华为 P50E Edge 反馈）', file: 'js/chatcard.js', needle: 'function flushCcSave' },
   { name: '#92 切桌面先冲刷字卡库（setActiveContact 在 __activeCid 变更前 ccFlushSave，防 A 桌面待写 120ms 防抖写进 B 桌面键）', file: 'js/contacts.js', needle: "if (window.ccFlushSave) window.ccFlushSave()" },
   { name: '#93 回信后切到「收到的信」tab（submitReply 原 showPage 不 selectMailTab，停在旧 tab 看不到刚回信的来信，红米 K80 Chrome 反馈）', file: 'js/mail.js', needle: "selectMailTab('in');" },
-  { name: '开屏进入门控补页面加载完成（window load 前「点击进入/仍要进入」都不放行，修 GitHub Pages 冷启动"网页还没加载完就能进、进去数据不全"）', file: 'js/clock.js', needle: '正在加载页面…' },
   { name: '#98 TA提问即进提问记录（pushAsk 发卡同步写 pending history + askTs 关联键透传，修"聊天有提问但主页提问记录空"）', file: 'js/ta-ask.js', needle: "status: 'pending'" },
   { name: '#98 chatAskReply 包装层统一写 ta-ask.history（覆盖文字题+单选题点选项两条回答路径，排除 deskCk 查岗卡）', file: 'js/ta-ask.js', needle: '__taAskReplyWrapped' },
   { name: '#98 提问记录待回答标签样式（.tc-li-pending 橙黄标签，TA已提问未回答时显示）', file: 'css/chat-pages.css', needle: 'tc-li-pending' },
@@ -1629,7 +1633,6 @@ const FIX_SENTINELS = [
   // ==== 2026-09-14 #315c 免责声明细化+年龄确认闸门（四条细化文案+18周岁红线+心理援助热线；勾选 xy-home-v2:age-confirmed 后才可进入，clock.js 门控）====
   { name: '#315c 免责细化文案在位（删则退回旧一句话免责：虚构娱乐边界/热线/数据自担全丢）', file: 'template.html', needle: '预先编写的随机代码随机触发' },
   { name: '#315c 年龄确认勾选框·静态锚点（删则开屏无勾选行=免责举证降级为默认已读）', file: 'template.html', needle: 'id="splash-age-check"' },
-  { name: '#315c 年龄确认·clock.js 门控（删 ageOk 判定则未勾选也能进入=闸门失效）', file: 'js/clock.js', needle: "const ok = r && scrolledBottom && ageOk;" },
   // ==== 2026-09-11 #316 聊天记录滚动跳动/闪烁（#199 overflow-anchor:none 连带关掉 Chromium 原生锚定：浏览图片较多历史时上方图片解码撑高无人补偿=内容被推走；解钉动态开回锚定、钉住态维持 none 防 #199 对打）====
   { name: '#316 解钉开滚动锚定·接线（删则用户手动滚动后锚定仍关、图片撑高继续推走视口=聊天记录一直跳；行为断言 tools/verify-chat-anchor.mjs）', file: 'js/chat.js', needle: 'function unpinChatAndAnchor() {' },
   { name: '#316 解钉开滚动锚定·CSS 开关（删则类挂了也不生效，Chromium 锚定回不来；钉住态 #199 none 语义不变）', file: 'css/base.css', needle: '.chat-body.scroll-anchor-auto { overflow-anchor: auto; }' },
@@ -1753,7 +1756,6 @@ const FIX_SENTINELS = [
   // ==== 2026-09-12 #379 连续送心愿单礼物第二件起闪一下就消失（小米15 Pro Chrome 等多机型）====
   { name: '#379 礼物消息去重签名用礼物自身字段（原误用鲜花字段=任意两件礼物签名恒等，60s 窗口内第二件被当相邻重复删）', file: 'js/chat.js', needle: "String(m.giftId || '') + '|' + String(m.giftName || '')" },
   // ==== 2026-09-12 #380 装修换页「今日备忘/心情」刷新回第三页（v3.13.x 一次性迁移写成了每次启动无条件迁移，用户手动换页被打回；小米15 Pro 等多机型）====
-  { name: '#380 memo-row 有布局一律尊重不迁移（删则 v3.13.x 强迁逻辑复活=每次启动把用户手动换页打回第三页）', file: 'js/personalize.js', needle: 'if (lay) return;' },
   // ==== 2026-09-12 #381 拍卖会背包/记录浮层显示不全（浮层 absolute 随 .au-stage，未开局 stage 仅 ~30px 列表被裁成一条缝；全机型）====
   { name: '#381 背包/记录浮层转全屏开关（删则浮层又缩回 30px 高的 stage 里显示不全）', file: 'js/auction.js', needle: "overlayEl.classList.toggle('au-ov-fs', !!fs)" },
   { name: '#381 全屏浮层 hidden 救援（.pong-overlay 的 display:flex 压掉 UA [hidden]，#331 同因；删则关不掉全屏背包/记录）', file: 'css/chat-pages.css', needle: '#au-overlay.au-ov-fs[hidden] { display:none; }' },
@@ -1803,7 +1805,6 @@ const FIX_SENTINELS = [
   { name: '#383 getPool 媒体令牌卡不进文字池（删则令牌卡再入池被当文字发出。#943 起四道守卫收成 chatHasMediaPayload 一条统一判据，锚点随新写法、语义只强不弱）', file: 'js/chat.js', needle: 'if (typeof c === \'string\' && chatHasMediaPayload(c)) return;' },
   { name: '#383 归一化裸令牌 text 补 type=image（删则存量乱码消息永停留文字气泡。#943 起该判据收口到 chatIsImgSrcLike，锚点收到「令牌＝图片引用」这一条必然存在的分支）', file: 'js/chat.js', needle: 'if (window.mochiMediaIsToken && window.mochiMediaIsToken(s)) return true;' },
   // ==== 2026-09-13 #384 开屏点击进入后强制观看公告（作者道别公告：二传二改/月底停更/二级密码）——每次进入先弹 #splash-mandatory，必须滑到底、点【我已阅读并确认进入】才真正进入；门控=未到底时确认按钮 is-disabled 不可点（clock.js mandBottom/finishEnter） ====
-  { name: '#384 强制公告滑到底才可确认进入（删则强制公告可跳过，进入不再必读）', file: 'js/clock.js', needle: 'if (mandBottom) finishEnter();' },
   // ==== 2026-09-13 #385 联系人消息乱码·令牌夹在文字中间直出（续 #383）——#383 只治「整条 text 是裸令牌」（normCell 升 type=image）；多字卡回复 pickN.join(' ') 拼出的混合文本消息里 @@m:hash 嵌在正文中间，type 仍 text，渲染端 escTxtBr 原样铺出令牌串＝乱码（聊天/群聊公用库共享多机型全现）。消费者边界（气泡渲染）统一把内嵌 @@m:<hash32> 行内转 <img>，交 media-pool 观察器解图，存量/新收/任一浏览器不再直出令牌串 ====
   { name: '#385 内嵌令牌转行内图·chat 助手核心逻辑（split 令牌正则——删则令牌串不再转 <img>/<img class=msg-inline-tok> 直出乱码。#948 起同一条 split 并切内联 dataURL 载荷，锚点取两者共同前缀（data: 分支改大小写显式字符类，故不锚其后缀））', file: 'js/chat.js', needle: 's.split(/(@@m:[0-9a-f]{32}|' },
   { name: '#385 chat 文本气泡渲染调用内嵌令牌助手（删调用则助手在但不用，混合乱码消息仍直出令牌串）', file: 'js/chat.js', needle: 'window.mochiInlineTextHtml(T(__rawText))' },
@@ -3220,7 +3221,6 @@ const FIX_SENTINELS = [
   { name: '#661b 开屏慢≠bug 独立成章·离线兜底（删掉＝断网/弱网用户看不到这章；#1455 重锚：章已按 #864 迁「设置→关于」，锚收到开屏 loading 提示的同义句）', file: 'template.html', needle: "设备越旧、数据越多都会更慢，属正常，不是坏了" },
   // #1455 退役：#1216 起开屏「必读摘要块」已撤除（template.html 注释明写指路走第一页目录），splash-hl 该块不存在
   // #1455 退役：同 #661a，#864 精简后 notice.json 已无该章与摘要高亮
-  { name: '#661c 开屏等得较久时就地解释原因（删掉/改判据＝只剩「数据较多，仍在加载…」，用户依旧不知道这是正常等待）', file: 'js/clock.js', needle: 'loadingSubEl.hidden = !(loadingShown && ((!ready() && slow) || (r && !loaded())));' },
   // ===== #660（2026-09-17 用户直派）聊天设置新增「输入栏按钮位置」——统一管理底部输入栏
   //   这一排的左右顺序（含开关型的 录音/继续说/批量发送 与 输入框本身；发送固定最右）。
   //   位置与显隐是两套独立配置：开关只管显不显示、本项只管排在哪里，互不覆盖。
@@ -6282,7 +6282,6 @@ const FIX_SENTINELS = [
   { name: '#1484f 轮询腿收口解除武装（删＝同上，轮询复原腿）', file: 'js/mobile-adapt.js', needle: 'if (_vkC) _vkC.overlaysContent = false;' },
   // ==== 2026-09-30 #1497 二级密码还原同码 990815＋每次加载重新上锁（作者推翻 #1495 分码口径，原话「我一直都是要同一个密码990815，只是说输两次密码」）：①散列还原 fnv1a('mochi#990815')，开屏锁卡/问答暗号仍同串；②解锁态只活本页生命周期（isOpen＝会话闸 sessionOpen）——每次打开/刷新都回到锁定、须在锁卡重输 990815＝「输两次」（暗号跳问答一次＋二级密码一次），存储 cardlock-state 仅作诊断留痕；③解锁就地生效不刷新（原解锁后 reload 在会话闸下＝解锁即被打回的死循环，已摘）；④全角/夹空白归一化保留（「输对解不开」多机型直因）。#1495a~k 十一针随批退役（分码口径推翻，见 FIX-REGRESSION #1497）；#404 开屏解锁等落库再刷新、#961d 刷新闸门两针同批退役（解锁不再刷新） ====
   { name: '#1497a 同码还原：散列回 990815（删/改＝又变分码或换码）', file: 'js/card-lock.js', needle: "'4240701628'" },
-  { name: '#1511a 解锁态持久化闸（删/改回会话闸＝每次刷新重输回流，作者口径「已解锁就不要每次重新解锁」）', file: 'js/card-lock.js', needle: "return stGet() === 'open'" },
   { name: '#1511b 问答答对一次＝本机永久放行（删＝答对后每次刷新仍重问回流）', file: 'js/applock.js', needle: '已解锁：本机以后不再问答' },
   { name: '#1497b 全角/夹空白归一化接入散列（删＝全角数字输入解锁不了回流＝「输对也解不开」多机型直因）', file: 'js/card-lock.js', needle: "fnv1a('mochi#' + normCode(pw))" },
   { name: '#1497e 暗号通路归一化（删＝跳问答/关应用锁/管理验证三入口全角输入照旧解不开）', file: 'js/applock.js', needle: 'function normCode(v) {' },
@@ -6334,8 +6333,6 @@ const FIX_SENTINELS = [
   { name: "#1443e2 点击按归属路由（改回裸 enterChat＝跨桌面查岗／贴贴申请点进去仍是当前桌面，「点进去却没有」复发）", file: "js/bg-keep.js", needle: "function notifyRoute(entry) {" },
   { name: "#1443e3 回收后开机补投的读出口（删＝点击落在页面还没挂 message 监听的空档里被吞，「点了通知什么也没发生」复发）", file: "js/bg-keep.js", needle: "window.xyPendingNotifyClick = function () {" },
   // ==== v8.56 #1475 免责声明存证＋标准条款批——同意记录改存「时间戳＋声明版本」JSON（改版自动重确认）＋免责卡补「按现状无担保／免费无对价／可分割性／第三方托管」＋第 3 条强化（后果自担自行负责＋最大范围内无论何种原因免责）；README/设置→关于/第15章三处同批同步 ====
-  { name: '#1475a 同意存证写入口（删＝勾选后退回裸 1，无时间无版本，改版重确认与事后举证双双失效）', file: 'js/clock.js', needle: 'JSON.stringify({ t: Date.now(), v: AGE_VER })' },
-  { name: '#1475b 声明版本比对闸（删＝免责声明改版后旧确认仍放行＝re-consent 失效，用户永远停在旧版本的同意上）', file: 'js/clock.js', needle: 'ageOk = !!(obj && obj.v === AGE_VER);' },
   { name: '#1475c 免责卡「按现状提供＋无担保」条款在位（删＝AS-IS 无担保与第三方托管免责整条丢失；needle 取开屏卡特有措辞，设置→关于同条为有意微差的另一形态）', file: 'template.html', needle: '不作任何形式的明示或默示保证，包括但不限于持续可用' },
   { name: '#1475d 同意记录根键免迁移（漏登记＝migrateLegacy 每次启动把 age-confirmed 搬进 default 并删根键＝改版重确认退化成每次开屏都重确认，#315c 起的存量隐性 bug）', file: 'js/contacts.js', needle: "'age-confirmed']" },
   { name: '#1471a 功能大全跨页链尾步延后落点（删＝切宿主页的异步收层把同一拍点开的面板收走＝「跳过去了面板没开」复发，功能大全→猜拳实测）', file: 'js/feature-hub.js', needle: "const crossPage = it.go.length > 1 && it.go[0].indexOf('[data-app=') >= 0;" },

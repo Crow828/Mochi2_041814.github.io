@@ -1,7 +1,6 @@
 (function () { try {
 (function () {
 return; // Personal version: this feature is disabled; stored data is preserved.
-
 const KEY = 'drift-data';
 const page = document.getElementById('page-drift');
 if (!page) return;

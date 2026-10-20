@@ -473,13 +473,13 @@ function dcfRefreshUI(k) {
 dcfSteppers(k).forEach(function (st) {
 const valEl = dcValEl(st);
 if (PERSONAL_LOCKED_DCF.includes(k)) {
-        if (valEl) { if (valEl.tagName === 'INPUT') valEl.type = 'text'; valEl.value = '—'; valEl.readOnly = true; valEl.setAttribute('aria-label', k === 'piggy' ? '暂不调整' : '已停用'); }
-        st.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-        st.style.marginLeft = 'auto'; st.style.flexShrink = '0';
-        st.title = k === 'piggy' ? '暂不调整：存钱罐保持运行，保留原概率' : '此功能已停用，原概率保留';
-        const row = st.closest('.gs-row');
-        if (row && !row.querySelector('.personal-feature-state')) { const tip = document.createElement('small'); tip.className = 'personal-feature-state'; tip.textContent = k === 'piggy' ? '（暂不调整）' : '（已停用）'; const label = row.querySelector(':scope > span'); if (label) label.appendChild(tip); else row.insertBefore(tip, st);  }
-      } else if (valEl) valEl.value = String(dcfRaw(k));
+if (valEl) { if (valEl.tagName === 'INPUT') valEl.type = 'text'; valEl.value = '—'; valEl.readOnly = true; valEl.setAttribute('aria-label', k === 'piggy' ? '暂不调整' : '已停用'); }
+st.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+st.style.marginLeft = 'auto'; st.style.flexShrink = '0';
+st.title = k === 'piggy' ? '暂不调整：存钱罐保持运行，保留原概率' : '此功能已停用，原概率保留';
+const row = st.closest('.gs-row');
+if (row && !row.querySelector('.personal-feature-state')) { const tip = document.createElement('small'); tip.className = 'personal-feature-state'; tip.textContent = k === 'piggy' ? '（暂不调整）' : '（已停用）'; const label = row.querySelector(':scope > span'); if (label) label.appendChild(tip); else row.insertBefore(tip, st);  }
+} else if (valEl) valEl.value = String(dcfRaw(k));
 });
 }
 window.dcfRefreshUI = dcfRefreshUI;
@@ -510,17 +510,14 @@ dcfRefreshUI(k);
 });
 }
 bindDcfProb();
-
-// Keep usable categories first and retired categories last, preserving relative order.
 ['dcp-fun-box', 'dcf-prob-box'].forEach(function (id) {
-  const box = document.getElementById(id);
-  if (!box) return;
-  const rows = Array.from(box.children).filter(function (row) { return row.classList.contains('gs-row') && row.querySelector('.stepper'); });
-  const keyOf = function (row) { const st = row.querySelector('.stepper'); return st.getAttribute('data-dcfkey') || st.id.replace(/^dcf-prob-/, '').replace(/-rs$/, ''); };
-  const anchor = rows.length ? rows[rows.length - 1].nextSibling : null;
-  rows.filter(function (row) { return !PERSONAL_DISABLED_DCF.includes(keyOf(row)); }).concat(rows.filter(function (row) { return PERSONAL_DISABLED_DCF.includes(keyOf(row)); })).forEach(function (row) { box.insertBefore(row, anchor); });
+const box = document.getElementById(id);
+if (!box) return;
+const rows = Array.from(box.children).filter(function (row) { return row.classList.contains('gs-row') && row.querySelector('.stepper'); });
+const keyOf = function (row) { const st = row.querySelector('.stepper'); return st.getAttribute('data-dcfkey') || st.id.replace(/^dcf-prob-/, '').replace(/-rs$/, ''); };
+const anchor = rows.length ? rows[rows.length - 1].nextSibling : null;
+rows.filter(function (row) { return !PERSONAL_DISABLED_DCF.includes(keyOf(row)); }).concat(rows.filter(function (row) { return PERSONAL_DISABLED_DCF.includes(keyOf(row)); })).forEach(function (row) { box.insertBefore(row, anchor); });
 });
-
 const DCF_DESC = {
 fish: '【摸鱼】联系人按你摸鱼/钓鱼的进度，在桌面上飘出「摸鱼浮字」打趣你；点击浮字可抓包，抓包会结算 TA 自上次被抓以来涨的全部摸鱼值（TA 补一份总账、你得同额），并在聊天里回应。\n触发时机：页面在前台时每 60 秒检查一次摸鱼值变化，仅在摸鱼值上涨、距上次 ≥45 分钟、当天不超过 12 次时判定；后台不触发。\n概率 = 每次判定出现浮字的概率（默认 35%），0% = 不出现浮字（本页字卡也可逐张关闭）。',
 eat: '【吃饭】到饭点（早 06:30–09:30、午 11:00–13:30、晚 17:00–19:30、夜宵 21:30–23:30）时，联系人主动来聊天提醒你吃饭，并按概率补一句「追问关心」（夜宵时段用夜宵关心话术）。\n触发时机：每 4 分钟判定一次，每个饭点每天只提醒一次，23:00–06:00 静默。主提醒由本功能自带的概率（默认 2%）控制；本项概率只控制提醒之后是否补发追问。\n概率 = 补发追问的概率（默认 35%），0% = 只提醒、不追问。',

@@ -33,6 +33,9 @@ jobs:
       - name: 构建
         run: node build.mjs
 
+      - name: 二改功能验证
+        run: node tools/verify-personal.cjs
+
       - name: Chrome 布局验证
         run: node tools/verify.mjs
 
@@ -44,3 +47,4 @@ jobs:
 
       - name: 全部回归脚本（verify:all 套件，失败可见性报告）
         run: node tools/verify-suite.mjs --tail 12
+

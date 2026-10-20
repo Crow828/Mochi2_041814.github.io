@@ -1,7 +1,6 @@
 (function () { try {
 (function () {
 return; // Personal version: this feature is disabled; stored data is preserved.
-
 var s = window.activeStore();
 var page = document.getElementById("page-garden");
 if (!s || !page) return;

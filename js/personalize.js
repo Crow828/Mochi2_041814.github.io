@@ -5599,12 +5599,11 @@ setTimeout(ensureDeskPeriodP3Order, 200);
 setTimeout(ensureDeskPeriodP3Order, 600);
 document.addEventListener('contact-switched', ensureDeskPeriod);
 function ensureMemoRowP3() {
-    // Optional widget: a saved layout controls placement; default is the component library.
-    if (deskLayout()) return;
-    const node = document.querySelector('[data-desk-widget="memo-row"]');
-    if (node) ensureWidgetPool().appendChild(node);
-  }
-  ensureMemoRowP3();
+if (deskLayout()) return;
+const node = document.querySelector('[data-desk-widget="memo-row"]');
+if (node) ensureWidgetPool().appendChild(node);
+}
+ensureMemoRowP3();
 setTimeout(ensureMemoRowP3, 150); // 等 buildDeskPages 的 setTimeout(ensureP3) 补齐第三页后兜底一次
 document.addEventListener('contact-switched', ensureMemoRowP3);
 function ensureP2SecondRowIcons() {

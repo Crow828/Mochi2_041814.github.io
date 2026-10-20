@@ -2200,7 +2200,7 @@ slide.dataset.desk = String(curCnt);
 const grid = document.createElement('div');
 grid.className = 'app-grid';
 grid.setAttribute('data-app', 'tp-page');
-   grid.appendChild(eatApp);  
+grid.appendChild(eatApp);
 slide.appendChild(grid);
 pagesBox.appendChild(slide);
 try {
@@ -2216,7 +2216,6 @@ if (!placed) {
 const p2Grid = document.querySelector('.app-grid.p2-grid');
 const p3g = document.querySelector('.app-grid.p3-grid');
 if (p2Grid) {
- 
 } else if (p3g) {   }
 if (p3g) {  p3g.appendChild(eatApp);   }
 else if (p2Grid) {  p2Grid.appendChild(eatApp);   }

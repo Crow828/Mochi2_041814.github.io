@@ -1,7 +1,6 @@
 (function () { try {
 (function () {
 return; // Personal version: this feature is disabled; stored data is preserved.
-
 const G = 'xy-home-v2';
 const ROSTER_KEY = 'cjian-roster';
 const STATE_KEY = 'cjian-state';

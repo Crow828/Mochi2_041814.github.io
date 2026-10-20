@@ -70,29 +70,15 @@ res: [/^divine-/, /^divf-/] },
 { id: 'music', name: '音乐', group: '桌面功能', scope: 'global', anchor: 'default', page: 'page-music',
 desc: '本地上传的音乐文件、歌单、收藏、播放顺序与播放记录（所有桌面共用一份）',
 res: [/^music-/] },
-
-
-
-
 { id: 'eat', name: '吃什么', group: '桌面功能', scope: 'desk', page: 'page-eat',
 desc: '菜单、抽取历史与提醒开关',
 res: [/^eat-/] },
-
-
 { id: 'checkin', name: '打卡与查岗记录', group: '桌面功能', scope: 'desk', page: 'page-checkin',
 desc: '打卡记录与历史、查岗卡片状态、连续天数',
 res: [/^checkin-/, /^ck-/, /^ck-off-/, /^ckq-/, /^checkin$/] },
 { id: 'loc', name: '定位', group: '桌面功能', scope: 'desk', page: 'page-loc-cards',
 desc: '定位历史、气泡与特效开关、自动定位、定位组合',
 res: [/^loc-/, /^loc-auto/, /^loc-sense/] },
-
-
-
-
-
-
-
-
 { id: 'gift', name: '礼物与集市', group: '桌面功能', scope: 'both', page: 'page-market',
 desc: '礼物盒、集市商品与自定义、钱包与心愿单、每日购买额度',
 res: [/^gift-/, /^market-/, /^giftbox-items$/, /^ml2_/, /^rp-wallet$/, /^wl-/, /^gift-wishlist/] },
