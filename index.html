@@ -10450,6 +10450,18 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .gc-set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
 </style>
 <style id="retired-feature-style">#page-garden,#page-cjian,#page-tongpin,#page-shenshou,#page-room,#page-water,#page-pomo,#page-drift{display:none!important}</style>
+<style id="personal-ios-top-fix">
+/* Personal iOS PWA fix: reserve the system status-bar area at the app shell,
+   including pages that hide the simulated status bar. Do not double-inset headers. */
+@supports (-webkit-touch-callout: none) {
+  html.ios-pwa-standalone .phone {
+    box-sizing: border-box;
+    padding-top: max(env(safe-area-inset-top, 0px), var(--mochi-safe-top, 0px)) !important;
+  }
+  html.ios-pwa-standalone .phone .statusbar { padding-top: 14px !important; }
+  html.ios-pwa-standalone .phone .page.full .chat-head { padding-top: 10px !important; }
+}
+</style>
 </head>
 <body>
   <!-- 开屏加载动画 -->

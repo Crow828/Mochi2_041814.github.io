@@ -1594,3 +1594,14 @@ img.media-tok-missing { background: rgba(0,0,0,.06); min-width: 48px; min-height
 
 /* FIX 2026-09-20 #913 手机发烫收口②：切后台全局暂停动画的落点（mobile-adapt.js 在 document.hidden 时挂类；回前台移除即刻恢复） */
 body.mochi-bg-pause *, body.mochi-bg-pause *::before, body.mochi-bg-pause *::after { animation-play-state: paused !important; }
+
+/* Personal iOS PWA fix: reserve the system status-bar area at the app shell,
+   including pages that hide the simulated status bar. Do not double-inset headers. */
+@supports (-webkit-touch-callout: none) {
+  html.ios-pwa-standalone .phone {
+    box-sizing: border-box;
+    padding-top: max(env(safe-area-inset-top, 0px), var(--mochi-safe-top, 0px)) !important;
+  }
+  html.ios-pwa-standalone .phone .statusbar { padding-top: 14px !important; }
+  html.ios-pwa-standalone .phone .page.full .chat-head { padding-top: 10px !important; }
+}
