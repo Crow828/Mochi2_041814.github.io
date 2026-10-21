@@ -3944,7 +3944,10 @@ window.mochiViewportForm = function (sig) {
   // 常驻监视：仅 iOS 主屏幕/全屏形态才有意义？不只——浏览器形态同样适用（缩放/底裁）。
   // 每 5s 一次轻量采集；✗ 形态签名变化（出现/消失/换形态）才算一次事件。
   let _sdLastBad = '', _sdPend = null;
+  // Personal performance trial: diagnostics run only from the manual settings entry.
+  const AUTO_SCREEN_DIAG = false;
   function sdTick() {
+    if (!AUTO_SCREEN_DIAG) return;
     try {
       if (document.visibilityState !== 'visible') return;
       if (!window.__collectScreenDiag) return;
@@ -3978,26 +3981,26 @@ window.mochiViewportForm = function (sig) {
       _sdPend = { sig: bad, names: badNames.join('、'), snap: sdSnapOf(r, 'auto') };
     } catch (e2) {}
   }
-  setInterval(sdTick, 5000);
+  if (AUTO_SCREEN_DIAG) setInterval(sdTick, 5000);
   // #209：事件沿捕获——5s 轮询会漏瞬态（切后台回来 innerHeight 短报整屏、旋转中
   // 态等，#208 守卫注释里的 21:32 瞬态即轮询空窗撞上的），resize/vv resize/旋转/
   // 回前台各补一次 1.2s 去抖采集，与轮询走同一套键盘守卫+签名去重
   let _sdEdgeT = null;
-  function sdEdge() { clearTimeout(_sdEdgeT); _sdEdgeT = setTimeout(sdTick, 1200); }
-  try { window.addEventListener('resize', sdEdge); } catch (e3) {}
-  try { if (window.visualViewport) window.visualViewport.addEventListener('resize', sdEdge); } catch (e4) {}
-  try { window.addEventListener('orientationchange', sdEdge); } catch (e5) {}
+  function sdEdge() { if (!AUTO_SCREEN_DIAG) return; clearTimeout(_sdEdgeT); _sdEdgeT = setTimeout(sdTick, 1200); }
+  if (AUTO_SCREEN_DIAG) try { window.addEventListener('resize', sdEdge); } catch (e3) {}
+  if (AUTO_SCREEN_DIAG) try { if (window.visualViewport) window.visualViewport.addEventListener('resize', sdEdge); } catch (e4) {}
+  if (AUTO_SCREEN_DIAG) try { window.addEventListener('orientationchange', sdEdge); } catch (e5) {}
   // FIX 2026-09-20 #917：切后台即断二次确认配对——_sdLastBad/_sdPend 跨后台存活时，
   // 回前台首个 tick 会拿「后台前那次坏签名」直接确认入环，入的是过期快照数值（长时间
   // 后台后尤其失真）。清零后回前台需两次连续 tick（≥5s、均为回前台后的真实几何）才
   // 入环——真故障只晚报 5s，跨后台拼出来的假确认不再出现。
   function sdPendBreak() { _sdLastBad = ''; _sdPend = null; }
-  try { document.addEventListener('visibilitychange', function () {
+  if (AUTO_SCREEN_DIAG) try { document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') { sdEdge(); return; }
     sdPendBreak();
     window.__mochiLeaveSnap('hide');
   }); } catch (e6) {}
-  try { window.addEventListener('pagehide', function () { window.__mochiLeaveSnap('hide'); }); } catch (e7) {}
+  if (AUTO_SCREEN_DIAG) try { window.addEventListener('pagehide', function () { window.__mochiLeaveSnap('hide'); }); } catch (e7) {}
   // v3.27.x：离开抢拍——#209 K70 实锤「停靠残留只存在于切页前最后一帧」（切页
   // syncChrome blur 即自愈），5s 轮询与事件沿都采不到。tabs.js 在把页面 hidden 之前、
   // 以及上方 hidden/pagehide 时刻同步调本钩子：坏形态当场存档（trig=switch/hide），
@@ -4005,6 +4008,7 @@ window.mochiViewportForm = function (sig) {
   // （停靠中内联高合法，采了必误报，与 sdTick 同守卫）。
   let _sdLeaveT = 0;
   window.__mochiLeaveSnap = function (trig) {
+    if (!AUTO_SCREEN_DIAG) return;
     try {
       const now = Date.now();
       if (now - _sdLeaveT < 3000) return;
@@ -4031,7 +4035,7 @@ window.mochiViewportForm = function (sig) {
   // syncChrome 的观察器——同一 hidden 变更的微任务检查点里先执行＝blur 自愈前
   // 现场；覆盖不经 tabs.js 的 JS 直切页（各模块 openXxx/返回）。与上面钩子共用
   // 3s 限频，先到先采。
-  try {
+  if (AUTO_SCREEN_DIAG) try {
     const sdPgMo = new MutationObserver(function () { window.__mochiLeaveSnap('switch'); });
     document.querySelectorAll('.page').forEach(function (p) { sdPgMo.observe(p, { attributes: true, attributeFilter: ['hidden'] }); });
   } catch (e9) {}

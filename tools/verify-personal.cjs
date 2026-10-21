@@ -17,6 +17,7 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  for(const width of [390,440]){
  const page=await browser.newPage({viewport:{width,height:956},serviceWorkers:'block'});
  await page.addInitScript(()=>{window.__sfxContexts=0;const Base=window.AudioContext||window.webkitAudioContext;if(Base){const Wrapped=new Proxy(Base,{construct(target,args,newTarget){if(new Error().stack.includes('/js/sfx.js'))window.__sfxContexts++;return Reflect.construct(target,args,newTarget)}});if(window.AudioContext)window.AudioContext=Wrapped;if(window.webkitAudioContext)window.webkitAudioContext=Wrapped;}});
+ await page.addInitScript(()=>{window.__automaticDiagTimers=0;const original=window.setInterval;window.setInterval=function(fn,ms,...args){if(fn&&fn.name==='sdTick')window.__automaticDiagTimers++;return original.call(this,fn,ms,...args);};});
  await page.goto('http://127.0.0.1:'+server.address().port+'/');
  await page.waitForFunction(()=>window.__mochiDataReady && window.dcfGet && window.mochiFeatureData,{},{timeout:30000}).catch(async()=>{await page.waitForFunction(()=>window.__mochiDataReady && window.dcfGet,{},{timeout:30000});});
  await page.waitForTimeout(700);
@@ -114,6 +115,22 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  });
  assert.equal(membership.renamed,'新名称');assert(membership.removed);assert.equal(membership.oldOffset,90);assert.equal(JSON.parse(membership.archive).saved,'ARCHIVE_TO_KEEP');assert.equal(membership.foreign,'[]');
  console.log('PASS retired modules absent, independent usage days, legacy data and shared wallet/archive retained at '+width+'px');
+
+ await page.evaluate(()=>{
+   window.__automaticScreenSamples=0;const original=window.__collectScreenDiag;
+   window.__collectScreenDiag=function(...args){window.__automaticScreenSamples++;return original.apply(this,args);};
+   for(const name of ['page-phone','page-chatcard','page-setting'])document.querySelector('.tabbar [data-page="'+name+'"]').click();
+   window.__mochiLeaveSnap('switch');window.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('orientationchange'));
+ });
+ await page.waitForTimeout(5300);
+ const diagnostic=await page.evaluate(()=>{
+   const count=window.__automaticScreenSamples;const report=window.__collectScreenDiag();
+   const row=document.getElementById('row-screen-diag');row.click();
+   return {timers:window.__automaticDiagTimers,automatic:count,manual:!!(report&&report.inp&&report.findings&&report.text),topFix:[...document.querySelectorAll('style')].some(x=>x.textContent.includes('html.ios-pwa-standalone .phone'))};
+ });
+ assert.equal(diagnostic.timers,0);assert.equal(diagnostic.automatic,0);assert(diagnostic.manual);assert(diagnostic.topFix);
+ await page.waitForFunction(()=>{try{return JSON.parse(localStorage.getItem('xy-home-v2:screen-diag-hist')||'[]').some(x=>x.trig==='manual');}catch(e){return false;}},{},{timeout:10000});
+ console.log('PASS no automatic screen sampling, manual diagnostic entry and iOS top fix retained at '+width+'px');
  console.log('PASS personal desktop and probability behavior at '+width+'px');await page.close();
  }
  // Restore one feature only in an isolated browser context, without changing project files.

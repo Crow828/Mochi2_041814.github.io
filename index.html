@@ -10042,7 +10042,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792603786794" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792608432704" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -19694,7 +19694,9 @@ localStorage.setItem(SD_ERR_KEY, JSON.stringify(arr));
 } catch (e1) {}
 }
 let _sdLastBad = '', _sdPend = null;
+const AUTO_SCREEN_DIAG = false;
 function sdTick() {
+if (!AUTO_SCREEN_DIAG) return;
 try {
 if (document.visibilityState !== 'visible') return;
 if (!window.__collectScreenDiag) return;
@@ -19718,21 +19720,22 @@ sdArchive(r, 'auto');
 _sdPend = { sig: bad, names: badNames.join('、'), snap: sdSnapOf(r, 'auto') };
 } catch (e2) {}
 }
-setInterval(sdTick, 5000);
+if (AUTO_SCREEN_DIAG) setInterval(sdTick, 5000);
 let _sdEdgeT = null;
-function sdEdge() { clearTimeout(_sdEdgeT); _sdEdgeT = setTimeout(sdTick, 1200); }
-try { window.addEventListener('resize', sdEdge); } catch (e3) {}
-try { if (window.visualViewport) window.visualViewport.addEventListener('resize', sdEdge); } catch (e4) {}
-try { window.addEventListener('orientationchange', sdEdge); } catch (e5) {}
+function sdEdge() { if (!AUTO_SCREEN_DIAG) return; clearTimeout(_sdEdgeT); _sdEdgeT = setTimeout(sdTick, 1200); }
+if (AUTO_SCREEN_DIAG) try { window.addEventListener('resize', sdEdge); } catch (e3) {}
+if (AUTO_SCREEN_DIAG) try { if (window.visualViewport) window.visualViewport.addEventListener('resize', sdEdge); } catch (e4) {}
+if (AUTO_SCREEN_DIAG) try { window.addEventListener('orientationchange', sdEdge); } catch (e5) {}
 function sdPendBreak() { _sdLastBad = ''; _sdPend = null; }
-try { document.addEventListener('visibilitychange', function () {
+if (AUTO_SCREEN_DIAG) try { document.addEventListener('visibilitychange', function () {
 if (document.visibilityState === 'visible') { sdEdge(); return; }
 sdPendBreak();
 window.__mochiLeaveSnap('hide');
 }); } catch (e6) {}
-try { window.addEventListener('pagehide', function () { window.__mochiLeaveSnap('hide'); }); } catch (e7) {}
+if (AUTO_SCREEN_DIAG) try { window.addEventListener('pagehide', function () { window.__mochiLeaveSnap('hide'); }); } catch (e7) {}
 let _sdLeaveT = 0;
 window.__mochiLeaveSnap = function (trig) {
+if (!AUTO_SCREEN_DIAG) return;
 try {
 const now = Date.now();
 if (now - _sdLeaveT < 3000) return;
@@ -19750,7 +19753,7 @@ if (!r.findings.some(function (f) { return !f.ok; })) return;
 sdArchive(r, trig === 'hide' ? 'hide' : 'switch');
 } catch (e8) {}
 };
-try {
+if (AUTO_SCREEN_DIAG) try {
 const sdPgMo = new MutationObserver(function () { window.__mochiLeaveSnap('switch'); });
 document.querySelectorAll('.page').forEach(function (p) { sdPgMo.observe(p, { attributes: true, attributeFilter: ['hidden'] }); });
 } catch (e9) {}
@@ -21687,4 +21690,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 <!-- __MOCHI_EOF__ -->
 </body>
 </html>
-<!-- __MOCHI_EOF__ mvie0e96 -->
+<!-- __MOCHI_EOF__ mvigrz28 -->
