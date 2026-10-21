@@ -65,7 +65,7 @@ const ok = (n, c, d) => { c ? R.pass++ : R.fail++; R.lines.push((c ? '  ✅ ' : 
 
 // ---------- S 组：产物源锚 ----------
 {
-  const fd = (() => { try { return readFileSync(join(root, 'js/feature-data.js'), 'utf8'); } catch (e) { return ''; } })();
+  const fd = ['js/feature-data.js','js/feature-data-catalog.js'].map(file => { try { return readFileSync(join(root, file), 'utf8'); } catch (e) { return ''; } }).join('\n');
   ok('S0 被测产物里有 feature-data（js/feature-data.js 非空）', fd.length > 3000, 'len=' + fd.length);
   ok('S1 共享命名空间判据在位（顶层＋登记表点名的那一格，不再等同顶层）',
     fd.includes("function isSharedNs(f, info) { return info.cid === null || (!!f.anchor && info.cid === f.anchor); }"));

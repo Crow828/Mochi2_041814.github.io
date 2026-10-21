@@ -113,7 +113,7 @@ function minifyCss(code) {
 
 // ===== 按顺序拼接样式 / 脚本（顺序即生效顺序） =====
 const cssFiles = ['base.css', 'home.css', 'chat-main.css', 'chat-pages.css', 'market.css', 'group-chat.css', 'setting.css', 'tabbar.css', 'dark.css', 'garden.css', 'memo.css', 'memo-arc.css', 'room.css', 'drift-bottle.css', 'applock.css', 'feature-data.css', 'display-tune.css'];
-const jsFiles = ['feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'garden.js', 'room.js', 'drift-bottle.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data.js', 'pwa.js', 'cjian.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js'];
+const jsFiles = ['feature-policy-config.js', 'feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'garden.js', 'room.js', 'drift-bottle.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data-catalog.js', 'feature-data.js', 'pwa.js', 'cjian.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js'];
 
 // ===== PERF-PLAN 阶段 1：JS 外置化（2026-09-18）=====
 // 首开「3.8MB 内联 JS 主线程整段解析执行」是 iOS/中低端安卓卡顿的结构性大头
@@ -135,7 +135,7 @@ const jsFiles = ['feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'app
 // · ta-ask/records/p2-features 等当年「保守留 core」的顾虑随 D2 消失：全 defer 下执行
 //   顺序=jsFiles 原序，与单包一致，不存在「core 先行、ext 整体后移」的次序漂移。
 // 改这份清单必须同步看 PERF-PLAN §2 的分级规则与 tools/verify-ext-boot.mjs 裁决门。
-const CORE_KEEP_INLINE = { 'feature-policy.js': 1, 'device.js': 1, 'pwa.js': 1 };
+const CORE_KEEP_INLINE = { 'feature-policy-config.js': 1, 'feature-policy.js': 1, 'device.js': 1, 'pwa.js': 1 };
 const extFiles = jsFiles.filter(f => !CORE_KEEP_INLINE[f]);
 const extSet = new Set(extFiles);
 const coreFiles = jsFiles.filter(f => !extSet.has(f));
@@ -3398,7 +3398,7 @@ const FIX_SENTINELS = [
   { name: '#679g 功能页显示时重算数据量（删掉＝加了数据后卡上还显示旧项数/旧体积，计数谎报）', file: 'js/feature-data.js', needle: "attributeFilter: ['hidden'], subtree: true" },
   { name: '#679h 重算按「功能登记的 page」匹配页面 id（误写成 f.id 比较＝重算永不触发，卡上计数长期停在陈旧值）', file: 'js/feature-data.js', needle: 'if (!f.page || f.page !== pageEl.id) return;' },
   { name: '#679i 容器被功能模块整块重写后补挂数据卡（删掉＝打开「我的档案」等页时卡被 innerHTML 冲掉，用户根本看不到入口；实测 #myarc-root 每次打开都重建）', file: 'js/feature-data.js', needle: 'if (!host.isConnected || host.querySelector(\'[data-fbar="\' + f.id + \'"]\')) return;' },
-  { name: '#679j 消息列表型页面不注入数据卡（删掉 gc 跳过＝卡混进群聊消息流、每次渲染被重建，且可能干扰贴底）', file: 'js/feature-data.js', needle: 'var FD_SKIP = { room: 1, gc: 1 };' },
+  { name: '#679j 消息列表型页面不注入数据卡（删掉 gc 跳过＝卡混进群聊消息流、每次渲染被重建，且可能干扰贴底）', file: 'js/feature-data-catalog.js', needle: 'var FD_SKIP = { room: 1, gc: 1 };' },
   { name: '#679f 功能页数据卡样式类（删掉＝卡内按钮裸排无布局，挤压原功能页内容）', file: 'css/feature-data.css', needle: '.fd-fbar { margin:10px 12px; padding:12px 14px; }' },
   // #678 通话中仍被跨桌面来电打扰（OPPO Reno6 5G + 雨见浏览器，明说多机型）：跨桌面来电调度
   //   只看了 layerBusy() 的 #call-mask，通话最小化到小框后该层是 hidden，且浮层让路上限到期会
@@ -5600,7 +5600,7 @@ const FIX_SENTINELS = [
   { name: '#1325a 本站「所有桌面共用一份」有两个落点，判据一把量完（顶层根键＋登记表点名的那一格；旧写法把 global 直接等同顶层，音乐那种硬用默认桌面命名空间当公共库的共享数据就永久隐形）', file: 'js/feature-data.js', needle: 'function isSharedNs(f, info) { return info.cid === null || (!!f.anchor && info.cid === f.anchor); }' },
   { name: '#1325b global 分支走这把尺（删＝退回「isTop 才算全局」，音乐那一发报障原样复发）', file: 'js/feature-data.js', needle: "if (f.scope === 'global') { if (isSharedNs(f, info)) return f; continue; }" },
   { name: '#1325c 共享落点由登记表 anchor 说了算（缺省顶层＝其余功能一字不变；写死 G ＝导入永远灌进模块读不到的那一格）', file: 'js/feature-data.js', needle: "function sharedNsOf(f) { return f.anchor ? G + ':' + f.anchor : G; }" },
-  { name: '#1325d 音乐登记的锚点＝默认桌面命名空间（music-player.js:10 MUSIC_PREFIX 与 :11 store=storeFor（default 命名空间） 那条事实搬进登记表；删掉＝计数／导出／清空三扇门再度看不见全部音乐数据）', file: 'js/feature-data.js', needle: "scope: 'global', anchor: 'default'" },
+  { name: '#1325d 音乐登记的锚点＝默认桌面命名空间（music-player.js:10 MUSIC_PREFIX 与 :11 store=storeFor（default 命名空间） 那条事实搬进登记表；删掉＝计数／导出／清空三扇门再度看不见全部音乐数据）', file: 'js/feature-data-catalog.js', needle: "scope: 'global', anchor: 'default'" },
   { name: '#1325e 导入落点走锚点（旧写法把共享键一律改写进顶层＝模块读不到、toast 却报「已导入，正在刷新…」＝第二次静默丢数据）', file: 'js/feature-data.js', needle: "if (f.scope === 'global' || (f.scope === 'both' && info.cid === null)) return { ns: sharedNsOf(f), suffix: info.suffix };" },
   { name: '#1325f 二进制文件体不内联（IDB 里存 Blob 的项字符串化只剩一个空壳对象＝一句假数据混进备份；音频文件体按家族记账并当场说清带不走）', file: 'js/feature-data.js', needle: "if (typeof Blob !== 'undefined' && v instanceof Blob) { bin.push(k); binBytes += v.size || 0; return; }" },
   { name: '#1325g 取值分批＋缺项记账（一次 idbGetMany 读全部＝4s+4s 超时只回部分映射，缺的键被当「没有」静默丢掉而导出照报成功；批量与 data-backup 的 measureProject 同尺）', file: 'js/feature-data.js', needle: "Object.defineProperty(out, 'missing', { value: missing, enumerable: false });" },

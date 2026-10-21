@@ -1680,7 +1680,12 @@
       <!-- #646：打开应用时的入口行为（默认均关闭）——「打开时先进入此间」+「打开时显示联系人列表」+「默认进入的桌面」（contacts.js 接线） -->
       <div class="set-group glass">
         
-        <div class="set-row" id="row-entry-show-list">
+        <div class="set-row" id="row-entry-cjian-first">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M8.5 8.5L12 12l3.5-3.5"/><path d="M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg></div>
+          <div class="txt">打开时先进入此间<span class="sub">每次打开先看此间，返回后再选本次进入哪个桌面</span></div>
+          <label class="toggle"><input type="checkbox" id="entry-cjian-first"><span class="tk"></span></label>
+        </div>
+<div class="set-row" id="row-entry-show-list">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.3" fill="#111111"/><circle cx="3.5" cy="12" r="1.3" fill="#111111"/><circle cx="3.5" cy="18" r="1.3" fill="#111111"/></svg></div>
           <div class="txt">打开时显示联系人列表<span class="sub">每次打开先列出全部联系人，点一个进入其桌面</span></div>
           <label class="toggle"><input type="checkbox" id="entry-show-list"><span class="tk"></span></label>
@@ -1870,7 +1875,12 @@
         <!-- v3.27.x：各功能数据单独管理（feature-data.js）——桌面上每个功能（花园/房间/记账/
              经期/占卜/音乐/小游戏…）各自分开导出/导入/清空，原来只有聊天/朋友圈/信箱三处有。
              整机备份（含全部功能）仍是上面的导出数据/导入数据；这里只针对单个功能。 -->
-        <div class="set-row" id="row-feature-data">
+        <div class="set-row" id="row-fish-days">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></div>
+          <div class="txt">修改摸鱼天数<span class="sub">摸鱼天数＝使用网站的累计天数（当天聊天/打卡等互动记 1 天）；数据丢失清零后在这里手动改回</span></div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+<div class="set-row" id="row-feature-data">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/><path d="M4 11.5v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></div>
           <div class="txt">各功能数据管理<span class="sub">按功能单独导出、导入、清空，互不影响</span></div>
           <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>

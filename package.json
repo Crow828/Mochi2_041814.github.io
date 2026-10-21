@@ -7,7 +7,9 @@
     "verify": "node tools/verify.mjs",
     "verify:webkit": "node tools/verify-webkit.mjs",
     "verify:device": "node tools/verify-device-regression.mjs",
-    "verify:all": "node tools/verify-suite.mjs"
+    "verify:all": "node tools/verify-suite.mjs",
+    "verify:personal": "node tools/verify-personal.cjs",
+    "verify:release": "node tools/verify-release.cjs"
   },
   "devDependencies": {
     "playwright": "^1.62.1"
