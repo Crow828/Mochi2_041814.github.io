@@ -41,7 +41,17 @@ if (_ctx.state === 'suspended') { const p = _ctx.resume(); if (p && p.catch) p.c
 return _ctx;
 } catch (e) { return null; }
 }
-function unlockCtx() { ensureCtx(); }
+function unlockCtx() {
+if (!_ctx) {
+const configured = Object.keys(KEYS).some(function (type) {
+const builtin = store.get(BKEYS[type]);
+const custom = store.get(KEYS[type]);
+return (builtin && builtin !== 'none') || (custom && custom !== 'none');
+});
+if (!configured) return;
+}
+ensureCtx();
+}
 document.addEventListener('touchstart', unlockCtx, { passive: true });
 document.addEventListener('click', unlockCtx, { passive: true });
 document.addEventListener('keydown', unlockCtx);

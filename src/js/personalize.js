@@ -215,9 +215,9 @@
 try {
       document.addEventListener('mochi-restore-done', function () {
         window.applyAvatars();
-        try { syncFishUI(); } catch (e) {}
-        try { if (!gStore.get('fish-log-global-migrated')) migrateFishLogGlobal(true); } catch (e) {}
-        try { updateFishDays(); } catch (e) {}
+
+        try { if (!gStore.get('fish-log-global-migrated')) window.mochiUsageDays.migrate(true); } catch (e) {}
+        try { window.mochiUsageDays.render(); } catch (e) {}
         // v3.5.116：回填完成后一并重绘桌面图标 + 壁纸——
         //   自定义图标/壁纸大键可能只存 IDB，回填完成前桌面显示的是默认/空白
         try { restoreAppIcons(); } catch (e) {}
@@ -6743,7 +6743,7 @@ if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;
   // ===== v3.6.x：卡片自由摆放（装修模式：上移/下移/移除；新增页可添加卡片） =====
   // 组件 id 列表（对应 template.html 中 [data-desk-widget]）；组件节点唯一，
   // 「添加」= 把节点移动到目标页（节点移动不重建，内部事件绑定保留）
-  const WIDGET_IDS = ['deco', 'quote-row', 'checkin', 'apps', 'music', 'p2apps', 'memo-row', 'week', 'weekend', 'desk-clock', 'desk-calendar', 'desk-timer', 'desk-anniv', 'desk-period',
+  const WIDGET_IDS = ['deco', 'quote-row', 'checkin', 'apps', 'music', 'p2apps', 'memo-row', 'week', 'desk-clock', 'desk-calendar', 'desk-timer', 'desk-anniv', 'desk-period',
     'app-chat', 'app-group-chat', 'app-home', 'app-mail', 'app-feed', 'app-calendar', 'app-memory', 'app-divination', 'app-note', 'app-music', 'app-stats', 'app-interact', 'app-checkin', 'p3apps', 'app-period', 'app-accounting', 'app-garden',     'app-tongpin', 'app-shenshou', 'app-water', 'app-eat', 'app-pomo', 'app-cjian', 'app-memo-arc', 'app-my-arc', 'app-room', 'app-piggy', 'app-memo'];
   const WIDGET_NAMES = {
     deco: '纪念日卡', 'quote-row': '今日情话 / 已摸鱼', checkin: '打卡横幅', apps: '功能图标(整组)',
@@ -8162,6 +8162,7 @@ if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;
     const enterMoveMode = () => {
       if (inMoveMode) return;
       inMoveMode = true;
+      setMoveTouchGuard(true);
       enterDecor();
       if (phone) phone.classList.add('desk-move-mode');
       const span = document.querySelector('#decor-bar span');
@@ -8175,6 +8176,8 @@ if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;
     const editLayoutBtn = document.getElementById('decor-edit-layout');
     if (editLayoutBtn) editLayoutBtn.addEventListener('click', enterMoveMode);
     const resetMoveMode = () => {
+      if (!inMoveMode && !dragging && !(phone && phone.classList.contains('desk-move-mode'))) return;
+      setMoveTouchGuard(false);
       inMoveMode = false;
       dragging = false;
       if (phone) phone.classList.remove('desk-move-mode');
@@ -8191,29 +8194,23 @@ if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;
     // 桌面无任何右键功能，全时拦截（含桌面 PC 右键，避免误触发浏览器菜单打断拖拽）
     if (phone) phone.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // touchstart capture 兜底：移动模式下短按即拖，浏览器会按 pan-x pan-y 接管触摸序列→
-    // pointermove 被抢占/翻页→拖不动。在 touchstart capture 阶段 preventDefault，阻止浏览器
-    // 启动 pan-x/pan-y 手势，让 pointer 完整派发。
-    // ⚠️ 必须限 inMoveMode：touchstart 的 preventDefault 会阻止浏览器合成 click 事件，
-    //    非移动模式下若也无条件 preventDefault，桌面所有功能按钮（.app）/卡片点击全部失效
-    //    （v3.10.x 回归：开屏进入后桌面按钮全点不动）。仅在移动模式（编辑布局后短按即拖）才需要。
-    pagesBox.addEventListener('touchstart', (e) => {
+    // Only editing can cancel native touch scrolling. Register blockers for that
+    // explicit mode, rather than making everyday scrolling wait for JS.
+    function blockMoveTouch(e) {
       if (!inMoveMode) return;
       if (e.target.closest('.desk-lib, .desk-page-add, .decor-bar')) return;
       if (!e.target.closest(DESK_SEL_ALL + ', .app')) return;
       e.preventDefault();
-    }, { capture: true, passive: false });
-    // v3.14.x：touchmove capture 兜底——组件已允许 pan-x pan-y（移动模式下桌面横滑翻页），
-    //   长按进移动模式那一下 touchstart 发生时 inMoveMode 还是 false 拦不到，但手指要 350ms
-    //   后才开始移动，第一个 touchmove 到达时 inMoveMode 已是 true——这里 preventDefault 阻止
-    //   浏览器把序列当滚动，长按拖拽不被抢占（否则组件允许 pan 后拖动会被浏览器抢成翻页）。
-    //   限 inMoveMode + 组件目标，不影响移动模式下组件间隙/空白处的正常横滑翻页。
-    pagesBox.addEventListener('touchmove', (e) => {
-      if (!inMoveMode) return;
-      if (e.target.closest('.desk-lib, .desk-page-add, .decor-bar')) return;
-      if (!e.target.closest(DESK_SEL_ALL + ', .app')) return;
-      e.preventDefault();
-    }, { capture: true, passive: false });
+    }
+    function setMoveTouchGuard(on) {
+      if (on) {
+        pagesBox.addEventListener('touchstart', blockMoveTouch, { capture: true, passive: false });
+        pagesBox.addEventListener('touchmove', blockMoveTouch, { capture: true, passive: false });
+      } else {
+        pagesBox.removeEventListener('touchstart', blockMoveTouch, true);
+        pagesBox.removeEventListener('touchmove', blockMoveTouch, true);
+      }
+    }
 
     // 长按检测（事件委托在 pagesBox）
     pagesBox.addEventListener('pointerdown', (e) => {
@@ -8503,144 +8500,6 @@ if (!store.get('desk-layout') && (isNaN(v) || v <= 3)) return 2;
       if (window.exitDecor) window.exitDecor();
     }, true);
   }
-
-  // 已摸鱼天数：按和 TA 打卡或聊天的自然日统计
-  // v3.9.x：改为全局累计（跨所有联系人按自然日去重），避免多联系人下每个桌面只显示各自天数
-  function fishToday() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-  function getFishLog() {
-    try { return JSON.parse(gStore.get('fish-log') || '[]'); } catch (e) { return []; }
-  }
-  // FIX 2026-09-11 #290：摸鱼天数自动修正——天数=fish-log 长度，三种错源里两种可就地修：
-  // ① 虚高（重复日期/脏值混入：读-改-写竞态、旧格式）→ 规范化（只留 YYYY-MM-DD 合法
-  //    日期 + Set 去重），有变化才写回（防无谓写放大）；② 偏低（各联系人命名空间旧
-  //    fish-log 副本迟到：migrateFishLogGlobal 原来只在模块加载跑一次，早于 IDB 回填，
-  //    副本后到就永远漏算）→ 见下方 restore-done/wrj-heal 再合并。③ IDB 旧快照遮蔽
-  //    已由 idb.js retainValue（LS 优先）+ wrj 时间戳守卫兜住，不在此重复设防。
-  function normalizeFishLog() {
-    const seen = new Set();
-    const clean = getFishLog().filter(d =>
-      typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && !seen.has(d) && seen.add(d));
-    const old = getFishLog();
-    if (old.length !== clean.length || old.some((d, i) => d !== clean[i])) {
-      gStore.set('fish-log', JSON.stringify(clean));
-    }
-    return clean;
-  }
-  function logFish() {
-    const list = normalizeFishLog();
-    const t = fishToday();
-    if (list.indexOf(t) === -1) {
-      list.push(t);
-      gStore.set('fish-log', JSON.stringify(list));
-    }
-    updateFishDays();
-  }
-  function updateFishDays() {
-    const el = document.getElementById('fish-days');
-    if (el) el.textContent = normalizeFishLog().length || 0;
-  }
-  window.logFish = logFish; // 供聊天页调用
-  // v3.9.x：一次性迁移——把各联系人命名空间下的旧 fish-log 合并到全局 fish-log（按自然日去重）
-  function migrateFishLogGlobal(setMark) {
-    try {
-      const all = new Set();
-      try { JSON.parse(gStore.get('fish-log') || '[]').forEach(d => all.add(d)); } catch (e) {}
-      const contacts = window.getContacts ? window.getContacts() : [{ id: 'default' }];
-      contacts.forEach(c => {
-        try {
-          const s = window.xyStore('xy-home-v2:' + c.id);
-          JSON.parse(s.get('fish-log') || '[]').forEach(d => all.add(d));
-        } catch (e) {}
-      });
-      if (all.size) gStore.set('fish-log', JSON.stringify(Array.from(all).sort()));
-      if (setMark) gStore.set('fish-log-global-migrated', '1');
-    } catch (e) {}
-  }
-  migrateFishLogGlobal(false); // 模块加载时先合并 LS 已有的
-  updateFishDays();
-  // #290：回填完成/写日志自愈后再合并一次——此时尚未合并进全局键的各联系人旧副本
-  //（只存 IDB、模块加载时还没回填进来）这时才可见；合并后规范化+刷新天数显示。
-  try {
-    function fishLogHeal() {
-      try { migrateFishLogGlobal(false); normalizeFishLog(); updateFishDays(); } catch (e) {}
-    }
-    document.addEventListener('mochi-restore-done', fishLogHeal);
-    document.addEventListener('mochi-wrj-heal', fishLogHeal);
-  } catch (e) {}
-
-  // 兼容旧数据：以前打过卡但未计入摸鱼天数的，自动补记（旧标记视为今天打卡）
-  (function () {
-    const ck = store.get('checkin');
-    if (ck) {
-      const d = ck === '1' ? fishToday() : ck; // 旧格式 '1' -> 今天；新格式为日期
-      const list = getFishLog();
-      if (list.indexOf(d) === -1) {
-        list.push(d);
-        gStore.set('fish-log', JSON.stringify(list));
-        updateFishDays();
-      }
-    }
-  })();
-
-  // ===== v3.27.x #645：修改摸鱼天数（设置 → 工具，#row-fish-days）=====
-  // 背景：fish-log（全局键，天数 = 日期去重个数）遇浏览器丢数据后从 0 重来，
-  // 用户要求能手动改回原天数。走 openModal 数字输入：目标 > 现有 → 在最早一天之前
-  // 往回补连续自然日（真实打卡日全部保留、仍是最近的日子）；目标 < 现有 → 保留最近
-  // n 天（今天/近期打卡日不动）。写回走 gStore.set（内存 + LS + IDB 同链路），
-  // #290 规范化/自愈只做并集合并，不会把这里的结果清掉。
-  (function () {
-    const row = document.getElementById('row-fish-days');
-    if (!row || typeof window.openModal !== 'function') return;
-    const fmtDate = (dt) =>
-      dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-    function fishToast(msg) {
-      let t = document.getElementById('cc-toast');
-      if (!t) { t = document.createElement('div'); t.id = 'cc-toast'; document.body.appendChild(t); }
-      t.textContent = msg;
-      t.className = 'cc-toast'; void t.offsetWidth; t.className = 'cc-toast show';
-      clearTimeout(t._timer);
-      t._timer = setTimeout(() => { t.className = 'cc-toast'; }, 2000);
-    }
-    row.addEventListener('click', function () {
-      const cur = normalizeFishLog().length;
-      const HINT = '当前已摸鱼 ' + cur + ' 天。摸鱼天数＝使用网站的累计天数：当天在站内聊天、打卡或有互动就记 1 天（同一天不重复计）。数据丢失后天数会从 0 重新开始，输入原来的天数即可改回；改回后照常每天 +1。';
-      const ctl = window.openModal('修改摸鱼天数', cur ? String(cur) : '', function (v) {
-        const sv = String(v == null ? '' : v).trim();
-        if (!/^\d+$/.test(sv)) { ctl.hint('请输入 0 起的整数天数'); ctl.stay(); return; }
-        const n = parseInt(sv, 10);
-        if (n > 36500) { ctl.hint('最多 36500 天（约 100 年），别填太大'); ctl.stay(); return; }
-        const list = normalizeFishLog().slice().sort();
-        if (n === list.length) { ctl.hint('现在就是 ' + n + ' 天，没有变化'); ctl.stay(); return; }
-        let out;
-        if (n < list.length) {
-          out = list.slice(list.length - n); // 收缩：丢最旧的，最近 n 天（含今天）不动
-        } else {
-          out = list.slice();
-          let d;
-          if (out.length) {
-            const p = out[0].split('-').map(Number);
-            d = new Date(p[0], p[1] - 1, p[2]); // 非空：在最早一天之前回补，真实打卡日全保留
-          } else {
-            const now = new Date();
-            d = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 空日志（数据丢失场景）：从今天往回补
-            d.setDate(d.getDate() + 1); // 循环先自减再入组，起点设明天＝首个入组日期是今天
-          }
-          for (let i = n - out.length; i > 0; i--) { d.setDate(d.getDate() - 1); out.unshift(fmtDate(d)); }
-        }
-        gStore.set('fish-log', JSON.stringify(out));
-        updateFishDays();
-        fishToast('已改为「已摸鱼 ' + n + ' 天」');
-      }, {
-        inputmode: 'numeric',
-        maxlength: 6,
-        placeholder: cur ? ('当前 ' + cur + ' 天，输入新天数') : '输入目标天数',
-        staticText: HINT
-      });
-    });
-  })();
 
   // ===== v3.27.x #707→#764：屏幕适配微调（设置 → 工具区首位，独立显眼分组，六轴滑杆）=====
   // #707 原「屏幕位置设置」：±2px 步进按钮 + 点数值 openModal 手输——用户看不到拖动效果只能猜。
@@ -9222,7 +9081,7 @@ bindAdjDrag(headTop, false); // #1534：拖标题行移动面板（与桌面美�
     // #1493：读不全先让路（quote-history 大键化后冷读空＝拿空档 unshift 会把整本存档顶掉；今天这句主页照常显示）
     try {
       if (!window.xyBigWriteHold || !window.xyBigWriteHold(store, 'quote-history')) {
-        const today = fishToday();
+        const today = window.mochiUsageDays.today();
         const list = JSON.parse(store.get('quote-history') || '[]');
         if (!list.length || list[0].date !== today) {
           list.unshift({ date: today, text: text, ts: Date.now() });
@@ -9691,7 +9550,7 @@ bindAdjDrag(headTop, false); // #1534：拖标题行移动面板（与桌面美�
     // 写日志合并自愈（mochi-wrj-heal）时再同步；点击逻辑不变，logFish 按自然日去重，
     // 重复点击不会虚增天数。
     function syncCheckinBtn() {
-      if (store.get('checkin') === fishToday()) {
+      if (store.get('checkin') === window.mochiUsageDays.today()) {
         btn.textContent = '✓ 已打卡';
         btn.classList.add('done');
       } else {
@@ -9702,8 +9561,8 @@ bindAdjDrag(headTop, false); // #1534：拖标题行移动面板（与桌面美�
     // v3.5.131：按日期判断——键存在但跨天时恢复可打卡（原逻辑首次打卡后永久锁定）
     syncCheckinBtn();
     try {
-      document.addEventListener('mochi-restore-done', function () { try { syncCheckinBtn(); updateFishDays(); } catch (e) {} });
-      document.addEventListener('mochi-wrj-heal', function () { try { syncCheckinBtn(); updateFishDays(); } catch (e) {} });
+      document.addEventListener('mochi-restore-done', function () { try { syncCheckinBtn(); window.mochiUsageDays.render(); } catch (e) {} });
+      document.addEventListener('mochi-wrj-heal', function () { try { syncCheckinBtn(); window.mochiUsageDays.render(); } catch (e) {} });
     } catch (e) {}
     // 打卡反馈弹窗（IAB 用页面内弹窗）
     function toast(msg) {
@@ -9725,341 +9584,12 @@ bindAdjDrag(headTop, false); // #1534：拖标题行移动面板（与桌面美�
       }
       btn.textContent = '✓ 已打卡';
       btn.classList.add('done');
-      store.set('checkin', fishToday()); // 存日期，便于识别是哪天打的卡
-      logFish();
-      const days = getFishLog().length;
-      toast('打卡成功！已摸鱼 ' + days + ' 天');
+      store.set('checkin', window.mochiUsageDays.today()); // 存日期，便于识别是哪天打的卡
+      window.logUsageDay();
+      const days = window.mochiUsageDays.dates().length;
+      toast('打卡成功！一起使用 ' + days + ' 天');
     });
   }
-
-  // 离周末还有几天（点击摸鱼 +1，当天数值）
-  const weDays = document.getElementById('weekend-days');
-  const weCount = document.getElementById('weekend-count');
-  const weFish = document.getElementById('weekend-fish');
-  if (weDays) {
-    const day = new Date().getDay(); // 0=日 6=六
-    let daysTo = (6 - day + 7) % 7;   // 距周六
-    if (day === 6 || day === 0) {
-      // 周六/周日都算周末（v3.5.x：周日曾误显示"离周末还有 6 天"）
-      weDays.textContent = '今天是周末';
-    } else {
-      weDays.textContent = '离周末还有 ' + daysTo + ' 天';
-    }
-  }
-
-  // ===== 摸鱼值（当天值 + 每日新增记录 + 历史累计）=====
-  // 三套数据（v3.5.26 起）：
-  //  - day-fish-<日期> / day-fish-ta-<日期>：当天摸鱼值（每天 0 点自动重置）
-  //  - fish-day-add：每日新增记录 [{date,mine,ta}]（按日期独立累加，导入备份不会互相覆盖）
-  //  - fish-total / fish-total-ta：历史累计（主页「每日摸鱼值」顶部展示）
-  function fishDayKey() {
-    const d = new Date();
-    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-  }
-  function fishDayLog() {
-    try { return JSON.parse(store.get('fish-day-add') || '[]'); } catch (e) { return []; }
-  }
-  function saveFishDayLog(list) { store.set('fish-day-add', JSON.stringify(list)); }
-  function dayVal(k) { return parseInt(store.get(k) || '0', 10) || 0; }
-  // 当天摸鱼值（读 day 键；新的一天自动从 0 开始）
-  function todayMine() { return dayVal('day-fish-' + fishDayKey()); }
-  function todayTa() { return dayVal('day-fish-ta-' + fishDayKey()); }
-  // v3.26.x：摸鱼值/工作值累计总开关（回复设置 → 其他，reply-fish-en / reply-work-en，
-  // 默认开）——闸门收在 addFish/addWork 入口，关掉后所有加分来源（60 秒自动累计、
-  // 点击摸鱼按钮、番茄钟补偿、抓包奖励）一并停止写入；已有数值保留只停止增长
-  function fishWorkOn(key) {
-if (!window.mochiFeatures.enabled('fish')) return false;
-    try {
-      const v = window.replyCfg ? window.replyCfg()[key] : undefined;
-      return v === undefined ? true : v === 1;
-    } catch (e) { return true; }
-  }
-  // 增加当天摸鱼值：写入 day 键（当天）+ fish-day-add（每日新增）+ fish-total*（历史累计）
-  function addFish(addMine, addTa) {
-    if (!fishWorkOn('fish-en')) return;
-    const key = fishDayKey();
-    if (addMine) {
-      store.set('day-fish-' + key, String(todayMine() + addMine));
-      store.set('fish-total', String((dayVal('fish-total') || 0) + addMine));
-    }
-    if (addTa) {
-      store.set('day-fish-ta-' + key, String(todayTa() + addTa));
-      store.set('fish-total-ta', String((dayVal('fish-total-ta') || 0) + addTa));
-    }
-    // 每日新增记录：当天独立累加（不覆盖历史）
-    const list = fishDayLog();
-    const ex = list.find(x => x.date === key);
-    if (ex) { ex.mine += addMine || 0; ex.ta += addTa || 0; }
-    else list.push({ date: key, mine: addMine || 0, ta: addTa || 0 });
-    if (list.length > 365) list.splice(0, list.length - 365);
-    saveFishDayLog(list);
-  }
-  // v3.13.x：跨模块加分口（番茄钟补偿摸鱼 / 抓包 TA 翻倍用）——加完同步桌面数值 UI
-  window.addFishPts = function (addMine, addTa) {
-    try { addFish(addMine || 0, addTa || 0); } catch (e) {}
-    try { syncFishUI(); } catch (e) {}
-  };
-  // 一次性迁移 v3.5.25 及更早数据：
-  //  旧 weekend-fish / weekend-fish-ta（历史累计）→ fish-total*（历史累计）
-  //  旧 fish-day-log（按天累计值）→ 按天差值拆成每日新增 fish-day-add + 重建当天 day-fish-*
-  (function () {
-    if (store.get('fish-migrated')) return;
-    try {
-      const oldMine = parseInt(store.get('weekend-fish') || '0', 10) || 0;
-      const oldTa = parseInt(store.get('weekend-fish-ta') || '0', 10) || 0;
-      // 历史累计
-      if (!store.get('fish-total') && oldMine) store.set('fish-total', String(oldMine));
-      if (!store.get('fish-total-ta') && oldTa) store.set('fish-total-ta', String(oldTa));
-      // 旧按天累计记录 → 每日新增（后一天减前一天）
-      let oldLog = [];
-      try { oldLog = JSON.parse(store.get('fish-day-log') || '[]'); } catch (e) {}
-      if (Array.isArray(oldLog) && oldLog.length) {
-        const days = [];
-        let prevMine = 0, prevTa = 0;
-        // v3.5.131：按日期数值排序（原字符串排序在跨月时错乱——'2026-10-1' < '2026-8-16'）
-        // v3.6.x：iOS Safari 对不补零日期（'2026-8-16'）按 ISO 解析返回 NaN——先补零再解析，
-        // 否则 iOS 上比较器恒为 0、排序失效（超过 365 天记录时 slice(-365) 会截错）
-        const parseDay = (s) => {
-          const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(s || ''));
-          if (!m) return NaN;
-          return Date.parse(m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2) + 'T00:00:00');
-        };
-        const byDate = (a, b) => (parseDay(a.date) || 0) - (parseDay(b.date) || 0);
-        oldLog.slice().sort(byDate).forEach(x => {
-          const m = parseInt(x.mine || '0', 10) || 0;
-          const t = parseInt(x.ta || '0', 10) || 0;
-          days.push({ date: x.date, mine: Math.max(0, m - prevMine), ta: Math.max(0, t - prevTa) });
-          prevMine = m; prevTa = t;
-        });
-        const list = fishDayLog(); // 新格式（迁移前为空）
-        const map = {};
-        list.forEach(x => { map[x.date] = x; });
-        days.forEach(x => {
-          if (map[x.date]) { map[x.date].mine += x.mine; map[x.date].ta += x.ta; }
-          else map[x.date] = x;
-        });
-        const merged = Object.keys(map).map(k => map[k]).sort((a, b) => (parseDay(a.date) || 0) - (parseDay(b.date) || 0)).slice(-365);
-        saveFishDayLog(merged);
-        // 重建当天 day 键（今天的新增 = 记录里今天的新增）
-        const key = fishDayKey();
-        const today = merged.find(x => x.date === key);
-        if (today) {
-          store.set('day-fish-' + key, String(dayVal('day-fish-' + key) + (today.mine || 0)));
-          store.set('day-fish-ta-' + key, String(dayVal('day-fish-ta-' + key) + (today.ta || 0)));
-        }
-      } else {
-        // 无旧记录：旧累计直接作为当天值（沿用）
-        const key = fishDayKey();
-        if (oldMine) store.set('day-fish-' + key, String(oldMine));
-        if (oldTa) store.set('day-fish-ta-' + key, String(oldTa));
-      }
-      store.set('fish-migrated', '1');
-    } catch (e) {}
-  })();
-
-  // ===== 工作值（v3.5.65：与摸鱼值完全并行——当天值 + 每日新增记录 + 历史累计） =====
-  //  - day-work-<日期> / day-work-ta-<日期>：当天工作值（每天 0 点自动重置）
-  //  - work-day-add：每日新增记录 [{date,mine,ta}]
-  //  - work-total / work-total-ta：历史累计（主页「每日打工值」顶部展示）
-  function workDayLog() {
-    try { return JSON.parse(store.get('work-day-add') || '[]'); } catch (e) { return []; }
-  }
-  function saveWorkDayLog(list) { store.set('work-day-add', JSON.stringify(list)); }
-  function todayWorkMine() { return dayVal('day-work-' + fishDayKey()); }
-  function todayWorkTa() { return dayVal('day-work-ta-' + fishDayKey()); }
-  function addWork(addMine, addTa) {
-    if (!fishWorkOn('work-en')) return;
-    const key = fishDayKey();
-    if (addMine) {
-      store.set('day-work-' + key, String(todayWorkMine() + addMine));
-      store.set('work-total', String((dayVal('work-total') || 0) + addMine));
-    }
-    if (addTa) {
-      store.set('day-work-ta-' + key, String(todayWorkTa() + addTa));
-      store.set('work-total-ta', String((dayVal('work-total-ta') || 0) + addTa));
-    }
-    const list = workDayLog();
-    const ex = list.find(x => x.date === key);
-    if (ex) { ex.mine += addMine || 0; ex.ta += addTa || 0; }
-    else list.push({ date: key, mine: addMine || 0, ta: addTa || 0 });
-    if (list.length > 365) list.splice(0, list.length - 365);
-    saveWorkDayLog(list);
-  }
-
-  // 我的摸鱼值（当天，与按钮数值一致）
-  const weMineEl = document.getElementById('weekend-mine');
-  const weMineName = document.getElementById('weekend-mine-name');
-  if (weMineName) {
-    const myName = store.get('lbl-user') || '我';
-    // v3.5.75：新结构 grid 两列（.pair > i）——按列标签更新昵称
-    const lab = weMineName.querySelectorAll('.pair i');
-    if (lab.length >= 2) { lab[0].textContent = myName + ' 摸鱼值'; lab[1].textContent = myName + ' 工作值'; }
-  }
-  if (weMineEl) {
-    weMineEl.textContent = todayMine();
-  }
-  if (weFish) {
-    // ===== v3.13.x：摸鱼连击 + TA 反向抓包 =====
-    // 连击：2.5 秒内连续点击算一波；第 3 连起每次 +2（翻倍），断了从头算。
-    //   当天/历史最高连击存 fish-combo-best（主页「每日摸鱼值」顶部展示）。
-    // 反向抓包：90 秒内点满 8 次且过冷却（10 分钟）时 45% 概率被 TA 抓包——
-    //   弹窗调侃 + 这次点击改记工作值（不进摸鱼）+ 当前连击清零。
-    const COMBO_WIN = 2500;
-    let comboLast = 0, comboRun = 0, runMax = 0, runTimer = null;
-    let recent = []; // 最近点击时间戳（反向抓包判定）
-    let weComboEl = null;
-    function comboBest() {
-      try {
-        const o = JSON.parse(store.get('fish-combo-best') || 'null');
-        const dk = fishDayKey();
-        if (o && o.d === dk) return { today: o.t || 0, best: o.b || 0 };
-        return { today: 0, best: (o && o.b) || 0 };
-      } catch (e) { return { today: 0, best: 0 }; }
-    }
-    function comboBestSave(today, best) {
-      store.set('fish-combo-best', JSON.stringify({ d: fishDayKey(), t: today, b: best }));
-    }
-    function comboShow(n) {
-      if (!n) { if (weComboEl) weComboEl.classList.remove('on'); return; }
-      if (!weComboEl) {
-        weComboEl = document.createElement('span');
-        weComboEl.className = 'we-combo';
-        weFish.parentNode.appendChild(weComboEl);
-      }
-      weComboEl.textContent = '连击 ×' + n;
-      weComboEl.classList.add('on');
-    }
-    function runEnd() {
-      if (runMax >= 3) {
-        const cb = comboBest();
-        if (runMax > cb.best) {
-          comboBestSave(Math.max(runMax, cb.today), runMax);
-          toast('连击新纪录 ×' + runMax + '！');
-          if (window.renderFishHistory) window.renderFishHistory();
-        }
-      }
-      comboRun = 0; runMax = 0; comboShow(0);
-    }
-    window.getFishComboBest = function () { return comboBest(); };
-    weFish.addEventListener('click', () => {
-      const now = Date.now();
-      // —— 反向抓包判定 ——
-      recent = recent.filter(t => now - t < 90 * 1000);
-      recent.push(now);
-      let caughtCd = 0;
-      try { caughtCd = parseInt(store.get('fish-caught-me:last') || '0', 10) || 0; } catch (e) {}
-      if (recent.length >= 8 && now - caughtCd > 10 * 60 * 1000 && Math.random() < 0.45 && window.openModal) {
-        store.set('fish-caught-me:last', String(now));
-        recent = [];
-        comboRun = 0; runMax = 0; comboShow(0);
-        addWork(1, 0); // 被抓包：这次算打工，不进摸鱼
-        syncFishUI();
-        const taName = store.get('lbl-partner') || 'TA';
-        const tease = [
-          '点这么快，老板就在身后吧？这次给你记成工作值啦。',
-          '被抓包了！摸鱼太频繁会被发现的——这条先算打工。',
-          '『你刚才是不是在疯狂点？』——嗯，被看见了。这次记工作值。',
-          '摸鱼要有节奏感。连续猛点会被抓的，这条算你打工。'
-        ][Math.floor(Math.random() * 4)];
-        // v3.15.x：被抓包事件写入主页「摸鱼抓包」记录（双向之一：TA 抓到我）
-        if (window.addFishCatchRecord) {
-          try { window.addFishCatchRecord('ta', tease); } catch (e) {}
-        }
-        window.openModal('被 ' + taName + ' 抓包了！', '', () => {}, {
-          noInput: true,
-          staticText: (window.taFit ? window.taFit(tease) : tease) + '\n\n本次点击已改为 工作值 +1'
-        });
-        return;
-      }
-      // —— 连击 ——
-      comboRun = (now - comboLast <= COMBO_WIN) ? comboRun + 1 : 1;
-      comboLast = now;
-      runMax = Math.max(runMax, comboRun);
-      const pts = comboRun >= 3 ? 2 : 1; // 第 3 连起翻倍
-      addFish(pts, 0);
-      comboShow(comboRun);
-      clearTimeout(runTimer);
-      runTimer = setTimeout(runEnd, COMBO_WIN + 100);
-      if (weCount) weCount.textContent = todayMine();
-      if (weMineEl) weMineEl.textContent = todayMine();
-      if (window.logFish) window.logFish();
-    });
-  }
-  // 联系人摸鱼值：使用网站时每 60 秒 60% 概率 +1~10（当天值 + 每日记录 + 历史累计）
-  // 我的摸鱼值：同样每 60 秒 60% 概率 +1~10（自动增长，按钮点击仍可 +1）
-  const weTaEl = document.getElementById('weekend-ta');
-  const weTaName = document.getElementById('weekend-ta-name');
-  if (weTaName) {
-    const name = store.get('lbl-partner') || 'TA';
-    // v3.5.75：新结构 grid 两列（.pair > i）——按列标签更新昵称，不覆盖 pair 结构
-    const lab = weTaName.querySelectorAll('.pair i');
-    if (lab.length >= 2) { lab[0].textContent = name + ' 摸鱼值'; lab[1].textContent = name + ' 工作值'; }
-  }
-  function syncFishUI() {
-    const mine = todayMine();
-    const ta = todayTa();
-    if (weMineEl) weMineEl.textContent = mine;
-    if (weTaEl) weTaEl.textContent = ta;
-    if (weCount) weCount.textContent = mine;
-    // v3.5.65：工作值同步显示（桌面小字 + 主页历史）
-    const wMine = todayWorkMine();
-    const wTa = todayWorkTa();
-    const weWorkMine = document.getElementById('weekend-work');
-    const weWorkTa = document.getElementById('weekend-work-ta');
-    if (weWorkMine) weWorkMine.textContent = wMine;
-    if (weWorkTa) weWorkTa.textContent = wTa;
-    // v3.5.74：昵称标签同步（摸鱼值 + 工作值标签一起更新昵称）
-    const myName = store.get('lbl-user') || '我';
-    const taName = store.get('lbl-partner') || 'TA';
-    if (weMineName) {
-      const lm = weMineName.querySelectorAll('.pair i');
-      if (lm.length >= 2) { lm[0].textContent = myName + ' 摸鱼值'; lm[1].textContent = myName + ' 工作值'; }
-    }
-    if (weTaName) {
-      const lt = weTaName.querySelectorAll('.pair i');
-      if (lt.length >= 2) { lt[0].textContent = taName + ' 摸鱼值'; lt[1].textContent = taName + ' 工作值'; }
-    }
-    if (window.renderFishHistory) window.renderFishHistory();
-    if (window.renderWorkHistory) window.renderWorkHistory();
-  }
-  if (weTaEl) {
-    syncFishUI();
-    setInterval(() => {
-      try {
-        if (document.hidden) return; // v3.5.127：后台不累计摸鱼/打工值
-        // v3.13.x：番茄钟专注进行中——摸鱼值双方冻结（TA 在旁边安静陪），
-        //   完成专注后由番茄钟结算「补偿摸鱼」；工作值照常累计（专注=在打工）
-        if (window.pomoFocusActive && window.pomoFocusActive()) {
-          let awm = 0, awt = 0;
-          if (Math.random() * 100 < 60) awm = 1 + Math.floor(Math.random() * 10);
-          if (Math.random() * 100 < 60) awt = 1 + Math.floor(Math.random() * 10);
-          if (awm || awt) { addWork(awm, awt); syncFishUI(); }
-          return;
-        }
-        let addMine = 0, addTa = 0, addWM = 0, addWT = 0;
-        // 摸鱼值：双方各 60% 概率 +1~10
-        if (Math.random() * 100 < 60) addTa = 1 + Math.floor(Math.random() * 10);
-        if (Math.random() * 100 < 60) addMine = 1 + Math.floor(Math.random() * 10);
-        // 工作值：同样各 60% 概率 +1~10（与摸鱼值刷新机制一致）
-        if (Math.random() * 100 < 60) addWT = 1 + Math.floor(Math.random() * 10);
-        if (Math.random() * 100 < 60) addWM = 1 + Math.floor(Math.random() * 10);
-        if (addMine || addTa) addFish(addMine, addTa);
-        if (addWM || addWT) addWork(addWM, addWT);
-        syncFishUI();
-      } catch (e) {}
-    }, 60000);
-  }
-  // 每日摸鱼值历史（供主页展示；fish-day-add 按日期独立，最新在前）
-  window.getFishHistory = function () { return fishDayLog().slice().reverse(); };
-  // 历史累计（供主页顶部展示）
-  window.getFishTotals = function () {
-    return { mine: dayVal('fish-total'), ta: dayVal('fish-total-ta') };
-  };
-  // v3.5.65：每日工作值历史 + 累计（供主页「每日打工值」）
-  window.getWorkHistory = function () { return workDayLog().slice().reverse(); };
-  window.getWorkTotals = function () {
-    return { mine: dayVal('work-total'), ta: dayVal('work-total-ta') };
-  };
 
   // 可二传二改的说明：点设置行 → 全屏说明页
   const licRow = document.getElementById('row-license');
@@ -11462,7 +10992,7 @@ if (!window.mochiFeatures.enabled('fish')) return false;
     try {
       const btn = document.querySelector('.checkin .ck-btn');
       if (btn) {
-        if (store.get('checkin') === fishToday()) {
+        if (store.get('checkin') === window.mochiUsageDays.today()) {
           btn.textContent = '✓ 已打卡';
           btn.classList.add('done');
         } else {
@@ -11471,13 +11001,10 @@ if (!window.mochiFeatures.enabled('fish')) return false;
         }
       }
     } catch (e) {}
-    try {
-      const cnt = document.getElementById('weekend-count');
-      if (cnt) cnt.textContent = String(dayVal('fish-total'));
-    } catch (e) {}
+
     // v3.6.x：摸鱼天数 / 恋爱纪念日 / 今日情话 / 其他纪念日列表——初始化只跑一次，
     // 切换联系人后必须按新桌面的 store 重新渲染（store 动态绑定当前联系人）
-    try { updateFishDays(); } catch (e) {}
+    try { window.mochiUsageDays.render(); } catch (e) {}
     try { updateLove(); } catch (e) {}
     try { syncRelUI(); } catch (e) {}
     try { renderQuoteOfDay(); } catch (e) {}

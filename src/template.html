@@ -793,14 +793,6 @@
             <span class="ck-txt">和 TA 一起摸鱼 · 今天也要甜甜的</span>
             <span class="ck-btn">打卡</span>
           </div>
-<div class="weekend-box glass" id="weekend-box" data-desk-widget="weekend" data-card-bg="weekend">
-<div class="we-left">
-<span class="we-top"><span class="we-days" id="weekend-days">离周末还有 0 天</span><span class="we-sub">距离周末 · 摸鱼倒计时</span></span>
-<span class="we-ta" id="weekend-ta-name"><span class="pair"><i>TA 摸鱼值</i><b id="weekend-ta">0</b></span><span class="pair"><i>TA 工作值</i><b id="weekend-work-ta">0</b></span></span>
-<span class="we-ta" id="weekend-mine-name"><span class="pair"><i>我 摸鱼值</i><b id="weekend-mine">0</b></span><span class="pair"><i>我 工作值</i><b id="weekend-work">0</b></span></span>
-</div>
-<button class="we-btn" id="weekend-fish" title="摸鱼 +1">摸鱼 +<b id="weekend-count">0</b></button>
-</div>
 <div class="mini-row" data-desk-widget="memo-row">
 <div class="mini-card glass memo-card" data-card-bg="memo">
 <div class="mc-top">今日备忘</div>
@@ -1680,11 +1672,7 @@
       <!-- #646：打开应用时的入口行为（默认均关闭）——「打开时先进入此间」+「打开时显示联系人列表」+「默认进入的桌面」（contacts.js 接线） -->
       <div class="set-group glass">
         
-        <div class="set-row" id="row-entry-cjian-first">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M8.5 8.5L12 12l3.5-3.5"/><path d="M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg></div>
-          <div class="txt">打开时先进入此间<span class="sub">每次打开先看此间，返回后再选本次进入哪个桌面</span></div>
-          <label class="toggle"><input type="checkbox" id="entry-cjian-first"><span class="tk"></span></label>
-        </div>
+        
 <div class="set-row" id="row-entry-show-list">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.3" fill="#111111"/><circle cx="3.5" cy="12" r="1.3" fill="#111111"/><circle cx="3.5" cy="18" r="1.3" fill="#111111"/></svg></div>
           <div class="txt">打开时显示联系人列表<span class="sub">每次打开先列出全部联系人，点一个进入其桌面</span></div>
@@ -1875,11 +1863,7 @@
         <!-- v3.27.x：各功能数据单独管理（feature-data.js）——桌面上每个功能（花园/房间/记账/
              经期/占卜/音乐/小游戏…）各自分开导出/导入/清空，原来只有聊天/朋友圈/信箱三处有。
              整机备份（含全部功能）仍是上面的导出数据/导入数据；这里只针对单个功能。 -->
-        <div class="set-row" id="row-fish-days">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></div>
-          <div class="txt">修改摸鱼天数<span class="sub">摸鱼天数＝使用网站的累计天数（当天聊天/打卡等互动记 1 天）；数据丢失清零后在这里手动改回</span></div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
+        
 <div class="set-row" id="row-feature-data">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/><path d="M4 11.5v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></div>
           <div class="txt">各功能数据管理<span class="sub">按功能单独导出、导入、清空，互不影响</span></div>
@@ -4544,62 +4528,7 @@
     </div>
 
     <!-- 花园页（桌面第二页点「花园」进入） -->
-    <div class="page" id="page-garden" hidden>
-      <div class="chat-head">
-        <span class="ch-back" id="garden-back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </span>
-        <span class="ch-name">花园</span>
-      </div>
-      <div class="garden-scroll">
-        <!-- 天气 + 花园状态 -->
-        <div class="garden-weather-bar" id="garden-weather-bar">
-          <span class="garden-weather-ico" id="garden-weather-ico">☀️</span>
-          <span class="garden-weather-txt" id="garden-weather-txt">晴朗 · 适合浇水</span>
-          <span class="garden-season" id="garden-season">🌸 春季</span>
-        </div>
-        <div class="garden-level-bar" id="garden-level-bar"></div>
-        <div class="garden-grid" id="garden-grid"></div>
-        <div class="garden-stats" id="garden-stats"></div>
-        <div class="garden-visitor" id="garden-visitor"></div>
-        <!-- 工具条 -->
-        <div class="garden-toolbar" id="garden-toolbar">
-          <button class="garden-tool" data-tool="water" title="浇水">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5S8 8.5 8 12a4 4 0 008 0c0-3.5-4-9.5-4-9.5z"/><path d="M8 18v2a2 2 0 002 2h4a2 2 0 002-2v-2"/></svg>
-            <span class="garden-tool-label">浇水</span>
-          </button>
-          <button class="garden-tool" data-tool="plant" title="种植">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10l-1.5-5h-7z"/><path d="M12 16v-7"/><path d="M12 12c-2 0-3.5-1-3.5-3"/><path d="M12 10c2 0 3.5-1 3.5-3"/><circle cx="12" cy="6" r="2"/></svg>
-            <span class="garden-tool-label">种植</span>
-          </button>
-          <button class="garden-tool" data-tool="fertilize" title="施肥">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l2 5h8l2-5"/><path d="M12 3v3"/><path d="M9 6h6"/><rect x="5" y="14" width="14" height="6" rx="1"/></svg>
-            <span class="garden-tool-label">施肥</span>
-          </button>
-          <button class="garden-tool" data-tool="harvest" title="收获">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l3 4h12l3-4"/><path d="M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8"/><path d="M12 10v10"/><path d="M9 14h6"/></svg>
-            <span class="garden-tool-label">收获</span>
-          </button>
-          <button class="garden-tool batch" data-tool="waterall" title="一键浇水">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3S4 7 4 9.5a3 3 0 006 0C10 7 7 3 7 3z"/><path d="M17 3S14 7 14 9.5a3 3 0 006 0C20 7 17 3 17 3z"/><path d="M12 11S9 15 9 17.5a3 3 0 006 0C15 15 12 11 12 11z"/></svg>
-            <span class="garden-tool-label">全浇</span>
-          </button>
-          <button class="garden-tool batch" data-tool="harvestall" title="一键收获">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18l-2 12H5z"/><path d="M8 8V5a4 4 0 018 0v3"/><path d="M12 12v4"/></svg>
-            <span class="garden-tool-label">全收</span>
-          </button>
-        </div>
-        <!-- 花园日志 -->
-        <div class="garden-log glass" id="garden-log">
-          <div class="garden-log-title">花园日志</div>
-          <div class="garden-log-list" id="garden-log-list"></div>
-        </div>
-        <div class="garden-dex glass" id="garden-dex"></div>
-        <div class="garden-inv glass" id="garden-inv"></div>
-        <div class="garden-decor glass" id="garden-decor"></div>
-        <div class="garden-lb glass" id="garden-lb"></div>
-      </div>
-    </div>
+    
 
     <!-- 占卜页（桌面点「占卜」进入） -->
     <div class="page" id="page-divine" hidden>
@@ -6362,121 +6291,13 @@
     </div>
 
     <!-- 此间：梦角世界时间与在场感知（聊天「更多功能」进入） -->
-    <div class="page" id="page-cjian" hidden>
-      <div class="chat-head">
-        <span class="ch-back" id="cj-back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </span>
-        <span class="ch-name">此间</span>
-        <span class="ch-settings" id="cj-manage-btn" title="梦角管理">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.3 1a7 7 0 00-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.3-1-2 3.4 2 1.6A7 7 0 005 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.3-1a7 7 0 002 1.2l.4 2.6h4l.4-2.6a7 7 0 002-1.2l2.3 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>
-        </span>
-      </div>
-      <div class="gs-scroll cj-scroll" id="cj-main">
-        <div class="cj-hero">
-          <div class="cj-hero-sub">此刻，你与TA之间。</div>
-          <div class="cj-hero-time" id="cj-hero-time">—</div>
-          <div class="cj-hero-range" id="cj-hero-range"></div>
-        </div>
-        <div id="cj-list"></div>
-        <div class="cj-empty" id="cj-empty" hidden>
-          <p>此间还没有梦角。</p>
-          <p class="cj-empty-sub">添加一个你想感知的人，看看TA此刻在哪、在做什么。</p>
-          <button class="cj-go cj-empty-add" id="cj-empty-add" type="button">添加梦角</button>
-        </div>
-        <button class="cj-perceive" id="cj-perceive" type="button">感知此间</button>
-        <div class="cj-perceive-result" id="cj-perceive-result" hidden></div>
-        <!-- #902：感知/状态流动/突然靠近的真实概率与触发节奏写进页面（用户反馈「概率和触发时间要写清楚」） -->
-        <div class="cj-today-note" id="cj-rate-note">概率与节奏：感知能对上的机会——很近 95%／可能在附近 75%／在远处 40%／离开中 25%／感知不到 12%，每次感知最多改变一位梦角（15 分钟内不会再次改变）；状态自然流动——在场状态每 20～45 分钟、在做的事每 8～25 分钟重抽一次；「……好像有什么靠近了。」是低概率小惊喜——每 30 秒检查一次，某位梦角状态超过 2 小时没变时约 0.3% 概率触发（全局至少间隔 20 分钟），触发后 90% 变「可能在附近」、10% 变「很近」，只改状态、不会发消息。</div>
-        <div class="cj-today-title">今日</div>
-        <div class="cj-today-note">每次打开，TA们会重新选择今天可能的样子。</div>
-        <div id="cj-today"></div>
-      </div>
-      <div class="gs-scroll cj-scroll" id="cj-detail" hidden>
-        <button class="cj-detail-back" id="cj-detail-back" type="button">‹ 返回</button>
-        <div id="cj-detail-body"></div>
-      </div>
-    </div>
+    
 
     <!-- 房间：双人小屋（桌面第三页「房间」/ 聊天更多功能进入） -->
-    <div class="page" id="page-room" hidden>
-      <div class="chat-head">
-        <span class="ch-back" id="room-back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </span>
-        <span class="ch-name">房间</span>
-        <span class="ch-settings" id="room-info-btn" title="小屋信息">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
-        </span>
-      </div>
-      <div class="room-stage">
-        <div class="r-hud">
-          <span class="r-chip" id="room-chip-lv">🏡 Lv.1</span>
-          <span class="r-chip" id="room-chip-cf">舒适度 ★☆☆☆☆</span>
-          <span class="r-chip" id="room-chip-cap">家具 0/9</span>
-          <span class="r-chip" id="room-chip-pt">🏠 0</span>
-        </div>
-        <div class="r-scene" id="room-scene">
-          <div class="r-wall wall-cream" id="room-wall">
-            <div class="r-door"></div>
-            <div class="r-window wa" id="room-win-a"><span class="r-sky" id="room-sky-a">☀️</span></div>
-            <div class="r-window wb" id="room-win-b"><span class="r-sky" id="room-sky-b">☀️</span></div>
-          </div>
-          <div class="r-floor floor-wood" id="room-floor"></div>
-          <div id="room-ta"><i class="r-ta-glow"></i></div>
-          <div class="r-bubble" id="room-bubble" hidden></div>
-          <div class="r-banner" id="room-banner" hidden>
-            <span id="room-banner-txt"></span>
-            <button id="room-banner-cancel" type="button">取消</button>
-          </div>
-        </div>
-        <div class="r-status" id="room-status">…</div>
-        <div class="r-sense-out" id="room-sense-out" hidden></div>
-        <div class="r-bar">
-          <button id="room-btn-inv" type="button">家具仓</button>
-          <button id="room-btn-sense" type="button">感应</button>
-          <button id="room-btn-deco" type="button">装扮</button>
-        </div>
-      </div>
-    </div>
+    
 
     <!-- 漂流瓶：两个世界之间的海（聊天更多功能【互动】进入；src/js/drift-bottle.js） -->
-    <div class="page" id="page-drift" hidden>
-      <div class="chat-head">
-        <span class="ch-back" id="drift-back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </span>
-        <span class="ch-name">漂流瓶</span>
-        <span class="ch-settings" id="drift-info-btn" title="关于漂流瓶">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
-        </span>
-      </div>
-      <div class="drift-scroll">
-        <div class="drift-sea" id="drift-sea">
-          <span class="ds-moon">🌙</span>
-          <span class="ds-sun">☀️</span>
-          <span class="ds-cloud c1">☁️</span>
-          <span class="ds-cloud c2">☁️</span>
-          <div class="ds-wave w1"></div>
-          <div class="ds-wave w2"></div>
-          <div class="ds-bob" id="drift-bob">🫙</div>
-          <div class="ds-cap" id="drift-sea-cap">两个世界之间的海</div>
-        </div>
-        <div class="d-actions">
-          <button class="d-pick" id="drift-pick" type="button">捡一个</button>
-          <button class="d-put" id="d-put" type="button">🌊 我也放一个</button>
-        </div>
-        <div class="d-open glass" id="d-open" hidden></div>
-        <div class="d-stats" id="d-stats"></div>
-        <div class="d-tabs">
-          <button class="d-tab sel" data-t="mine" type="button">我的瓶子</button>
-          <button class="d-tab" data-t="got" type="button">捡到的</button>
-          <button class="d-tab" data-t="theirs" id="d-tab-theirs" type="button"></button>
-          <button class="d-tab" data-t="fav" type="button">收藏</button>
-        </div>
-        <div class="d-list" id="d-list"></div>
-      </div>
-    </div>
+    
 
     <!-- 梦角档案：每个梦角一份，记录「我后来才慢慢了解到的TA」（桌面第三页「梦角档案」进入） -->
     <div class="page" id="page-memo-arc" hidden>
@@ -6715,18 +6536,9 @@
           </button>
         </div>
         <div class="more-grid" id="more-grid-fun">
-          <button class="more-item" id="more-room" data-mcat="tool" title="房间（双人小屋）">
-            <span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.8 9.6V20h12.4V9.6"/><path d="M10 20v-5.4h4V20"/></svg></span>
-            <span>房间</span>
-          </button>
-<button class="more-item" id="more-cjian" data-mcat="tool" title="此间（梦角世界时间与在场感知）">
-            <span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/><circle cx="12" cy="12" r="2.2"/></svg></span>
-            <span>此间</span>
-          </button>
-<button class="more-item" id="more-drift" data-mcat="chat" title="漂流瓶（两个世界之间的海）">
-            <span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5h4v3.2l1.5 2A7.2 7.2 0 0117 11.6V19a2 2 0 01-2 2H9a2 2 0 01-2-2v-7.4c0-1.4.46-2.77 1.5-3.9L10 5.7z"/><path d="M10.4 12.6h3.2"/><path d="M2.5 18.6c1.5 1.1 3 1.1 4.5 0s3-1.1 4.5 0 3 1.1 4.5 0 3-1.1 4.5 0"/></svg></span>
-            <span>漂流瓶</span>
-          </button>
+          
+
+
 <button class="more-item" id="more-decide" data-mcat="tool" title="帮我决定">
             <span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>
             <span>帮我决定</span>

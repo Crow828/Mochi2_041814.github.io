@@ -771,34 +771,7 @@ if (!entryCjianFirstOn()) {
 if (entryShowListOn()) openContactPicker({ mode: 'entry', sub: '选一个联系人桌面进入吧。' });
 return;
 }
-if (!window.openCjian) { openContactPicker({ mode: 'entry' }); return; }
-let page = null;
-try { page = document.getElementById('page-cjian'); } catch (e) {}
-if (!page) { openContactPicker({ mode: 'entry' }); return; }
-let fired = false;
-const obs = new MutationObserver(function () {
-if (!page.hidden || fired) return;
-fired = true;
-try { obs.disconnect(); } catch (e) {}
-removeCjianHint();
-const chat = document.getElementById('page-chat');
-if (chat && !chat.hidden) return;
-setTimeout(function () { openContactPicker({ mode: 'entry' }); }, 0);
-});
-try { obs.observe(page, { attributes: true, attributeFilter: ['hidden'] }); } catch (e) {}
-try {
-window.__cjianFrom = '';
-window.openCjian();
-showCjianHint();
-const chips = document.querySelectorAll('#cj-groups .cj-gchip');
-for (let i = 0; i < chips.length; i++) {
-if (chips[i].textContent === '全部') { chips[i].click(); break; }
-}
-} catch (e) {
-try { obs.disconnect(); } catch (e2) {}
-removeCjianHint();
-openContactPicker({ mode: 'entry' });
-}
+openContactPicker({mode:'entry'});
 };
 function syncEntryModes() {
 const hasDef = !!entryDefaultCid();

@@ -3943,7 +3943,7 @@ const matchTxt = isPref ? '✦ 刚好想到了一起'
 : isLiked ? '你们想得不一样，不过TA似乎很喜欢你的答案'
 : '这次没有选到一起。TA心里想的是：「' + prefTxt + '」';
 if (window.chatChooseReply) window.chatChooseReply(idx, String(o.t || ''), o, matchTxt);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 });
 wrap.appendChild(b);
 });
@@ -3995,7 +3995,7 @@ const answers = [];
 const replies = [];
 chosen.forEach(r => { answers.push(r.t); repliesOf(r.o).forEach(s => replies.push(s)); });
 if (window.chatAskReply) window.chatAskReply(idx, answers.join('、'), replies.length ? replies : undefined);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 });
 wrap.appendChild(btn);
 syncSubmit();
@@ -4014,7 +4014,7 @@ let _cr = null;
 if (window.taAskChatReplyOn && window.taAskChatReplyOn() && window.genChatStyleReply) _cr = window.genChatStyleReply();
 if (_cr && window.chatAskReply) window.chatAskReply(idx, String(o.t || ''), _cr, { raw: true });
 else if (window.chatAskReply) window.chatAskReply(idx, String(o.t || ''), o.reply);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 });
 wrap.appendChild(b);
 });
@@ -4072,7 +4072,7 @@ const pool = window.getInteractPool ? window.getInteractPool('询问·回应', d
 // 原裸抽 pool[random] 会把功能池里混入的媒体卡原样发进 rec.askReply＝互动卡直出令牌串
 window.chatAskReply(idx, v, (window.pickAskCardReply ? window.pickAskCardReply(pool) : pool[Math.floor(Math.random() * pool.length)]));
 }
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 delete inplaceDrafts[idx];
 };
 send.addEventListener('click', doSend);
@@ -8712,20 +8712,6 @@ window.openCheckinPage();
 } else toast('寻踪加载失败');
 });
 }
-const moreCjian = document.getElementById('more-cjian');
-if (moreCjian) {
-moreCjian.addEventListener('click', (e) => {
-e.stopPropagation();
-if (morePanel) morePanel.hidden = true;
-if (window.openCjian) {
-window.__cjianFrom = 'chat';
-try { window.openCjian(); } catch (err) {
-try { if (window.__jsErrors) window.__jsErrors.push('openCjian: ' + (err && err.message || err)); } catch (e2) {}
-toast('此间打开出错，请刷新页面重试');
-}
-} else toast('此间加载失败，请刷新页面重试');
-});
-}
 let lastMineText = '';
 let lastMineIdx = -1;
 let lastMineQuote = '';
@@ -10148,7 +10134,7 @@ text = '{me} ' + action;
 // 跟底标记——否则上翻过聊天＝解钉态，拍一拍气泡永远落在视口下方不自动滚到最底
 chatUserFollowScroll = true;
 addRec({ side: 'in', text: text, special: 'poke', rateAllow: true, nightAllow: true });
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 setTimeout(() => {
 const c2 = cfg();
 if (hit(c2['rn-prob'])) {
@@ -10468,7 +10454,7 @@ try { if (window.giftCoinLedgerAdd) window.giftCoinLedgerAdd('earn', real, real,
 setTimeout(() => addIn('🪙 双方心意币各 +¥' + (real / 100).toFixed(2), { special: 'poke', nightAllow: true, rateAllow: true }), randInt(800, 1600));
 }
 } catch (e) {}
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 }, randInt(900, 1600));
 }
 const moreRps = document.getElementById('more-rps');
@@ -10742,7 +10728,7 @@ const myCid = window.__activeCid || 'default';
 setTimeout(() => {
 if ((window.__activeCid || 'default') !== myCid) return;
 addIn('', { special: 'redpacket', rateAllow: true, rpAmount: amt, rpWish: wish, rpStatus: 'pending', rpTs: Date.now(), rpCover: rpCoverGet('in') ? 1 : 0 });
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 }, randInt(800, 2000));
 }
 const ASK_DAILY_PREFIX = 'ml2_ask_daily_';
@@ -11061,7 +11047,7 @@ rpWalletSet(wallet);
 const cover = rpCoverGet(rpSide);
 const rec = { side: rpSide, special: 'redpacket', rpAmount: amt, rpWish: wish, rpStatus: 'pending', rpTs: Date.now(), rpCover: cover ? 1 : 0 };
 addRec(rec);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 if (rpSide === 'out') {
 setTimeout(() => handleSendResponse(rec), randInt(3000, 8000));
 }
@@ -11768,7 +11754,7 @@ const locateAsk = () => {
   if (msgs[askIdx] && msgs[askIdx].special === 'ask' && msgs[askIdx].askStatus !== 'answered') return askIdx;
   return -1;
 };
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 const recTs = Date.now();
 const myCid = window.__activeCid || 'default';
 const sameCid = () => (window.__activeCid || 'default') === myCid;
@@ -11843,7 +11829,7 @@ const locateInvite = () => {
   if (msgs[inviteIdx] && msgs[inviteIdx].special === 'invite' && msgs[inviteIdx].inviteStatus !== 'answered') return inviteIdx;
   return -1;
 };
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 const histKey = 'invite-ask-history';
 const recTs = Date.now();
 const myCid = window.__activeCid || 'default';
@@ -12768,7 +12754,7 @@ try { if (window.giftCoinLedgerAdd) window.giftCoinLedgerAdd('earn', real, real,
 setTimeout(() => addIn('🪙 双方心意币各 +¥' + (real / 100).toFixed(2), { special: 'poke', nightAllow: true, rateAllow: true }), randInt(800, 1600));
 }
 } catch (e) {}
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 showTyping();
 setTimeout(() => {
 hideTyping();
@@ -12785,7 +12771,7 @@ if (window.placeCall) window.placeCall();
 else {
 const name = chatPartnerName();
 addRec({ side: 'out', text: '拨打 ' + name + ' 语音通话', special: 'call' });
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 }
 setTimeout(updateCallPanel, 120);
 });
@@ -14726,14 +14712,14 @@ if (quote) { rec.quote = quote.q; rec.qside = quote.s; if (typeof quote.i === 'n
 addRec(rec);
 if (inputEl) inputEl.textContent = '';
 renderDraft();
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 scheduleReply();
 } else {
 lastMineText = src;
 const rec = { side: 'out', text: src, type: 'sticker', parts: [{ k: 'img', v: src }] };
 if (quote) { rec.quote = quote.q; rec.qside = quote.s; if (typeof quote.i === 'number' && quote.i >= 0) rec.qidx = quote.i; }
 addRec(rec);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 scheduleReply();
 }
 closeEmojiPanel();
@@ -15194,7 +15180,7 @@ if (quote) { lastQuote = null; renderDraft(); }
 const rec = { side: 'out', text: t, parts: [{ k: 'text', v: t }] };
 if (quote) { rec.quote = quote.q; rec.qside = quote.s; if (typeof quote.i === 'number' && quote.i >= 0) rec.qidx = quote.i; }
 addRec(rec);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 scheduleReply();
 closeEmojiPanel();
 }
@@ -15693,9 +15679,9 @@ batchItems = [];
 renderBatchList();
 closeBatchPanel();
 if (window.playSfx) window.playSfx('out');
-if (batchSendTarget) { batchSendTarget(items); if (window.logFish) window.logFish(); toast('已批量发送 ' + items.length + ' 条消息'); return; }
+if (batchSendTarget) { batchSendTarget(items); if (window.logUsageDay) window.logUsageDay(); toast('已批量发送 ' + items.length + ' 条消息'); return; }
 items.forEach(sendBatchItem);
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 scheduleReply();
 toast('已批量发送 ' + items.length + ' 条消息');
 }
@@ -16223,7 +16209,7 @@ lastMineText = '[语音]';
 addRec({ side: 'out', text: name + '|||' + voiceDataUrl, type: 'voice' });
 closeVoicePanel();
 if (window.playSfx) window.playSfx('out');
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 scheduleReply();
 }
 if (micBtn) micBtn.addEventListener('click', (e) => {
@@ -16914,12 +16900,11 @@ lastQuote = null;
 addRec(rec);
 lastSendTxt = t;
 lastSendTs = Date.now();
-try { if (window.cjianNoteChat) window.cjianNoteChat(); } catch (err) {}
 if (window.playSfx) window.playSfx('out');
 clearChatInput();
 draftImgs = [];
 renderDraft();
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 try { window.__replyOnceDiag = 0; console.log('[mochi-reply] addMsg 发送, 重置 replyOnce 计数'); } catch(e){}
 scheduleReply();
 };

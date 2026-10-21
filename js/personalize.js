@@ -127,9 +127,8 @@ window.fillAvatar('chat-partner-av', 'cs-avatar-partner');
 try {
 document.addEventListener('mochi-restore-done', function () {
 window.applyAvatars();
-try { syncFishUI(); } catch (e) {}
-try { if (!gStore.get('fish-log-global-migrated')) migrateFishLogGlobal(true); } catch (e) {}
-try { updateFishDays(); } catch (e) {}
+try { if (!gStore.get('fish-log-global-migrated')) window.mochiUsageDays.migrate(true); } catch (e) {}
+try { window.mochiUsageDays.render(); } catch (e) {}
 try { restoreAppIcons(); } catch (e) {}
 try { restoreTabbarIcons(); } catch (e) {} // #769h1 回填后重绘底部栏
 try { restoreAppIconOrder(); } catch (e) {}
@@ -5414,7 +5413,7 @@ renderDeskCountdowns();
 setupDeskCountdownClick();
 document.addEventListener('contact-switched', renderDeskTexts);
 document.addEventListener('contact-switched', renderDeskCountdowns);
-const WIDGET_IDS = ['deco', 'quote-row', 'checkin', 'apps', 'music', 'p2apps', 'memo-row', 'week', 'weekend', 'desk-clock', 'desk-calendar', 'desk-timer', 'desk-anniv', 'desk-period',
+const WIDGET_IDS = ['deco', 'quote-row', 'checkin', 'apps', 'music', 'p2apps', 'memo-row', 'week', 'desk-clock', 'desk-calendar', 'desk-timer', 'desk-anniv', 'desk-period',
 'app-chat', 'app-group-chat', 'app-home', 'app-mail', 'app-feed', 'app-calendar', 'app-memory', 'app-divination', 'app-note', 'app-music', 'app-stats', 'app-interact', 'app-checkin', 'p3apps', 'app-period', 'app-accounting', 'app-garden',     'app-tongpin', 'app-shenshou', 'app-water', 'app-eat', 'app-pomo', 'app-cjian', 'app-memo-arc', 'app-my-arc', 'app-room', 'app-piggy', 'app-memo'];
 const WIDGET_NAMES = {
 deco: '纪念日卡', 'quote-row': '今日情话 / 已摸鱼', checkin: '打卡横幅', apps: '功能图标(整组)',
@@ -6560,6 +6559,7 @@ let inMoveMode = false, dragging = false;
 const enterMoveMode = () => {
 if (inMoveMode) return;
 inMoveMode = true;
+setMoveTouchGuard(true);
 enterDecor();
 if (phone) phone.classList.add('desk-move-mode');
 const span = document.querySelector('#decor-bar span');
@@ -6570,6 +6570,8 @@ if (navigator.vibrate) try { navigator.vibrate(20); } catch (e) {}
 const editLayoutBtn = document.getElementById('decor-edit-layout');
 if (editLayoutBtn) editLayoutBtn.addEventListener('click', enterMoveMode);
 const resetMoveMode = () => {
+if (!inMoveMode && !dragging && !(phone && phone.classList.contains('desk-move-mode'))) return;
+setMoveTouchGuard(false);
 inMoveMode = false;
 dragging = false;
 if (phone) phone.classList.remove('desk-move-mode');
@@ -6580,18 +6582,21 @@ document.addEventListener('decor-exited', resetMoveMode);
 const _tabbar = document.querySelector('.tabbar');
 if (_tabbar) _tabbar.addEventListener('click', resetMoveMode);
 if (phone) phone.addEventListener('contextmenu', (e) => e.preventDefault());
-pagesBox.addEventListener('touchstart', (e) => {
+function blockMoveTouch(e) {
 if (!inMoveMode) return;
 if (e.target.closest('.desk-lib, .desk-page-add, .decor-bar')) return;
 if (!e.target.closest(DESK_SEL_ALL + ', .app')) return;
 e.preventDefault();
-}, { capture: true, passive: false });
-pagesBox.addEventListener('touchmove', (e) => {
-if (!inMoveMode) return;
-if (e.target.closest('.desk-lib, .desk-page-add, .decor-bar')) return;
-if (!e.target.closest(DESK_SEL_ALL + ', .app')) return;
-e.preventDefault();
-}, { capture: true, passive: false });
+}
+function setMoveTouchGuard(on) {
+if (on) {
+pagesBox.addEventListener('touchstart', blockMoveTouch, { capture: true, passive: false });
+pagesBox.addEventListener('touchmove', blockMoveTouch, { capture: true, passive: false });
+} else {
+pagesBox.removeEventListener('touchstart', blockMoveTouch, true);
+pagesBox.removeEventListener('touchmove', blockMoveTouch, true);
+}
+}
 pagesBox.addEventListener('pointerdown', (e) => {
 if (e.button !== 0 && e.pointerType === 'mouse') return;
 if (e.target.closest('.desk-lib, .desk-page-add, .decor-bar')) return;
@@ -6830,123 +6835,6 @@ if (e.target.closest(DESK_SEL_ALL + ', .app, .desk-page-add, .desk-lib, .decor-b
 if (window.exitDecor) window.exitDecor();
 }, true);
 }
-function fishToday() {
-const d = new Date();
-return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-function getFishLog() {
-try { return JSON.parse(gStore.get('fish-log') || '[]'); } catch (e) { return []; }
-}
-function normalizeFishLog() {
-const seen = new Set();
-const clean = getFishLog().filter(d =>
-typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && !seen.has(d) && seen.add(d));
-const old = getFishLog();
-if (old.length !== clean.length || old.some((d, i) => d !== clean[i])) {
-gStore.set('fish-log', JSON.stringify(clean));
-}
-return clean;
-}
-function logFish() {
-const list = normalizeFishLog();
-const t = fishToday();
-if (list.indexOf(t) === -1) {
-list.push(t);
-gStore.set('fish-log', JSON.stringify(list));
-}
-updateFishDays();
-}
-function updateFishDays() {
-const el = document.getElementById('fish-days');
-if (el) el.textContent = normalizeFishLog().length || 0;
-}
-window.logFish = logFish; // 供聊天页调用
-function migrateFishLogGlobal(setMark) {
-try {
-const all = new Set();
-try { JSON.parse(gStore.get('fish-log') || '[]').forEach(d => all.add(d)); } catch (e) {}
-const contacts = window.getContacts ? window.getContacts() : [{ id: 'default' }];
-contacts.forEach(c => {
-try {
-const s = window.xyStore('xy-home-v2:' + c.id);
-JSON.parse(s.get('fish-log') || '[]').forEach(d => all.add(d));
-} catch (e) {}
-});
-if (all.size) gStore.set('fish-log', JSON.stringify(Array.from(all).sort()));
-if (setMark) gStore.set('fish-log-global-migrated', '1');
-} catch (e) {}
-}
-migrateFishLogGlobal(false); // 模块加载时先合并 LS 已有的
-updateFishDays();
-try {
-function fishLogHeal() {
-try { migrateFishLogGlobal(false); normalizeFishLog(); updateFishDays(); } catch (e) {}
-}
-document.addEventListener('mochi-restore-done', fishLogHeal);
-document.addEventListener('mochi-wrj-heal', fishLogHeal);
-} catch (e) {}
-(function () {
-const ck = store.get('checkin');
-if (ck) {
-const d = ck === '1' ? fishToday() : ck; // 旧格式 '1' -> 今天；新格式为日期
-const list = getFishLog();
-if (list.indexOf(d) === -1) {
-list.push(d);
-gStore.set('fish-log', JSON.stringify(list));
-updateFishDays();
-}
-}
-})();
-(function () {
-const row = document.getElementById('row-fish-days');
-if (!row || typeof window.openModal !== 'function') return;
-const fmtDate = (dt) =>
-dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-function fishToast(msg) {
-let t = document.getElementById('cc-toast');
-if (!t) { t = document.createElement('div'); t.id = 'cc-toast'; document.body.appendChild(t); }
-t.textContent = msg;
-t.className = 'cc-toast'; void t.offsetWidth; t.className = 'cc-toast show';
-clearTimeout(t._timer);
-t._timer = setTimeout(() => { t.className = 'cc-toast'; }, 2000);
-}
-row.addEventListener('click', function () {
-const cur = normalizeFishLog().length;
-const HINT = '当前已摸鱼 ' + cur + ' 天。摸鱼天数＝使用网站的累计天数：当天在站内聊天、打卡或有互动就记 1 天（同一天不重复计）。数据丢失后天数会从 0 重新开始，输入原来的天数即可改回；改回后照常每天 +1。';
-const ctl = window.openModal('修改摸鱼天数', cur ? String(cur) : '', function (v) {
-const sv = String(v == null ? '' : v).trim();
-if (!/^\d+$/.test(sv)) { ctl.hint('请输入 0 起的整数天数'); ctl.stay(); return; }
-const n = parseInt(sv, 10);
-if (n > 36500) { ctl.hint('最多 36500 天（约 100 年），别填太大'); ctl.stay(); return; }
-const list = normalizeFishLog().slice().sort();
-if (n === list.length) { ctl.hint('现在就是 ' + n + ' 天，没有变化'); ctl.stay(); return; }
-let out;
-if (n < list.length) {
-out = list.slice(list.length - n); // 收缩：丢最旧的，最近 n 天（含今天）不动
-} else {
-out = list.slice();
-let d;
-if (out.length) {
-const p = out[0].split('-').map(Number);
-d = new Date(p[0], p[1] - 1, p[2]); // 非空：在最早一天之前回补，真实打卡日全保留
-} else {
-const now = new Date();
-d = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 空日志（数据丢失场景）：从今天往回补
-d.setDate(d.getDate() + 1); // 循环先自减再入组，起点设明天＝首个入组日期是今天
-}
-for (let i = n - out.length; i > 0; i--) { d.setDate(d.getDate() - 1); out.unshift(fmtDate(d)); }
-}
-gStore.set('fish-log', JSON.stringify(out));
-updateFishDays();
-fishToast('已改为「已摸鱼 ' + n + ' 天」');
-}, {
-inputmode: 'numeric',
-maxlength: 6,
-placeholder: cur ? ('当前 ' + cur + ' 天，输入新天数') : '输入目标天数',
-staticText: HINT
-});
-});
-})();
 (function () {
 const AXES = [
 { k: 'top', name: '顶部', min: -80, max: 80, group: 'pos', hint: '顶部内容被状态栏遮挡=往正拖；离得太远=往负拖' },
@@ -7437,7 +7325,7 @@ el.style.fontSize = fs + 'px';
 });
 try {
 if (!window.xyBigWriteHold || !window.xyBigWriteHold(store, 'quote-history')) {
-const today = fishToday();
+const today = window.mochiUsageDays.today();
 const list = JSON.parse(store.get('quote-history') || '[]');
 if (!list.length || list[0].date !== today) {
 list.unshift({ date: today, text: text, ts: Date.now() });
@@ -7820,7 +7708,7 @@ const checkin = document.querySelector('.checkin');
 if (checkin) {
 const btn = checkin.querySelector('.ck-btn');
 function syncCheckinBtn() {
-if (store.get('checkin') === fishToday()) {
+if (store.get('checkin') === window.mochiUsageDays.today()) {
 btn.textContent = '✓ 已打卡';
 btn.classList.add('done');
 } else {
@@ -7830,8 +7718,8 @@ btn.classList.remove('done');
 }
 syncCheckinBtn();
 try {
-document.addEventListener('mochi-restore-done', function () { try { syncCheckinBtn(); updateFishDays(); } catch (e) {} });
-document.addEventListener('mochi-wrj-heal', function () { try { syncCheckinBtn(); updateFishDays(); } catch (e) {} });
+document.addEventListener('mochi-restore-done', function () { try { syncCheckinBtn(); window.mochiUsageDays.render(); } catch (e) {} });
+document.addEventListener('mochi-wrj-heal', function () { try { syncCheckinBtn(); window.mochiUsageDays.render(); } catch (e) {} });
 } catch (e) {}
 function toast(msg) {
 let t = document.getElementById('cc-toast');
@@ -7852,287 +7740,12 @@ return;
 }
 btn.textContent = '✓ 已打卡';
 btn.classList.add('done');
-store.set('checkin', fishToday()); // 存日期，便于识别是哪天打的卡
-logFish();
-const days = getFishLog().length;
-toast('打卡成功！已摸鱼 ' + days + ' 天');
+store.set('checkin', window.mochiUsageDays.today()); // 存日期，便于识别是哪天打的卡
+window.logUsageDay();
+const days = window.mochiUsageDays.dates().length;
+toast('打卡成功！一起使用 ' + days + ' 天');
 });
 }
-const weDays = document.getElementById('weekend-days');
-const weCount = document.getElementById('weekend-count');
-const weFish = document.getElementById('weekend-fish');
-if (weDays) {
-const day = new Date().getDay(); // 0=日 6=六
-let daysTo = (6 - day + 7) % 7;   // 距周六
-if (day === 6 || day === 0) {
-weDays.textContent = '今天是周末';
-} else {
-weDays.textContent = '离周末还有 ' + daysTo + ' 天';
-}
-}
-function fishDayKey() {
-const d = new Date();
-return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-}
-function fishDayLog() {
-try { return JSON.parse(store.get('fish-day-add') || '[]'); } catch (e) { return []; }
-}
-function saveFishDayLog(list) { store.set('fish-day-add', JSON.stringify(list)); }
-function dayVal(k) { return parseInt(store.get(k) || '0', 10) || 0; }
-function todayMine() { return dayVal('day-fish-' + fishDayKey()); }
-function todayTa() { return dayVal('day-fish-ta-' + fishDayKey()); }
-function fishWorkOn(key) {
-if (!window.mochiFeatures.enabled('fish')) return false;
-try {
-const v = window.replyCfg ? window.replyCfg()[key] : undefined;
-return v === undefined ? true : v === 1;
-} catch (e) { return true; }
-}
-function addFish(addMine, addTa) {
-if (!fishWorkOn('fish-en')) return;
-const key = fishDayKey();
-if (addMine) {
-store.set('day-fish-' + key, String(todayMine() + addMine));
-store.set('fish-total', String((dayVal('fish-total') || 0) + addMine));
-}
-if (addTa) {
-store.set('day-fish-ta-' + key, String(todayTa() + addTa));
-store.set('fish-total-ta', String((dayVal('fish-total-ta') || 0) + addTa));
-}
-const list = fishDayLog();
-const ex = list.find(x => x.date === key);
-if (ex) { ex.mine += addMine || 0; ex.ta += addTa || 0; }
-else list.push({ date: key, mine: addMine || 0, ta: addTa || 0 });
-if (list.length > 365) list.splice(0, list.length - 365);
-saveFishDayLog(list);
-}
-window.addFishPts = function (addMine, addTa) {
-try { addFish(addMine || 0, addTa || 0); } catch (e) {}
-try { syncFishUI(); } catch (e) {}
-};
-(function () {
-if (store.get('fish-migrated')) return;
-try {
-const oldMine = parseInt(store.get('weekend-fish') || '0', 10) || 0;
-const oldTa = parseInt(store.get('weekend-fish-ta') || '0', 10) || 0;
-if (!store.get('fish-total') && oldMine) store.set('fish-total', String(oldMine));
-if (!store.get('fish-total-ta') && oldTa) store.set('fish-total-ta', String(oldTa));
-let oldLog = [];
-try { oldLog = JSON.parse(store.get('fish-day-log') || '[]'); } catch (e) {}
-if (Array.isArray(oldLog) && oldLog.length) {
-const days = [];
-let prevMine = 0, prevTa = 0;
-const parseDay = (s) => {
-const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(s || ''));
-if (!m) return NaN;
-return Date.parse(m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2) + 'T00:00:00');
-};
-const byDate = (a, b) => (parseDay(a.date) || 0) - (parseDay(b.date) || 0);
-oldLog.slice().sort(byDate).forEach(x => {
-const m = parseInt(x.mine || '0', 10) || 0;
-const t = parseInt(x.ta || '0', 10) || 0;
-days.push({ date: x.date, mine: Math.max(0, m - prevMine), ta: Math.max(0, t - prevTa) });
-prevMine = m; prevTa = t;
-});
-const list = fishDayLog(); // 新格式（迁移前为空）
-const map = {};
-list.forEach(x => { map[x.date] = x; });
-days.forEach(x => {
-if (map[x.date]) { map[x.date].mine += x.mine; map[x.date].ta += x.ta; }
-else map[x.date] = x;
-});
-const merged = Object.keys(map).map(k => map[k]).sort((a, b) => (parseDay(a.date) || 0) - (parseDay(b.date) || 0)).slice(-365);
-saveFishDayLog(merged);
-const key = fishDayKey();
-const today = merged.find(x => x.date === key);
-if (today) {
-store.set('day-fish-' + key, String(dayVal('day-fish-' + key) + (today.mine || 0)));
-store.set('day-fish-ta-' + key, String(dayVal('day-fish-ta-' + key) + (today.ta || 0)));
-}
-} else {
-const key = fishDayKey();
-if (oldMine) store.set('day-fish-' + key, String(oldMine));
-if (oldTa) store.set('day-fish-ta-' + key, String(oldTa));
-}
-store.set('fish-migrated', '1');
-} catch (e) {}
-})();
-function workDayLog() {
-try { return JSON.parse(store.get('work-day-add') || '[]'); } catch (e) { return []; }
-}
-function saveWorkDayLog(list) { store.set('work-day-add', JSON.stringify(list)); }
-function todayWorkMine() { return dayVal('day-work-' + fishDayKey()); }
-function todayWorkTa() { return dayVal('day-work-ta-' + fishDayKey()); }
-function addWork(addMine, addTa) {
-if (!fishWorkOn('work-en')) return;
-const key = fishDayKey();
-if (addMine) {
-store.set('day-work-' + key, String(todayWorkMine() + addMine));
-store.set('work-total', String((dayVal('work-total') || 0) + addMine));
-}
-if (addTa) {
-store.set('day-work-ta-' + key, String(todayWorkTa() + addTa));
-store.set('work-total-ta', String((dayVal('work-total-ta') || 0) + addTa));
-}
-const list = workDayLog();
-const ex = list.find(x => x.date === key);
-if (ex) { ex.mine += addMine || 0; ex.ta += addTa || 0; }
-else list.push({ date: key, mine: addMine || 0, ta: addTa || 0 });
-if (list.length > 365) list.splice(0, list.length - 365);
-saveWorkDayLog(list);
-}
-const weMineEl = document.getElementById('weekend-mine');
-const weMineName = document.getElementById('weekend-mine-name');
-if (weMineName) {
-const myName = store.get('lbl-user') || '我';
-const lab = weMineName.querySelectorAll('.pair i');
-if (lab.length >= 2) { lab[0].textContent = myName + ' 摸鱼值'; lab[1].textContent = myName + ' 工作值'; }
-}
-if (weMineEl) {
-weMineEl.textContent = todayMine();
-}
-if (weFish) {
-const COMBO_WIN = 2500;
-let comboLast = 0, comboRun = 0, runMax = 0, runTimer = null;
-let recent = []; // 最近点击时间戳（反向抓包判定）
-let weComboEl = null;
-function comboBest() {
-try {
-const o = JSON.parse(store.get('fish-combo-best') || 'null');
-const dk = fishDayKey();
-if (o && o.d === dk) return { today: o.t || 0, best: o.b || 0 };
-return { today: 0, best: (o && o.b) || 0 };
-} catch (e) { return { today: 0, best: 0 }; }
-}
-function comboBestSave(today, best) {
-store.set('fish-combo-best', JSON.stringify({ d: fishDayKey(), t: today, b: best }));
-}
-function comboShow(n) {
-if (!n) { if (weComboEl) weComboEl.classList.remove('on'); return; }
-if (!weComboEl) {
-weComboEl = document.createElement('span');
-weComboEl.className = 'we-combo';
-weFish.parentNode.appendChild(weComboEl);
-}
-weComboEl.textContent = '连击 ×' + n;
-weComboEl.classList.add('on');
-}
-function runEnd() {
-if (runMax >= 3) {
-const cb = comboBest();
-if (runMax > cb.best) {
-comboBestSave(Math.max(runMax, cb.today), runMax);
-toast('连击新纪录 ×' + runMax + '！');
-if (window.renderFishHistory) window.renderFishHistory();
-}
-}
-comboRun = 0; runMax = 0; comboShow(0);
-}
-window.getFishComboBest = function () { return comboBest(); };
-weFish.addEventListener('click', () => {
-const now = Date.now();
-recent = recent.filter(t => now - t < 90 * 1000);
-recent.push(now);
-let caughtCd = 0;
-try { caughtCd = parseInt(store.get('fish-caught-me:last') || '0', 10) || 0; } catch (e) {}
-if (recent.length >= 8 && now - caughtCd > 10 * 60 * 1000 && Math.random() < 0.45 && window.openModal) {
-store.set('fish-caught-me:last', String(now));
-recent = [];
-comboRun = 0; runMax = 0; comboShow(0);
-addWork(1, 0); // 被抓包：这次算打工，不进摸鱼
-syncFishUI();
-const taName = store.get('lbl-partner') || 'TA';
-const tease = [
-'点这么快，老板就在身后吧？这次给你记成工作值啦。',
-'被抓包了！摸鱼太频繁会被发现的——这条先算打工。',
-'『你刚才是不是在疯狂点？』——嗯，被看见了。这次记工作值。',
-'摸鱼要有节奏感。连续猛点会被抓的，这条算你打工。'
-][Math.floor(Math.random() * 4)];
-if (window.addFishCatchRecord) {
-try { window.addFishCatchRecord('ta', tease); } catch (e) {}
-}
-window.openModal('被 ' + taName + ' 抓包了！', '', () => {}, {
-noInput: true,
-staticText: (window.taFit ? window.taFit(tease) : tease) + '\n\n本次点击已改为 工作值 +1'
-});
-return;
-}
-comboRun = (now - comboLast <= COMBO_WIN) ? comboRun + 1 : 1;
-comboLast = now;
-runMax = Math.max(runMax, comboRun);
-const pts = comboRun >= 3 ? 2 : 1; // 第 3 连起翻倍
-addFish(pts, 0);
-comboShow(comboRun);
-clearTimeout(runTimer);
-runTimer = setTimeout(runEnd, COMBO_WIN + 100);
-if (weCount) weCount.textContent = todayMine();
-if (weMineEl) weMineEl.textContent = todayMine();
-if (window.logFish) window.logFish();
-});
-}
-const weTaEl = document.getElementById('weekend-ta');
-const weTaName = document.getElementById('weekend-ta-name');
-if (weTaName) {
-const name = store.get('lbl-partner') || 'TA';
-const lab = weTaName.querySelectorAll('.pair i');
-if (lab.length >= 2) { lab[0].textContent = name + ' 摸鱼值'; lab[1].textContent = name + ' 工作值'; }
-}
-function syncFishUI() {
-const mine = todayMine();
-const ta = todayTa();
-if (weMineEl) weMineEl.textContent = mine;
-if (weTaEl) weTaEl.textContent = ta;
-if (weCount) weCount.textContent = mine;
-const wMine = todayWorkMine();
-const wTa = todayWorkTa();
-const weWorkMine = document.getElementById('weekend-work');
-const weWorkTa = document.getElementById('weekend-work-ta');
-if (weWorkMine) weWorkMine.textContent = wMine;
-if (weWorkTa) weWorkTa.textContent = wTa;
-const myName = store.get('lbl-user') || '我';
-const taName = store.get('lbl-partner') || 'TA';
-if (weMineName) {
-const lm = weMineName.querySelectorAll('.pair i');
-if (lm.length >= 2) { lm[0].textContent = myName + ' 摸鱼值'; lm[1].textContent = myName + ' 工作值'; }
-}
-if (weTaName) {
-const lt = weTaName.querySelectorAll('.pair i');
-if (lt.length >= 2) { lt[0].textContent = taName + ' 摸鱼值'; lt[1].textContent = taName + ' 工作值'; }
-}
-if (window.renderFishHistory) window.renderFishHistory();
-if (window.renderWorkHistory) window.renderWorkHistory();
-}
-if (weTaEl) {
-syncFishUI();
-setInterval(() => {
-try {
-if (document.hidden) return; // v3.5.127：后台不累计摸鱼/打工值
-if (window.pomoFocusActive && window.pomoFocusActive()) {
-let awm = 0, awt = 0;
-if (Math.random() * 100 < 60) awm = 1 + Math.floor(Math.random() * 10);
-if (Math.random() * 100 < 60) awt = 1 + Math.floor(Math.random() * 10);
-if (awm || awt) { addWork(awm, awt); syncFishUI(); }
-return;
-}
-let addMine = 0, addTa = 0, addWM = 0, addWT = 0;
-if (Math.random() * 100 < 60) addTa = 1 + Math.floor(Math.random() * 10);
-if (Math.random() * 100 < 60) addMine = 1 + Math.floor(Math.random() * 10);
-if (Math.random() * 100 < 60) addWT = 1 + Math.floor(Math.random() * 10);
-if (Math.random() * 100 < 60) addWM = 1 + Math.floor(Math.random() * 10);
-if (addMine || addTa) addFish(addMine, addTa);
-if (addWM || addWT) addWork(addWM, addWT);
-syncFishUI();
-} catch (e) {}
-}, 60000);
-}
-window.getFishHistory = function () { return fishDayLog().slice().reverse(); };
-window.getFishTotals = function () {
-return { mine: dayVal('fish-total'), ta: dayVal('fish-total-ta') };
-};
-window.getWorkHistory = function () { return workDayLog().slice().reverse(); };
-window.getWorkTotals = function () {
-return { mine: dayVal('work-total'), ta: dayVal('work-total-ta') };
-};
 const licRow = document.getElementById('row-license');
 if (licRow) {
 licRow.addEventListener('click', () => {
@@ -9343,7 +8956,7 @@ try { applyCardRadius(getCardRadius()); } catch (e) {}
 try {
 const btn = document.querySelector('.checkin .ck-btn');
 if (btn) {
-if (store.get('checkin') === fishToday()) {
+if (store.get('checkin') === window.mochiUsageDays.today()) {
 btn.textContent = '✓ 已打卡';
 btn.classList.add('done');
 } else {
@@ -9352,11 +8965,7 @@ btn.classList.remove('done');
 }
 }
 } catch (e) {}
-try {
-const cnt = document.getElementById('weekend-count');
-if (cnt) cnt.textContent = String(dayVal('fish-total'));
-} catch (e) {}
-try { updateFishDays(); } catch (e) {}
+try { window.mochiUsageDays.render(); } catch (e) {}
 try { updateLove(); } catch (e) {}
 try { syncRelUI(); } catch (e) {}
 try { renderQuoteOfDay(); } catch (e) {}

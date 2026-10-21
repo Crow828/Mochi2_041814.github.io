@@ -5386,8 +5386,9 @@
   (function () {
     const libPage = document.getElementById('page-chatcard');
     if (libPage && typeof MutationObserver !== 'undefined') {
-      new MutationObserver(() => {
-        if (libPage.hidden) return;
+      let refreshGeneration = 0;
+      function refreshVisibleLibrary(generation) {
+        if (generation !== refreshGeneration || libPage.hidden) return;
         refreshLibCounts(true);
         if (libScopesDeferred(['public', 'own'])) {
           try { toast('字卡较多，正在加载…'); } catch (e) {}
@@ -5401,6 +5402,15 @@
           return;
         }
         hydrateLibScopes(['public', 'own']);
+      }
+      new MutationObserver(() => {
+        const generation = ++refreshGeneration;
+        if (libPage.hidden) return;
+        // Give the selected page a paint opportunity before counting/hydrating cards.
+        // Recheck the generation so a fast tab change cannot revive stale work.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          setTimeout(() => refreshVisibleLibrary(generation), 0);
+        }));
       }).observe(libPage, { attributes: true, attributeFilter: ['hidden'] });
     }
     // #266 修复标记：本块必须立即调用（结尾 `})();`）。漏掉调用括号＝语法仍合法、

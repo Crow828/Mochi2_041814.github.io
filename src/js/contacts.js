@@ -1220,39 +1220,8 @@
       if (entryShowListOn()) openContactPicker({ mode: 'entry', sub: '选一个联系人桌面进入吧。' });
       return;
     }
-    if (!window.openCjian) { openContactPicker({ mode: 'entry' }); return; }
-    let page = null;
-    try { page = document.getElementById('page-cjian'); } catch (e) {}
-    if (!page) { openContactPicker({ mode: 'entry' }); return; }
-    let fired = false;
-    // 不侵入 cjian.js：观察 #page-cjian 的 hidden 变化，用户离开此间时决定去向
-    const obs = new MutationObserver(function () {
-      if (!page.hidden || fired) return;
-      fired = true;
-      try { obs.disconnect(); } catch (e) {}
-      removeCjianHint();
-      // 点【去找TA】＝用户已显式选定目标（此间会切到该联系人并打开聊天页）→ 直接进入，不再弹选择桌面页；
-      // 只有点左上角返回（回桌面主页 #page-phone）才弹「选择本次进入的桌面」
-      const chat = document.getElementById('page-chat');
-      if (chat && !chat.hidden) return;
-      setTimeout(function () { openContactPicker({ mode: 'entry' }); }, 0);
-    });
-    try { obs.observe(page, { attributes: true, attributeFilter: ['hidden'] }); } catch (e) {}
-    try {
-      window.__cjianFrom = '';
-      window.openCjian();
-      showCjianHint();
-      // 开屏进入此间时默认停在「全部」总览（openCjian 内部默认回到当前桌面，这里点选「全部」chip 切过去；
-      // 不侵入 cjian.js——setView(ALL) 只改视图、不持久化、不影响之后从桌面正常进入）
-      const chips = document.querySelectorAll('#cj-groups .cj-gchip');
-      for (let i = 0; i < chips.length; i++) {
-        if (chips[i].textContent === '全部') { chips[i].click(); break; }
-      }
-    } catch (e) {
-      try { obs.disconnect(); } catch (e2) {}
-      removeCjianHint();
-      openContactPicker({ mode: 'entry' });
-    }
+
+    openContactPicker({mode:'entry'});
   };
 
   // #646：设置页「打开时先进入此间」开关 + 「打开时显示联系人列表」开关 + 「默认进入的桌面」入口

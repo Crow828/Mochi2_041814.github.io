@@ -37,12 +37,17 @@ document.querySelectorAll('.page').forEach(p => { if (!p.hidden) p.hidden = true
 }
 tabs.forEach(tab => {
 tab.addEventListener('click', () => {
-sdLeaveSnap();
 const target = document.getElementById(tab.dataset.page || '');
 if (!target) {
 try { if (window.__jsErrors) window.__jsErrors.push('底部 tab 目标页缺失（data-page=' + (tab.dataset.page || '?') + '），已放弃本次切页'); } catch (e3) {}
 return;
 }
+if (!target.hidden && tab.classList.contains('active')) {
+const ae = document.activeElement;
+if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) ae.blur();
+return;
+}
+sdLeaveSnap();
 tabs.forEach(t => t.classList.remove('active'));
 tab.classList.add('active');
 hideAllPages();
@@ -79,9 +84,9 @@ const ae = document.activeElement;
 if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) ae.blur();
 } catch (e) {}
 }
+const chromeObserver = new MutationObserver(syncChrome);
 document.querySelectorAll('.page').forEach(p => {
-const mo = new MutationObserver(syncChrome);
-mo.observe(p, { attributes: true, attributeFilter: ['hidden'] });
+chromeObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] });
 });
 syncChrome();
 const appearanceRow = document.getElementById('row-appearance');

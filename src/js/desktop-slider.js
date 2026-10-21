@@ -422,6 +422,7 @@
     rafId = 0;
     sync();
   }  pages.addEventListener('scroll', () => {
+    swipeWarm(); // Keep compositor warm through momentum and snap, not only the first 150ms.
     if (!rafId) rafId = requestAnimationFrame(syncFrame);
     perfSample(); // #690：翻页现场记一段帧耗时（静止时不跑）
     // #976：滑页期间挂 desk-swiping（暂停壁纸全屏模糊，见 home.css 注释），停下 150ms 后摘

@@ -62,7 +62,6 @@
   }
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      sdLeaveSnap();
       // FIX #815：先拿目标页再关其它页——旧写法关完才 getElementById，目标取不到就是
       // TypeError，而此时全部页已 hidden＝整屏空白卡死。取不到目标就一页都不关。
       const target = document.getElementById(tab.dataset.page || '');
@@ -70,6 +69,13 @@
         try { if (window.__jsErrors) window.__jsErrors.push('底部 tab 目标页缺失（data-page=' + (tab.dataset.page || '?') + '），已放弃本次切页'); } catch (e3) {}
         return;
       }
+      // Tapping the selected tab must not hide/show the same page and wake its observers.
+      if (!target.hidden && tab.classList.contains('active')) {
+        const ae = document.activeElement;
+        if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) ae.blur();
+        return;
+      }
+      sdLeaveSnap();
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       hideAllPages();
@@ -131,9 +137,10 @@
     } catch (e) {}
   }
   // 监听所有页面 hidden 变化（任何页面切换都会触发）
+  // One observer batches the old/new page changes into one chrome update.
+  const chromeObserver = new MutationObserver(syncChrome);
   document.querySelectorAll('.page').forEach(p => {
-    const mo = new MutationObserver(syncChrome);
-    mo.observe(p, { attributes: true, attributeFilter: ['hidden'] });
+    chromeObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] });
   });
   syncChrome();
 

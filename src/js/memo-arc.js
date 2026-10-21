@@ -1399,7 +1399,7 @@
         break;
       }
       // #611：档案页的管理只做名单（添加/改名/删除）——传 arc 让此间的「时辰区间」不进档案页
-      case 'add-roster': if (window.cjianManage) window.cjianManage({ arc: 1 }); break;
+      case 'add-roster': manageRoster(); break;
       case 'efield': editField(el.getAttribute('data-map'), el.getAttribute('data-key')); break;
       case 'add-li': addLi(el.getAttribute('data-kind')); break;
       case 'edit-li': editLi(el.getAttribute('data-kind'), id); break;
@@ -1444,13 +1444,39 @@
     }
   }
 
+
+  // The world simulation is retired. Keep roster ownership and archive IDs unchanged.
+  function manageRoster() {
+    if (!window.openModal) return;
+    const cs=window.getContacts ? window.getContacts() : [{id:'default',name:'TA'}];
+    let cid=window.__activeCid||'default', phase='action', target='';
+    const actions=[{label:'添加',value:'add'},{label:'改名',value:'rename'},{label:'移出名单',value:'remove'},{label:'切换联系人',value:'contact'}];
+    const owner=()=>window.xyStore(GNS+':'+cid);
+    const save=list=>{owner().set('cjian-roster',JSON.stringify(list));owner().set('cjian-seeded','1');render();};
+    const ctl=window.openModal('梦角名单管理','',function(value){
+      if(!value)return;
+      if(phase==='contact'){cid=value;phase='action';ctl.stay();ctl.title('梦角名单 · '+partnerNameOf(cid));ctl.pills(actions);return;}
+      if(phase==='action'){
+        ctl.stay();ctl.pills([]);
+        if(value==='contact'){phase='contact';ctl.input(false);ctl.pills(cs.map(c=>({label:c.name||c.id,value:c.id})));return;}
+        if(value==='add'){phase='name';ctl.title('添加梦角');ctl.input(true);ctl.maxLen(30);return;}
+        phase=value==='rename'?'pick-rename':'pick-remove';ctl.input(false);ctl.pills(deskRoster(cid).filter(x=>x&&x.id&&x.name).map(x=>({label:x.name,value:x.id})));return;
+      }
+      if(phase==='name'){const name=String(value).trim();if(!name)return;const list=deskRoster(cid);list.push({id:makeId(),name,cid,manual:1,offsetMin:0});save(list);toast('已添加梦角');return;}
+      if(phase==='pick-rename'){target=value;phase='rename';ctl.stay();ctl.title('新名字');ctl.pills([]);ctl.input(true);ctl.maxLen(30);return;}
+      if(phase==='rename'){const list=deskRoster(cid),item=list.find(x=>x.id===target);if(item){item.name=String(value).trim();item.manual=1;save(list);}return;}
+      if(phase==='pick-remove'){target=value;phase='confirm-remove';ctl.stay();ctl.title('移出名单？档案数据会保留');ctl.pills([{label:'确认移出',value:'yes'}]);return;}
+      if(phase==='confirm-remove'&&value==='yes'){save(deskRoster(cid).filter(x=>x.id!==target));toast('已移出名单，原档案仍保留在备份中');}
+    },{noInput:true,pills:actions});
+  }
+
   // ---- 绑定 ----
   function bind() {
     const back = document.getElementById('narc-back');
     if (back) back.addEventListener('click', function () { window.closeNarc(); });
     const manage = document.getElementById('narc-manage');
     // #611：带 arc 标记——档案页不该出现「时辰区间」（那是此间的世界时间设定）
-    if (manage) manage.addEventListener('click', function (e) { e.stopPropagation(); if (window.cjianManage) window.cjianManage({ arc: 1 }); });
+    if (manage) manage.addEventListener('click', function (e) { e.stopPropagation(); manageRoster(); });
     const appIcon = document.querySelector('.app[data-app="memo-arc"]');
     if (appIcon) {
       appIcon.addEventListener('click', function () {

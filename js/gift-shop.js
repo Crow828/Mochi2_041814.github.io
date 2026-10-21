@@ -1047,7 +1047,7 @@ const rec = { side: side, special: 'gift', rateAllow: true, giftId: gift.id, gif
 const entry = recordBox(gift, side, wish);
 if (entry && entry.id) rec.giftBoxId = entry.id;
 if (window.chatAddGift) window.chatAddGift(rec); else if (window.chatAddIn) window.chatAddIn('', { special: 'gift' });
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 if (side === 'out') giftReplyFeedback(gift, rec);
 return true;
 }
@@ -1069,7 +1069,7 @@ const entryAt = recordBoxAt(cid, gift, 'in', wish);
 if (entryAt && entryAt.id) rec.giftBoxId = entryAt.id;
 if (window.chatAppendDeskRec) window.chatAppendDeskRec(cid, rec);
 }
-if (window.logFish) window.logFish();
+if (window.logUsageDay) window.logUsageDay();
 } catch (e) {}
 }, delayMs);
 }

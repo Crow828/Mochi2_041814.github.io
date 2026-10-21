@@ -1285,7 +1285,7 @@
     const entry = recordBox(gift, side, wish);
     if (entry && entry.id) rec.giftBoxId = entry.id;
     if (window.chatAddGift) window.chatAddGift(rec); else if (window.chatAddIn) window.chatAddIn('', { special: 'gift' });
-    if (window.logFish) window.logFish();
+    if (window.logUsageDay) window.logUsageDay();
     // #848：我送出给 TA 的这一刻起，TA 有概率回一句（走当前桌面的聊天，延迟里切桌面则补投）
     // #985：这句回话拿到之后同时贴到「我送出」那张礼物卡与心意柜那件礼物上（传 rec 给它认领）
     if (side === 'out') giftReplyFeedback(gift, rec);
@@ -1331,7 +1331,7 @@
           if (entryAt && entryAt.id) rec.giftBoxId = entryAt.id;
           if (window.chatAppendDeskRec) window.chatAppendDeskRec(cid, rec);
         }
-        if (window.logFish) window.logFish();
+        if (window.logUsageDay) window.logUsageDay();
       } catch (e) {}
     }, delayMs);
   }

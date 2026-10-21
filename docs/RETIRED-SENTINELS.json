@@ -1,0 +1,546 @@
+[
+  {
+    "name": "#1421a 房间页那根滚动轴（删＝房间页回到「划哪儿都不动」，内容一高过可视区就被静默裁掉）",
+    "file": "css/room.css",
+    "needle": "overflow-y: auto; overscroll-behavior: auto;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#646 开屏进入此间默认停在「全部」总览（删掉/chip 文案改掉＝又回到默认的当前桌面视图）",
+    "file": "js/contacts.js",
+    "needle": "if (chips[i].textContent === '全部') { chips[i].click(); break; }",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#646 开屏此间点【去找TA】直接进桌面、不弹选择页（删掉/改判据＝点【去找TA】后仍多余弹出选择桌面页，用户反馈要再点一次）",
+    "file": "js/contacts.js",
+    "needle": "if (chat && !chat.hidden) return;",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "番茄钟提前结束预选「结束」pill（只点确定也生效）",
+    "file": "js/p2-features.js",
+    "needle": "noInput: true, lock: true, pill: '1', pills",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "此间梦角显式归属纠偏（fixBelonging 按 cid 搬回错放梦角，修不同联系人梦角串桌）",
+    "file": "js/cjian.js",
+    "needle": "function fixBelonging",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "此间认亲匹配双名字（homeCidForName 同时匹配 TA 昵称与联系人名，修 lbl-partner 与联系人名不一致认不到家）",
+    "file": "js/cjian.js",
+    "needle": "idn === n || cn === n",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#409 此间串桌修复·按名认亲降级一次性（cjian-belong-v2 标记后 cid 权威，修梦角名撞联系人名/改名认领后每次启动反复搬桌）",
+    "file": "js/cjian.js",
+    "needle": "'cjian-belong-v2'",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#409 此间串桌修复·迁移注册表就绪闸（未就绪不认亲不清根键，防错归属被固化）",
+    "file": "js/cjian.js",
+    "needle": "if (!r.get('contacts')) return;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#409 此间串桌修复·联系人改名梦角跟随（contact-renamed 监听同步旧名梦角，防名字与身份漂移）",
+    "file": "js/cjian.js",
+    "needle": "addEventListener('contact-renamed'",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#409 此间串桌修复·播种昵称链对齐（cs-lbl-partner 优先，梦角名与聊天里看到的名字一致）",
+    "file": "js/cjian.js",
+    "needle": "get('cs-lbl-partner')",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·自愈函数就位（多桌面「名字串桌」存量救济：错放梦角按名字搬回同名桌面）",
+    "file": "js/cjian.js",
+    "needle": "function healBelonging()",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·产品函数暴露（回归脚本直接断言产品函数而非复刻实现）",
+    "file": "js/cjian.js",
+    "needle": "window.cjianHealBelonging = healBelonging;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·打开此间时自愈+搬空后重新播种（同一拍，避免中间态被渲染）",
+    "file": "js/cjian.js",
+    "needle": "try { healBelonging(); seedIfEmpty(curCid()); } catch (e) {}",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·切分组时自愈（防别的桌面的梦角挂在本分组下，即用户报的症状）",
+    "file": "js/cjian.js",
+    "needle": "try { healBelonging(); } catch (e) {}",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·本尊标记（播种梦角带 own，名字漂移时按本桌有效昵称对齐）",
+    "file": "js/cjian.js",
+    "needle": "offsetMin: 0, cid: cid, own: 1 })",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#514 此间梦角归属自愈·手动标记（用户手动添加/改名的梦角带 manual，永不自动搬——#409 顾虑的正面解法）",
+    "file": "js/cjian.js",
+    "needle": "c.manual = 1;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "副本消费方已全部移除（absent 守卫：花园不再整包 JSON.parse 自动备份副本，防数百 MB 遗留快照 OOM）",
+    "file": "js/garden.js",
+    "needle": "offerSnapshotRecover",
+    "absent": true,
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#116 工坊配方卡缺料反馈（需求行改「已有/需求」+ 缺料提示行 + 按钮常驻缺料置灰，修「工坊做不了花艺配方」无从知晓缺什么）",
+    "file": "js/garden.js",
+    "needle": "recipe-lack",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#122 番茄钟陪伴模式内置话术池注册字卡库跨分类搜索",
+    "file": "js/p2-features.js",
+    "needle": "name: '番茄钟陪伴'",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#844 摸鱼抓包结算总账（奖励＝距上次抓包以来 TA 涨的全部 fish-total-ta，基线 settledTa 只随抓包推进；改回 Math.max(1, delta) 单 60s 窗口即回归——用户报「抓到只加个位数，与自动增长量级不符」）",
+    "file": "js/p2-features.js",
+    "needle": "const bonus = Math.max(1, cur - base);",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#132 摸鱼浮字/抓包回应概率接 dcf-fish（改回 Math.random()<0.35 硬编码即回归；#224 改经本 IIFE 助手 dcfPFish→window.dcfGet，原锚 dcfP 跨 IIFE 不可见是作用域 bug 本体）",
+    "file": "js/p2-features.js",
+    "needle": "dcfPFish(35)",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#132 同频敲三下回应概率接 dcf-sync（改回硬编码 0.6 即回归）",
+    "file": "js/p2-features.js",
+    "needle": "dcfP('sync', 60)",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#132 伸手摸到概率接 dcf-reach（改回硬编码 0.55 即回归）",
+    "file": "js/p2-features.js",
+    "needle": "dcfP('reach', 55)",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#132 花园悄悄话概率接 dcf-garden（改回 Math.random()<0.4 硬编码即回归）",
+    "file": "js/garden.js",
+    "needle": "if (Math.random() * 100 < _gP) {",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#132 房间字卡门控接 dcf-room（删 sayLine 门控行即回归）",
+    "file": "js/room.js",
+    "needle": "window.dcfGet('room')",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#132 此间字卡门控接 dcf-cjian（删 cjLine 门控行即回归）",
+    "file": "js/cjian.js",
+    "needle": "window.dcfGet('cjian')",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#611 梦角档案管理·入口提醒（档案页管理弹窗顶部「梦角会跟着桌面联系人自动创建」，删这句即回归）",
+    "file": "js/cjian.js",
+    "needle": "'梦角会跟着桌面联系人自动创建，一般不用手动添加'",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#611 梦角档案管理·arc 不带时辰（档案页添加梦角不弹时辰浮层、提示改指此间；改回「下一步还能限定 TA 常在的时辰区间」即回归）",
+    "file": "js/cjian.js",
+    "needle": "'选一个时间偏移（想限定 TA 常在的时辰，去「此间」设）'",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#132 漂流瓶字卡门控接 dcf-drift（删 poolLine 门控行即回归）",
+    "file": "js/drift-bottle.js",
+    "needle": "window.dcfGet('drift')",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#224 摸鱼抓包 chk 作用域修复（本 IIFE 自备 dcfPFish 走 window.dcfGet——删助手改回跨 IIFE 引用 dcfP 即回归：每分钟 ReferenceError dcfP is not defined）",
+    "file": "js/p2-features.js",
+    "needle": "function dcfPFish(def)",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#255 room.js 装扮地板第二步 floorPick 补齐（函数整体缺失=装扮选墙纸确定必抛 ReferenceError「Can't find variable: floorPick」诊断实证；删地板弹窗此锚消失）",
+    "file": "js/room.js",
+    "needle": "function floorPick() {",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#644 修改摸鱼天数·修正结果写回全局 fish-log（天数=去重日期数；删则弹窗确定后不保存，重开归零）",
+    "file": "js/personalize.js",
+    "needle": "gStore.set('fish-log', JSON.stringify(out));",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#394 漂流瓶候选池剔令牌（删则瓶内容出令牌串）",
+    "file": "js/drift-bottle.js",
+    "needle": "mochiMediaIsToken(s)) return '';",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#394 悬浮伴侣话术池剔令牌",
+    "file": "js/p2-features.js",
+    "needle": "mochiMediaIsToken(s)));",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#403 TA 瓶三道来源全空回退内置兜底（删则 dcf 关断+无历史时出空白信纸）",
+    "file": "js/drift-bottle.js",
+    "needle": "note = sampleHistLine() || poolLine('TA的话', 'ta') || rnd(FB.ta);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#403 普通/特殊瓶文案永不落空（删则 dcf 关断时 normal/special 瓶空白）",
+    "file": "js/drift-bottle.js",
+    "needle": "note = poolLine('海风', 'sea') || rnd(FB.sea);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446 扩建改自愿·开垦资格到顶分支（plotN≥资格给提示弹窗；删则回退等级自动送地，「建这么多养不过来」复发）",
+    "file": "js/garden.js",
+    "needle": "if (cur >= ent) {",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446/#601e plotN 存量迁移（load 默认 12 块；存档 12 块之后已有花则保留到最远那株＝老玩家的花一块不少。删则存量玩家升级地块被裁回 12 且花被截）",
+    "file": "js/garden.js",
+    "needle": "d.plotN = _maxP >= PLOTS ? (_maxP + 1) : PLOTS;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#601f 装饰商店 emoji 可见（emoji 外套白底圆)；删则绿底上的白色字形 emoji 又「看不见」",
+    "file": "js/garden.js",
+    "needle": "garden-decor-shop-ico",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#601f 装饰商店 emoji 可见（白底圆样式）；删则 emoji 回落绿底低对比",
+    "file": "css/garden.css",
+    "needle": ".garden-decor-shop-ico {",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446 里程碑奖励与地块脱钩（跨 Lv3/5/8/12 送稀有种子；删则「不开垦=亏升级奖励」的强制感回归）",
+    "file": "js/garden.js",
+    "needle": "msgs.push(\"🎁 里程碑奖励：稀有种子「\"",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446 一键补种（空地按上次品种补齐且不消耗稀有库存；删则 30 块地日常=逐块点种植，养护负担复发）",
+    "file": "js/garden.js",
+    "needle": "data.lastSeed && T[data.lastSeed] && !T[data.lastSeed].rare",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446 浇水有效期 36h（waterLvl 分母 WATER_SEC；删则回退 24h 天天浇＝多地块高负担复发）",
+    "file": "js/garden.js",
+    "needle": "plot.watered) / WATER_SEC);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#446 凋谢宽限 72h→#503 再放宽 96h（WILT_SEC=345600；删则回退收不及时就枯萎＝收花心意币钱损复发）",
+    "file": "js/garden.js",
+    "needle": "var WILT_SEC = 345600;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 资格缩小不裁已有地（plotCount 去掉向下钳制＝老存档 plotN 高于新资格也一块不裁；改回钳制则上限瘦身后老玩家多种的花被静默删除）",
+    "file": "js/garden.js",
+    "needle": "return data.plotN || PLOTS;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 手动缩地 shrinkPlots（只收尾部空地、下限 4 块、有花不裁；删则「开多了收不回」复发）",
+    "file": "js/garden.js",
+    "needle": "while (cur > MIN_PLOTS && !data.p[cur - 1]) cur--;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 收地按钮登记（工具条 shrink；删则缩地无入口）",
+    "file": "js/garden.js",
+    "needle": "sb.dataset.tool = \"shrink\";",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#528 花园土地默认展开（#503 折叠改默认展开；改回 true 则土地又被默认收起＝用户反馈复发）",
+    "file": "js/garden.js",
+    "needle": "var emptyFolded = false;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#528 空地折叠砖保留（默认展开时仍给「收起」入口；删则无法手动收起空地）",
+    "file": "js/garden.js",
+    "needle": "(emptyFolded ? \"点开\" : \"收起\")",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 日志全量查看（默认 20 条+「查看全部」展开；删则联系人的打理记录看不全复发）",
+    "file": "js/garden.js",
+    "needle": "garden-log-toggle",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 日志容量 100→300（slice(-300)；改回 100 则老记录被挤掉复发）",
+    "file": "js/garden.js",
+    "needle": "if (data.l.length > 300) data.l = data.l.slice(-300);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#503 日志独立 tab（garden-log 移入「日志」分区；删则日志又挤回花园页）",
+    "file": "js/garden.js",
+    "needle": "move(\"garden-log\", \"log\");",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "摸鱼值累计总开关闸门 addFish 入口（删则回复设置→其他「摸鱼值累计」开关失效，关闭后摸鱼值照涨）",
+    "file": "js/personalize.js",
+    "needle": "if (!fishWorkOn('fish-en')) return;",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "工作值累计总开关闸门 addWork 入口（删则回复设置→其他「工作值累计」开关失效，关闭后工作值照涨）",
+    "file": "js/personalize.js",
+    "needle": "if (!fishWorkOn('work-en')) return;",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#533g 悬浮伴侣话术池排除 URL 媒体卡（删/改＝桌面悬浮伴侣把图链当台词说出来）",
+    "file": "js/p2-features.js",
+    "needle": "s.indexOf('data:') !== 0 && !/^https?:\\/\\//i.test(s) && !(window.mochiMediaIsToken && window.mochiMediaIsToken(s))); // FIX 2026-09-13 #394 令牌卡不进悬浮伴侣话术；FIX 2026-09-15 #533 URL 媒体卡同款排除",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#546 场景基础亮度恒 1（夜间从 0 起算＝没开灯进房 brightness(0) 纯黑）",
+    "file": "js/room.js",
+    "needle": "let v = 1;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#546 场景亮度 CSS 兜底下限 .45（--room-bright 为 0 也不许渲染成纯黑）",
+    "file": "css/room.css",
+    "needle": "brightness(max(var(--room-bright, 1), .45))",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#588f 花园读回期「正在读取」提示（删＝LS 未回填时先画空花园，用户以为数据全丢）",
+    "file": "js/garden.js",
+    "needle": "toast(\"正在读取本地花园数据…\");",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#604e 摸鱼浮字巡检带「游戏开着就跳过」闸门（删＝玩游戏时「点我抓包」浮字又盖在棋盘/方向键上抢点按，用户报「挡住我玩游戏」）",
+    "file": "js/p2-features.js",
+    "needle": "if (gamePanelOpen()) return;",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#604f 摸鱼闸门必须在 taChimeUse 之前（挪到其后＝45 分钟冷却与每日额度被吃掉，出游戏后这次涨值再也飘不出来）",
+    "file": "js/p2-features.js",
+    "needle": "const GAME_PANEL_IDS = ",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#616n 此间本尊名字漂移对齐目标改走桌面优先（改回 cs 优先＝自动播种的梦角名被昵称池轮换带着改；2026-09-18 收口换锚＝旧双行 needle 随缩进碎裂，改钉取值链首返单行）",
+    "file": "js/cjian.js",
+    "needle": "if (lb) return lb;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#615 此间「全部」chip 排在 contacts 循环之前（换回末尾＝这两行相邻关系消失，报障复发）",
+    "file": "js/cjian.js",
+    "needle": "chip('全部', ALL);\ncontacts().forEach(ct => chip(contactName(ct.id), ct.id));",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#723d 稀有花呼吸光改晕盘伪层（改回 drop-shadow 插值＝花园页常驻重绘回归）",
+    "file": "css/garden.css",
+    "needle": "animation:gardenRareHalo 2s ease-in-out infinite",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#723e 流星改 translateX 合成位移（改回 left 插值＝夜晚房间每帧 reflow 回归）",
+    "file": "css/room.css",
+    "needle": "0% { transform: rotate(-22deg) translateX(0); opacity: 0; }",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#723f 放置呼吸格底色改伪层 opacity（改回 background 插值＝放置模式常驻重绘回归）",
+    "file": "css/room.css",
+    "needle": "background: rgba(122,200,122,.28); opacity: .29; pointer-events: none;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759a 字卡分组经 GRP 表换算（删＝英文键又被当库分组名传进去，家具话术退回内置短句、逐张开关再度失效）",
+    "file": "js/room.js",
+    "needle": "GRP[group] || group",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759b 池与兜底双空时不出声（删＝rnd([]) 把字面量 \"undefined\" 吐进气泡）",
+    "file": "js/room.js",
+    "needle": "if (!arr.length) return '';",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759c 双段话术首条短驻留（删/改回无参调用＝补话的让路守卫必命中，点灯与夜里点窗的第二句又变死代码）",
+    "file": "js/room.js",
+    "needle": "bubble(sayLine(c.grp, c.grp), BUB_SHORT);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759d 补话时刻排在首条气泡之后（改回 900~1300ms＝又落进首条驻留期内被守卫吞掉）",
+    "file": "js/room.js",
+    "needle": "near ? BUB_AGAIN : BUB_AGAIN + 400",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759e bubble 支持自定义驻留时长（删掉 ms 形参＝双段话术无处安身，两拍节奏回归单拍常驻）",
+    "file": "js/room.js",
+    "needle": "bubT = setTimeout(() => { bubbleEl.hidden = true; }, ms || 3800);",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759f 灯光开关按实例记、关灯即删键（改回类型键＝同种两盏灯同开同关且残键继续增亮）",
+    "file": "js/room.js",
+    "needle": "if (on) d.lit[inst.i] = true; else delete d.lit[inst.i];",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759g 亮度只按在场实例的灯计（改回 Object.keys(d.lit)＝收回全部灯后房间仍按有灯增亮）",
+    "file": "js/room.js",
+    "needle": "d.fx.forEach(it => { if (d.lit[it.i]) v += 0.12; });",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759h 旧档 lit 类型键迁移到实例键（删＝升级后老存档的灯全灭、且类型残键永久赖在表里）",
+    "file": "js/room.js",
+    "needle": "if (o.fx.some(f => f.i === k)) return;",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759z 禁止灯光状态回退为按类型记（出现 `d.lit[it.t]`/`d.lit[inst.t]`＝同种两盏灯又同开同关）",
+    "file": "js/room.js",
+    "needle": "d.lit[it.t]",
+    "absent": true,
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#759y 禁止 sayLine 再收到库内不存在的分组名（回退为按 灯亮 作分组/兜底键＝池与兜底双空、气泡吐 undefined）",
+    "file": "js/room.js",
+    "needle": "sayLine(g, '灯亮')",
+    "absent": true,
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#892a 删空名单清播种标记＝恢复自动播种（删＝该桌面永远空态再也不自动建梦角）",
+    "file": "js/cjian.js",
+    "needle": "if (!list.length) { const rs = storeOf(mCid); if (rs) rs.remove(SEED_KEY); }",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#892b 时辰浮层取消照常按已选偏移建档（改回取消＝不创建＝「设置不了随机时间流」复发）",
+    "file": "js/cjian.js",
+    "needle": "function () { createPlain(); }, // 取消：时辰不限定，照常建档",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#903a 时段变动失效已抽当前时刻（不失效＝改完时辰区间仍显示老时辰旧时刻到冷却结束，「设置的时间与显示的时辰对不上」复发）",
+    "file": "js/cjian.js",
+    "needle": "function invalidateTaTime(cid) { try { const s = storeOf(cid); if (s) s.remove('cjian-ta-time'); } catch (e) {} }",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#903b 改时辰区间后立即重抽世界时间（不重抽＝梦角世界时间驻留旧时辰 1-8 小时）",
+    "file": "js/cjian.js",
+    "needle": "clearOttTag(c.id); invalidateTaTime(mCid); // #903：改回时间偏移流动同样重抽",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#902a 此间页概率/节奏说明锚（删＝感知概率、状态流动间隔、突然靠近概率重新变成黑盒）",
+    "file": "template.html",
+    "needle": "cj-rate-note",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#910a 房间 TA 头像放大到 44px 并自成一层（改回 34px 或去掉 translateZ＝真人照片认不出是谁、「头像很模糊看不清」复发）",
+    "file": "css/room.css",
+    "needle": "width: 44px; height: 44px; transform: translateX(-50%) translateZ(0)",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#910b 走路颠步关键帧保留自成一层（掉 translateZ＝走动时头像并回祖先合成层按 1x 重采样，走动段又发糊）",
+    "file": "css/room.css",
+    "needle": "@keyframes rBob { 0%,100% { transform: translateX(-50%) translateZ(0); }",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#1515b p2 fishPool 兜底过闸（删＝摸鱼浮字/抓包回应全关后照旧回落）",
+    "file": "js/p2-features.js",
+    "needle": "return arr.length ? arr : (window.gateCardFallback ? window.gateCardFallback('fish', fallback) : fallback.slice());",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#1515c p2 tpPool 尾行裸兜底过闸（删＝TA 此刻整组停用后状态照旧出）",
+    "file": "js/p2-features.js",
+    "needle": "return pool.length ? pool : (window.gateCardFallback ? window.gateCardFallback('sync', DEF_STATUS) : DEF_STATUS.slice());",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#1515f 摸鱼浮字空池不烧冷却不浮层（删＝全关后浮字出 undefined 且白吃冷却额度）",
+    "file": "js/p2-features.js",
+    "needle": "if (!note) { lastTa = cur; return; } // #1515 全关＝不浮字不吃冷却（lastTa 照常推进）",
+    "reason": "Removed feature block; original snippet recorded in baseline"
+  },
+  {
+    "name": "#1498c 房间话术兜底过闸＋过滤结果一律采用（删＝全关时留下未过滤池，实测 11/11 仍被使用）",
+    "file": "js/room.js",
+    "needle": "window.gateCardFallback('room'",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#1498d 花园悄悄话兜底过闸＋空则不发音（删＝WM 兜底 7/7 与数据组同文，全关后照旧出声）",
+    "file": "js/garden.js",
+    "needle": "window.gateCardFallback(\"garden\", WM)",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#1522a 花园年报分享走 feedAddPost 正路（删＝退回裸读裸写 feed-posts＝同步层读空一发抹掉朋友圈历史＋点击帧兆级串化长任务）",
+    "file": "js/garden.js",
+    "needle": "!!window.feedAddPost(text)",
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "#1522b 花园年报整包盲写已退役（删除型；回流＝JSON.parse(st.get(FK)) 读空顶库、st.set 整包写回复发）",
+    "file": "js/garden.js",
+    "needle": "st.set(FK, raw)",
+    "absent": true,
+    "reason": "Removed feature module"
+  },
+  {
+    "name": "房间放置/移动横幅取消钮能真正隐藏（.r-banner[hidden] 补 display:none，修「取消」弹窗一直不消失）",
+    "file": "index.html",
+    "needle": ".r-banner[hidden] { display: none; }",
+    "reason": "Removed room CSS"
+  }
+]

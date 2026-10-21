@@ -69,7 +69,19 @@
   }
   // Web Audio 同样受 iOS 自动播放策略约束：首次真实手势内 resume，
   // 之后定时器/后台触发的音效播放一律放行（与上方 HTMLMediaElement 解锁并行，互不干扰）
-  function unlockCtx() { ensureCtx(); }
+  function unlockCtx() {
+    // Default silence should not initialize an audio device on an unrelated tap.
+    // Configured sounds still unlock within a real user gesture (required by iOS).
+    if (!_ctx) {
+      const configured = Object.keys(KEYS).some(function (type) {
+        const builtin = store.get(BKEYS[type]);
+        const custom = store.get(KEYS[type]);
+        return (builtin && builtin !== 'none') || (custom && custom !== 'none');
+      });
+      if (!configured) return;
+    }
+    ensureCtx();
+  }
   document.addEventListener('touchstart', unlockCtx, { passive: true });
   document.addEventListener('click', unlockCtx, { passive: true });
   document.addEventListener('keydown', unlockCtx);
