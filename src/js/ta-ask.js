@@ -461,6 +461,8 @@
   // 各自用不同弹窗容器（modal/tc/qa），同一时刻多个机制命中时会同时弹多个弹窗叠在一起。
   // 弹窗前检查：已有任一互动弹窗打开则不弹本次（卡片仍进聊天，可手动点开）。
   function cardPopupBusy() {
+    if (document.querySelector('dialog[open]')) return true;
+    if (document.querySelector('#page-chat.chat-fav-selecting')) return true;
     return ['modal-mask', 'tc-mask', 'qa-mask'].some(id => {
       const el = document.getElementById(id);
       return el && !el.hidden;
@@ -4636,3 +4638,4 @@ window.openTCPanel = openTCPanel;
   // v3.28.x：全站原生分组/分类下拉统一换成自定义样式（含未走 bindNewGrp 的 .ta-type）
   try { if (window.cardGroups) window.cardGroups.ensureCustomSelects(); } catch (e) {}
 })();
+

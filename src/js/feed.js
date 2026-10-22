@@ -100,6 +100,19 @@
     } catch (e) {}
   })();
   const KEY = 'feed-posts';
+  function favoritePostAuthor(p) {
+    const mine = (p.role || p.by) === 'me', owner = p.owner || 'default';
+    return {sourceId:p.id,authorRole:mine ? 'me' : 'ta',authorOwner:owner,authorName:p.authorName || (mine ? feedUserNameFor(owner) : taFeedNameFor(owner)),authorAv:p.authorAv || (mine ? feedUserAvFor(owner) : taAvFor(owner)),side:mine ? 'out' : 'in'};
+  }
+  window.feedFavoriteAuthorResolver = function() {
+    try {
+      const ids = new Map(), messages = new Map();
+      const put = (map,key,p) => map.set(key,map.has(key) ? null : p);
+      load().forEach(p => { if(p.id) put(ids,p.id,p);put(messages,JSON.stringify([p.ts,String(p.content || '')]),p); });
+      return f => { const p = f.sourceId ? ids.get(f.sourceId) : messages.get(JSON.stringify([f.ts,String(f.text || '')]));return p ? favoritePostAuthor(p) : null; };
+    } catch(e) { return () => null; }
+  };
+  window.feedFavoriteAuthor = f => window.feedFavoriteAuthorResolver()(f);
   // v3.7.x：LS 剥图快照兜底——主键 >200KB（含图片 dataURL）时 xyStore 只进
   // IndexedDB + 内存缓存（LS 5MB 配额保护），Edge 等浏览器杀后台/强制关闭会丢
   // IndexedDB 数据（WORKLOG 有 vivo S16 Edge 实录），届时动态只剩聊天里的系统
@@ -2235,13 +2248,13 @@
       if (!window.addMyFavItem) { toast('收藏功能暂不可用'); return; }
       if (!p) { toast('未找到这条动态'); return; }
       const isMine = (p.role || p.by) === 'me';
-      const ok = window.addMyFavItem({
+      const ok = window.addMyFavItem(Object.assign({
         kind: 'feed',
         text: p.content || '',
         imgs: (p.imgs || []).slice(),
         ts: p.ts || Date.now(),
         side: isMine ? 'out' : 'in'
-      });
+      }, favoritePostAuthor(p)));
       toast(ok ? '已收藏这条动态' : '这条动态已收藏过');
       refreshPostCard(pid); // 刷新收藏按钮高亮态
     }));
@@ -3146,7 +3159,7 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
           const mine = list2.filter(x => (x.role || x.by) === 'me');
           if (!mine.length) return;
           const pick = mine[Math.floor(Math.random() * mine.length)];
-          const f = { kind: 'feed', text: pick.content || '', imgs: (pick.imgs || []).slice(), ts: pick.ts || Date.now() };
+          const f = Object.assign({ kind: 'feed', text: pick.content || '', imgs: (pick.imgs || []).slice(), ts: pick.ts || Date.now(), collectedAt: Date.now() }, favoritePostAuthor(pick));
           const s = window.storeFor(cid);
           // FIX 2026-09-28 #1361f：这一发不经过 chat.js 的 favAuth 闸（跨模块直接 s.set 整包），
           // 而它恰恰是**没有任何用户动作**的那一发——发完动态各桌面 TA 各自掷概率，命中就自动收藏。

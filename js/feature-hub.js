@@ -87,7 +87,6 @@ const HUB = [
 { n: 'TA 自动发红包概率', d: 'TA 聊天中主动发红包的触发概率（红包页面→设置）', k: '红包 概率 自动 触发', go: ['.app[data-app="chat"]', '#more-rp', '#rp-settings-btn'] },
 { n: 'TA 每日发红包上限', d: 'TA 每天最多主动发几个红包（红包页面→设置）', k: '红包 上限 每日 次数', go: ['.app[data-app="chat"]', '#more-rp', '#rp-settings-btn'] },
 { n: '隐藏联系人的表情包', d: '聊天里不显示 TA 发的表情包图片', k: '表情包 隐藏 贴图', go: ['.app[data-app="chat"]', '#chat-settings-btn', '#cs-hide-ta-sticker'] },
-{ n: '聊天全屏模式', d: '隐藏模拟状态栏让聊天页全屏', k: '全屏 状态栏 隐藏', go: ['.app[data-app="chat"]', '#chat-settings-btn', '#cs-fullscreen'] },
 { n: '全屏边缘防误触', d: '全屏时边缘手势防误触保护', k: '全屏 边缘 防误触 手势', go: ['.app[data-app="chat"]', '#chat-settings-btn', '#cs-edge-guard'] },
 { n: '隐藏音乐悬浮小窗', d: '听歌时的悬浮小窗显隐开关', k: '音乐 悬浮 小窗 隐藏', go: ['.app[data-app="chat"]', '#chat-settings-btn', '#cs-music-float'] },
 { n: '隐藏通话小框', d: '通话时的迷你悬浮条显隐开关', k: '通话 小框 悬浮 迷你 隐藏', go: ['.app[data-app="chat"]', '#chat-settings-btn', '#cs-call-mini-hide'] },
@@ -286,7 +285,6 @@ const HUB = [
 { n: '会不会做成 App', d: '为什么不考虑做成 App（功能太多、Bug 更多、适配问题）', k: '做成 app 客户端 软件 下载 安装包', go: ['#row-faq-app'] },
 { n: '自己转 App 使用', d: '“链接转应用”本质是浏览器套壳；替代：安装快捷方式到桌面可用', k: '转 app 套壳 一个木函 链接转应用', go: ['#row-faq-app2'] },
 { n: '怎么添加字卡', d: '系统预设字卡是补充类；聊天/写信/朋友圈用自定义字卡添加', k: '添加字卡 公用字卡 专享字卡 自定义字卡 怎么加卡', go: ['#row-faq-addcard'] },
-{ n: '全屏模式失效', d: '切后台再回来全屏会失效，怎么恢复', k: '全屏 失效 切后台 状态栏 快捷方式', go: ['#row-faq-fullscreen'] },
 { n: '系统预设字卡与功能设置', d: '建议全开使用的原因', k: '系统预设字卡 功能设置 全开 建议打开', go: ['#row-faq-preset'] }
 ] }
 ];

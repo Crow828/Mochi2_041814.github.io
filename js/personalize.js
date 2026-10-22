@@ -4116,6 +4116,8 @@ const applyThemeMode = (mode) => {
 const eff = (mode === 'auto') ? (sysPrefersDark() ? 'dark' : 'light') : mode;
 if (eff === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 else document.documentElement.removeAttribute('data-theme');
+const modeSwitch=document.getElementById('theme-mode-switch');
+if(modeSwitch)modeSwitch.checked=eff==='dark';
 if (themeModeVal) themeModeVal.textContent = mode === 'auto' ? '跟随系统' : (mode === 'dark' ? '已开启' : '关闭');
 try {
 const bg = getComputedStyle(document.documentElement).getPropertyValue('--page-bg').trim();
@@ -4129,8 +4131,15 @@ const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)
 if (mql && typeof mql.addEventListener === 'function') mql.addEventListener('change', () => { if (getThemeMode() === 'auto') applyThemeMode('auto'); });
 else if (mql && typeof mql.addListener === 'function') mql.addListener(() => { if (getThemeMode() === 'auto') applyThemeMode('auto'); });
 } catch (e) {}
+const modeSwitch=document.getElementById('theme-mode-switch');
+if(modeSwitch)modeSwitch.addEventListener('change',()=>{
+const mode=modeSwitch.checked?'dark':'light';
+try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
+applyThemeMode(mode);
+});
 if (themeModeRow) {
-themeModeRow.addEventListener('click', () => {
+themeModeRow.addEventListener('click', (event) => {
+if(event.target.closest('.toggle'))return;
 if (!window.openModal) {
 const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
 try { localStorage.setItem(THEME_KEY, next); } catch (e) {}

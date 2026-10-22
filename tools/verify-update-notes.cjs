@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const {chromium}=require('playwright');const root=path.resolve(__dirname,'..');
+const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!f.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(f,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',f.endsWith('.js')?'application/javascript':f.endsWith('.json')?'application/json':'text/html');res.end(b);});});
+(async()=>{let browser;try{await new Promise(r=>server.listen(0,'127.0.0.1',r));browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','/usr/bin/google-chrome','/usr/bin/chromium'].find(p=>fs.existsSync(p))});
+for(const width of [360,390,440]){
+ const p=await browser.newPage({viewport:{width,height:844},hasTouch:true,serviceWorkers:'block'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.addLocatorHandler(p.locator('#tc-mask:visible'),async()=>{await p.evaluate(()=>document.getElementById('tc-mask-close').click());});await p.addLocatorHandler(p.locator('#qa-mask:visible'),async()=>{await p.evaluate(()=>document.getElementById('qa-mask-close').click());});
+ await p.addInitScript(()=>{localStorage.setItem('xy-home-v2:storage-guide-shown','1250');for(const pre of ['xy-home-v2','xy-home-v2:default']){localStorage.setItem(pre+':reply-as-en','0');for(const k of ['ta-ask','ta-choose','ta-curious','ta-roast','ta-checkin','ta-invite','ta-ask-card'])localStorage.setItem(pre+':'+k,JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));localStorage.setItem(pre+':interact-card-last',String(Date.now()));localStorage.setItem(pre+':ta-choose',JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));const now=new Date();localStorage.setItem(pre+':greeted-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),'1');localStorage.setItem(pre+':__last-backup',String(Date.now()));localStorage.setItem(pre+':__last-backup-remind',String(Date.now()));}});
+ await p.goto('http://127.0.0.1:'+server.address().port+'/');await p.waitForFunction(()=>window.__mochiDataReady);
+ await p.addLocatorHandler(p.locator('#modal-mask:visible').filter({hasNotText:/收藏备注|删除选中的/}),async()=>{console.log('Dismiss unrelated fixture notice:',await p.locator('#modal-mask .modal-title').textContent());await p.evaluate(()=>document.getElementById('modal-cancel').click());});
+ await p.evaluate(()=>document.querySelector('.tab[data-page="page-setting"]').click());
+ const entry=p.locator('#row-update-notes');await entry.scrollIntoViewIfNeeded();assert(await entry.isVisible());
+ assert(await p.locator('#settings-update-group').evaluate(e=>e.parentElement.lastElementChild===e));
+ assert.equal(await entry.locator('svg').count(),2);
+ await entry.click();assert(await p.locator('#page-update-notes').isVisible());
+ const order=await p.evaluate(()=>{const page=document.getElementById('page-update-notes'),bar=document.querySelector('.tabbar');return !!(page.compareDocumentPosition(bar)&Node.DOCUMENT_POSITION_FOLLOWING);});assert(order);
+ const details=p.locator('.update-notes-date');assert.equal(await details.count(),1);assert.equal(await details.locator('summary').textContent(),'2026年10月23日');assert.equal(await details.evaluate(e=>e.open),false);
+ await details.locator('summary').click();assert(await details.evaluate(e=>e.open));assert.equal(await details.locator('li').count(),9);assert((await details.textContent()).includes('自定义心情'));assert((await details.textContent()).includes('聊天多选收藏'));
+ assert(await details.evaluate(e=>e.scrollWidth<=e.clientWidth+1));
+ if(process.env.MOCHI_SCREENSHOT_DIR){fs.mkdirSync(process.env.MOCHI_SCREENSHOT_DIR,{recursive:true});await p.evaluate(()=>{const toast=document.getElementById('cc-toast');if(toast)toast.style.visibility='hidden';});await p.screenshot({path:path.join(process.env.MOCHI_SCREENSHOT_DIR,'update-notes-'+width+'.png')});}
+ await details.locator('summary').click();assert.equal(await details.evaluate(e=>e.open),false);
+ await p.locator('#update-notes-back').click();assert(await entry.isVisible());await entry.click();await p.evaluate(()=>document.documentElement.setAttribute('data-theme','dark'));assert.notEqual(await details.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');await p.locator('#update-notes-back').click();
+ assert.deepEqual(errors,[]);console.log('PASS updates entry last in General, date accordion, content, back navigation, mobile layout and dark mode at '+width);await p.close();
+}
+}finally{if(browser)await browser.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

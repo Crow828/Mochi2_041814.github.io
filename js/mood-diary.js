@@ -31,7 +31,51 @@ el.__timer = setTimeout(() => { el.className = 'cc-toast'; }, 1800);
 }
 function pad(n) { return (n < 10 ? '0' : '') + n; }
 function dkey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-function moodByEmoji(e) { return MOODS.find(m => m.e === e) || null; }
+const CUSTOM_KEY = 'mood-diary-custom';
+function customMoods() {
+try { const list=JSON.parse(store().get(CUSTOM_KEY)||'[]');return Array.isArray(list)?list.filter(m=>m&&typeof m.e==='string'&&m.e&&typeof m.n==='string'&&m.n&&!MOODS.some(b=>b.e===m.e)).map(m=>({e:m.e,n:m.n,s:Math.max(1,Math.min(5,Number(m.s)||3))})):[]; }catch(e){return [];}
+}
+function moodByEmoji(e,record) {
+return MOODS.find(m=>m.e===e)||customMoods().find(m=>m.e===e)||(e?{e:e,n:record&&record.label||'自定义心情',s:Math.max(1,Math.min(5,Number(record&&record.score)||3))}:null);
+}
+function renderEmojiGrid() {
+const grid=document.getElementById('mood-emoji-grid');if(!grid)return;
+grid.innerHTML='';
+MOODS.concat(customMoods()).forEach(m=>{
+const b=document.createElement('button');b.type='button';b.className='mood-emoji-item'+(selMood===m.e?' sel':'');b.dataset.mood=m.e;b.setAttribute('aria-pressed',String(selMood===m.e));
+const face=document.createElement('span');face.className='mood-emoji-face';face.textContent=m.e;
+const name=document.createElement('span');name.className='mood-emoji-name';name.textContent=m.n;b.append(face,name);
+b.addEventListener('click',()=>{selMood=selMood===m.e?'':m.e;grid.querySelectorAll('.mood-emoji-item').forEach(x=>{x.classList.toggle('sel',x.dataset.mood===selMood);x.setAttribute('aria-pressed',String(x.dataset.mood===selMood));});});grid.appendChild(b);
+});
+const add=document.createElement('button');add.type='button';add.id='mood-custom-add';add.className='mood-emoji-item mood-custom-add';add.innerHTML='<span class="mood-emoji-face" aria-hidden="true">＋</span><span class="mood-emoji-name">添加心情</span>';add.addEventListener('click',openCustomMood);grid.appendChild(add);
+}
+function openCustomMood() {
+const owner=window.activePrefix();
+let dialog=document.getElementById('mood-custom-dialog');if(dialog)dialog.remove();
+dialog=document.createElement('dialog');dialog.id='mood-custom-dialog';dialog.className='mood-custom-dialog';dialog.setAttribute('aria-labelledby','mood-custom-title');
+dialog.innerHTML='<h3 id="mood-custom-title">添加自定义心情</h3><label for="mood-custom-emoji">Emoji</label><input id="mood-custom-emoji" type="text" maxlength="32" placeholder="例如：🌻" autocomplete="off" aria-label="自定义心情 Emoji"><label for="mood-custom-name">心情名称</label><input id="mood-custom-name" type="text" maxlength="12" placeholder="例如：充满期待" autocomplete="off" aria-label="自定义心情名称"><label for="mood-custom-score">心情程度<span class="mood-custom-hint">用于月度曲线</span></label><select id="mood-custom-score"><option value="1">1 · 很低落</option><option value="2">2 · 偏低</option><option value="3" selected>3 · 一般</option><option value="4">4 · 不错</option><option value="5">5 · 很好</option></select><p id="mood-custom-error" role="status" aria-live="polite"></p><div class="mood-custom-actions"><button type="button" id="mood-custom-cancel">取消</button><button type="button" id="mood-custom-confirm">添加</button></div>';
+document.body.appendChild(dialog);
+dialog.querySelector('#mood-custom-cancel').addEventListener('click',()=>dialog.close());
+const fail=text=>{dialog.querySelector('#mood-custom-error').textContent=text;};
+dialog.querySelector('#mood-custom-confirm').addEventListener('click',()=>{
+if(window.activePrefix()!==owner){dialog.close();toast('桌面已切换，请重新添加心情');return;}
+if(window.mochiDataPending&&window.mochiDataPending()){fail('心情数据还在读取，请稍后再添加');return;}
+const emoji=dialog.querySelector('#mood-custom-emoji').value.trim(),name=dialog.querySelector('#mood-custom-name').value.trim();
+const isEmoji=/(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[0-9#*]\uFE0F?\u20E3)/u.test(emoji);
+const count=typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(emoji)].length:1;
+if(!isEmoji||count!==1||emoji.length>32){fail('请填写一个 emoji 表情');return;}
+if(!name||name.length>12){fail('请填写 1～12 个字的心情名称');return;}
+const list=customMoods();if(MOODS.concat(list).some(m=>m.e===emoji)){fail('这个 emoji 已有对应心情，请选择其他表情');return;}
+if(list.length>=50){fail('最多可添加 50 个自定义心情');return;}
+list.push({e:emoji,n:name,s:Number(dialog.querySelector('#mood-custom-score').value)||3});
+try{store().set(CUSTOM_KEY,JSON.stringify(list));}catch(e){fail('保存未完成，请稍后重试');return;}
+selMood=emoji;renderEmojiGrid();dialog.close();toast('已添加「'+name+'」，点击「记下今天」即可记录');
+});
+dialog.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229&&event.target.tagName!=='SELECT'){event.preventDefault();dialog.querySelector('#mood-custom-confirm').click();}});
+dialog.addEventListener('input',()=>fail(''));
+dialog.addEventListener('change',()=>fail(''));
+dialog.showModal();
+}
 function normPkg(v) {
 if (!v || typeof v !== 'object' || !v.d || typeof v.d !== 'object') return null;
 if (!v.days || typeof v.days !== 'object') v.days = {};
@@ -147,7 +191,8 @@ return !_interactCache.set[dateKey] && !_interactCache.seen;
 function taMoodFor(dateKey) {
 if (!hasInteraction(dateKey)) return null; // 无真实交互 → 不显示 TA 心情
 const h = hashStr('ta-mood-indep|' + (window.__activeCid || 'default') + '|' + dateKey);
-return MOODS[h % MOODS.length];
+const pool = MOODS.concat(customMoods());
+return pool[h % pool.length];
 }
 let curYM = null; // 'YYYY-MM'，月视图当前月
 let selMood = '';
@@ -169,22 +214,7 @@ const k = dkey(now);
 const data = loadAll();
 const mine = data.d[k];
 selMood = mine ? mine.m : '';
-const grid = document.getElementById('mood-emoji-grid');
-if (grid) {
-grid.innerHTML = '';
-MOODS.forEach(m => {
-const b = document.createElement('button');
-b.type = 'button';
-b.className = 'mood-emoji-item' + (selMood === m.e ? ' sel' : '');
-b.innerHTML = '<span class="mood-emoji-face">' + m.e + '</span><span class="mood-emoji-name">' + m.n + '</span>';
-b.addEventListener('click', () => {
-selMood = (selMood === m.e ? '' : m.e);
-grid.querySelectorAll('.mood-emoji-item').forEach(x => x.classList.remove('sel'));
-if (selMood) b.classList.add('sel');
-});
-grid.appendChild(b);
-});
-}
+renderEmojiGrid();
 const note = document.getElementById('mood-note');
 if (note) note.value = mine ? (mine.n || '') : '';
 const ta = document.getElementById('mood-ta-line');
@@ -202,7 +232,8 @@ btn.addEventListener('click', () => {
 if (!selMood) { toast('先选一个今天的心情吧'); return; }
 const dd = loadAll();
 if (!Object.keys(dd.d).length && window.mochiDataPending && window.mochiDataPending()) { toast('数据还在从本机数据库读取，稍等几秒再记，免得盖掉更早的日记'); return; }
-dd.d[dkey(new Date())] = { m: selMood, n: (document.getElementById('mood-note') || {}).value || '', ts: Date.now() };
+const choice=moodByEmoji(selMood);
+dd.d[dkey(new Date())] = { m: selMood, label:choice.n, score:choice.s, n: (document.getElementById('mood-note') || {}).value || '', ts: Date.now() };
 saveAll(dd);
 toast('今天的心情记下啦 ' + selMood);
 renderToday();
@@ -233,7 +264,7 @@ let seg = [], segs = [];
 for (let i = 1; i <= days; i++) {
 const k = y + '-' + pad(mo) + '-' + pad(i);
 let s = null;
-if (which === 'me') { const rec = data[k]; if (rec) { const m = moodByEmoji(rec.m); if (m) s = m.s; } }
+if (which === 'me') { const rec = data[k]; if (rec) { const m = moodByEmoji(rec.m,rec); if (m) s = m.s; } }
 else { const m = taMoodFor(k); if (m) s = m.s; }
 if (s == null) { if (seg.length > 1) segs.push(seg); seg = []; }
 else seg.push([cxf(i - 1), cyf(s)]);
@@ -257,9 +288,9 @@ const k = y + '-' + pad(mo) + '-' + pad(i);
 const rec = data[k];
 const tm = taMoodFor(k);
 const cls = 'mood-cell mood-day' + (k === todayK ? ' today' : '');
-gh += '<span class="' + cls + '" title="我 ' + (rec ? moodByEmoji(rec.m).n : '未记录') + '｜TA ' + (tm ? tm.n : '未互动') + '">' +
+gh += '<span class="' + cls + '" title="我 ' + (rec ? esc(moodByEmoji(rec.m,rec).n) : '未记录') + '｜TA ' + (tm ? esc(tm.n) : '未互动') + '">' +
 '<span class="mood-dnum">' + i + '</span>' +
-'<span class="mood-dfaces"><i>' + (rec ? rec.m : '') + '</i><i>' + (tm ? tm.e : '') + '</i></span></span>';
+'<span class="mood-dfaces"><i>' + (rec ? esc(rec.m) : '') + '</i><i>' + (tm ? esc(tm.e) : '') + '</i></span></span>';
 }
 gridEl.innerHTML = gh;
 if (stats) {
@@ -267,7 +298,7 @@ let rec = 0, taRec = 0;
 const cnt = {};
 for (let i = 1; i <= days; i++) {
 const k = y + '-' + pad(mo) + '-' + pad(i);
-if (data[k]) { rec++; const mm = moodByEmoji(data[k].m); if (mm) cnt[mm.e + ' ' + mm.n] = (cnt[mm.e + ' ' + mm.n] || 0) + 1; }
+if (data[k]) { rec++; const mm = moodByEmoji(data[k].m,data[k]); if (mm) cnt[mm.e + ' ' + mm.n] = (cnt[mm.e + ' ' + mm.n] || 0) + 1; }
 if (taMoodFor(k)) taRec++;
 }
 const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
@@ -325,7 +356,7 @@ try {
 const k = dkey(new Date());
 const data = loadAll();
 const rec = data.d[k];
-const mine = rec ? { e: rec.m, n: (moodByEmoji(rec.m) || {}).n || '', note: rec.n || '' } : null;
+const mine = rec ? { e: rec.m, n: (moodByEmoji(rec.m,rec) || {}).n || '', note: rec.n || '' } : null;
 _interactCache.built = false; // 重建「有交互日期」集合，确保读到最新聊天
 const tm = taMoodFor(k);
 return { mine: mine, ta: tm ? { e: tm.e, n: tm.n } : null, taUnknown: !tm && interactionUnknown(k) };

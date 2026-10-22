@@ -1634,14 +1634,7 @@
       <div class="them-sec" data-sec="basic">
       <!-- FIX 2026-09-20 #927：全屏模式自「系统」段提到通用首位、独立成组（用户：设置里的全屏模式要放在最前面一个显眼独立的地方）；
            行下小字首条写明「切后台会自动退出全屏＝设备限制、不是 bug」（原只在常见问题里，用户当 bug 报） -->
-      <div class="set-group glass">
-        <div class="set-row" id="sf-fullscreen-row">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt"><span id="sf-fullscreen-label">全屏模式（隐藏手机状态栏）</span><span class="tag" id="sf-fullscreen-help" role="button" tabindex="0" aria-haspopup="dialog">功能说明</span></div>
-          <label class="toggle"><input type="checkbox" id="sf-fullscreen"><span class="tk"></span></label>
-        </div>
-        <div class="gs-sub" id="sf-fullscreen-sub"><b>手机端切到后台（锁屏 / 切去别的应用）会自动退出全屏，这是设备限制、不是 bug</b>，切回来手动再开一次即可。<br>开启后尽量隐藏手机顶部状态栏/浏览器栏，让内容占满全屏。<br>iOS 限制：iPhone 顶部系统状态栏（时间/电量）由系统控制，任何网页都无法隐藏；从主屏幕打开时本开关会让内容顶满屏幕，应用内模拟状态栏（Mochi/时间/电量）下移到系统状态栏正下方、两栏不重叠。</div>
-      </div>
+      
       <!-- FIX 2026-09-19 #805（工作树被并行旧缓冲打回，2026-09-20 随 #927 重放）：导出数据/导入数据自「工具」段移入通用段——
            备份是防丢的唯一防线，放太靠后的 tag 用户不知道有这个功能；row id 不变，直达跳转按 closest('.them-sec') 动态取 tag -->
       <div class="set-group glass">
@@ -1689,7 +1682,7 @@
         <div class="set-row" id="row-theme-mode">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
           <div class="txt">深色模式</div>
-          <div class="val" id="theme-mode-val">关闭</div>
+          <div class="val" id="theme-mode-val" hidden>关闭</div><label class="toggle"><input type="checkbox" id="theme-mode-switch" aria-label="深色模式"><span class="tk"></span></label>
         </div>
         <div class="set-row" id="row-appearance">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg></div>
@@ -1764,12 +1757,13 @@
         <div class="gs-sub" id="bg-notify-sub"><b>后台弹窗＝页面切到后台（锁屏 / 切到别的应用）时，TA 发消息用系统通知弹横幅。</b>必备：① 本机得有网页通知能力——安卓或电脑上的 Chrome / Edge（Chromium 内核）且 https 打开，或 iPhone / iPad 用 Safari「添加到主屏幕」后从桌面图标打开本站（标签页形态没有这个能力）；小米 / vivo / OPPO 自带浏览器、UC、夸克这些没有通知能力，开不起来；② 允许通知权限（地址栏左侧图标 → 网站设置 → 通知）；③ 本开关（会自动开启「后台保活」——后台不产生消息就无从弹起）；④ 系统设置里给浏览器允许通知、且不限制其后台运行/省电（小米 / 红米还要开「在屏幕上方显示 / 悬浮通知」）。<b>iPhone / iPad：Safari 标签页里没有网页通知能力，要到 Safari「添加到主屏幕」后从桌面图标打开本站，这个开关才开得了</b>——那边能授权、能弹系统通知；但 iOS 不给网页推送服务端，应用被系统收回后不保证弹，所以「后台保活」要一起开着，并可用「桌面消息弹窗」的应用内横幅兜底。点本行「功能说明」看完整步骤与「收不到」的排查，点右侧「测试」＝后台弹窗自测：第一段当场体检（开关/权限/保活/后台服务）并真发一条；成功后再点「现在测（切后台）」按 Home 切后台，第二段会由页面在后台再发一条、回来给结论。<b>⚠ 后台弹窗跟着保活一起：保活被截断/页面被丢弃＝后台弹窗一起停摆</b>（别的 App 刷视频、听歌占用音频；挂后台太久被系统冻结——见上方红字）；失效后彻底关闭网页重新打开，再把两个开关重新打开。<b>还有一条最容易漏：手机开了勿扰 / 免打扰（iPhone 叫「专注模式」）时，通知被系统静默收进通知栏、屏幕上方不弹横幅</b>——网页读不到它，「测试」体检全绿你也可能什么都没看到；先下拉通知栏看那条测试通知在不在，在＝被系统压住（去系统设置关掉勿扰，或把本浏览器 / 桌面上的 Mochi 加进勿扰的允许例外）。</div>
         <!-- #1059：通知逐条弹（关闭内容去重）——用户直派「联系人发来的多条消息我都要看到弹窗」。
              默认关闭＝保持去重（同内容/近期弹过只弹一条）；打开后每条消息都单独弹系统通知。 -->
+        <div class="gs-sub dict-lock-hint" id="bg-notify-perm-warn" hidden></div>
         <div class="gs-row"><span>通知逐条弹（关闭去重）</span><label class="toggle"><input type="checkbox" id="bg-notify-nodedup"><span class="tk"></span></label></div>
         <div class="gs-sub" id="bg-notify-nodedup-sub">默认关闭：内容相同或近期弹过的消息只弹一条（去重，防同句连轰）。<b>打开后每条消息都弹</b>——字卡重复率高时会连环弹同句提示，按需开；聊天记录与未读角标不受影响。</div>
         <!-- FIX 2026-09-22 #1014：权限不到位时不再自动关开关（用户实报「切后台自动关闭」）——
              真实状态与一步到位的方法写在这条标红行里，由 bg-keep.js 按权限读数渲染（granted 时隐藏；
              设备根本没有通知能力时一直显示）。视觉复用 #961 红条族 .dict-lock-hint -->
-        <div class="gs-sub dict-lock-hint" id="bg-notify-perm-warn" hidden></div>
+        
         <!-- FIX 2026-09-20 #927：本段的「全屏模式（隐藏手机状态栏）」行（#sf-fullscreen 及其说明小字）已整体搬到
              「通用」段首位独立成组（用户点名要放最前面显眼处）；本段只留下方「全屏边缘防误触」等配套开关。 -->
         <!-- v3.26.x：布局手动兜底——浏览器「桌面版网站」模式会把 UA / screen / 触摸能力 /
@@ -1794,9 +1788,9 @@
              桌面版 Chrome 同样可用，而安卓自带浏览器多数没有这个能力） -->
         <div class="set-row">
           <div class="txt">离线消息提醒<span class="tag" id="psync-help" role="button" tabindex="0" aria-haspopup="dialog">功能说明</span></div>
-          <label class="toggle"><input type="checkbox" id="psync-en"><span class="tk"></span></label>
+          <label class="toggle"><input type="checkbox" id="psync-en" aria-describedby="psync-status-description"><span class="tk"></span></label>
         </div>
-        <div class="gs-row" style="display:block"><span id="psync-status" style="font-size:11px;color:var(--muted,#999);line-height:1.5;white-space:normal">…</span></div>
+        <div class="gs-sub offline-status" id="psync-status-description"><b>离线消息提醒状态：</b><span id="psync-status" style="font-size:11px;color:var(--muted,#999);line-height:1.5;white-space:normal">…</span></div>
       </div>
       </div><!-- /them-sec system -->
       <!-- 工具：屏幕适配 / 字卡自检 / 各功能数据 / 信息诊断 / 存储 / 卡顿优化等数据与诊断工具
@@ -2079,11 +2073,7 @@
           <div class="txt">怎么添加字卡<span class="sub">系统预设字卡 + 自定义字卡</span></div>
           <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
         </div>
-        <div class="set-row" id="row-faq-fullscreen">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt">全屏模式失效<span class="sub">切后台会失效 · 怎么恢复</span></div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
+        
         <div class="set-row" id="row-faq-preset">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></div>
           <div class="txt">系统预设字卡与功能设置<span class="sub">建议打开使用 · 原因说明</span></div>
@@ -3646,12 +3636,6 @@
             <div class="gs-row"><span>来信内容使用 emoji</span><label class="toggle"><input type="checkbox" id="ml-emoji-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>来信内容使用表情包</span><label class="toggle"><input type="checkbox" id="ml-sticker-en"><span class="tk"></span></label></div>
           </div>
-          <!-- #645：每周摸鱼小结寄信开关——关闭后 TA 不再寄「本周摸鱼小结」（判定在 src/js/mail.js fishWeekReportFor） -->
-          <div class="gs-title">每周摸鱼小结</div>
-          <div class="set-group glass">
-            <div class="gs-row"><span>摸鱼小结寄信</span><label class="toggle"><input type="checkbox" id="ml-fish-week-en"><span class="tk"></span></label></div>
-            <div class="gs-sub">开启后每周日 18 点后 TA 会把「本周摸鱼小结」寄进信箱（周一~周三会补上周的）；关闭后不再寄，主动来信/回信不受影响</div>
-          </div>
         </div>
         <div class="gs-panel" data-rpanel="feed" hidden>
           <!-- #534：内容类型总开关——与信箱页「写信内容类型」同款。关闭后该类型在朋友圈
@@ -3716,7 +3700,7 @@
         </div>
         <!-- v3.9.x：查岗——TA 主动查你的岗：随主动发送按概率发查岗问题卡（聊天互动卡 + 概率弹窗，作答后 TA 回应） -->
         <div class="gs-panel" data-rpanel="ck" hidden>
-          <div class="gs-title">TA 主动查岗</div>
+          <div class="gs-title">TA主动查岗与概率</div>
           <div class="set-group glass">
             <div class="gs-row"><span>TA 主动查岗</span><label class="toggle"><input type="checkbox" id="ckq-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>查岗概率</span><div class="stepper" data-k="ckq-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="ckq-prob-val" readonly><button class="stp-max">+</button></div></div>
@@ -3727,7 +3711,7 @@
         </div>
         <!-- v3.9.x：其他——联系人主动邀请（猜拳/玩游戏），随 TA 主动找你的消息按概率触发 -->
         <div class="gs-panel" data-rpanel="other" hidden>
-          <div class="gs-title">联系人主动邀请</div>
+          <div class="gs-title">TA主动邀请</div>
           <div class="set-group glass">
             <div class="gs-row"><span>主动邀请猜拳</span><label class="toggle"><input type="checkbox" id="ai-rps-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>猜拳邀请概率</span><div class="stepper" data-k="ai-rps-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="ai-rps-prob-val" readonly><button class="stp-max">+</button></div></div>
@@ -3752,13 +3736,6 @@
             <div class="gs-row"><span>跨桌面来电概率</span><div class="stepper" data-k="desk-call-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="desk-call-prob-val" readonly><button class="stp-max">+</button></div></div>
           </div>
           <div class="gs-sub" style="padding:0 14px 2px">其他桌面的联系人会按各自概率（默认 2%，可在此逐联系人调整）主动给你来电，冷却与查岗一致 30 分钟。全局开关在 设置 →「开启 联系人跨桌面打电话」（默认关闭，需先到那里手动打开，这里调了概率也不会来电）</div>
-          <!-- v3.26.x：摸鱼值 / 工作值累计总开关——桌面摸鱼小组件数值增长闸门（personalize.js addFish/addWork 消费） -->
-          <div class="gs-title" style="margin-top:10px">摸鱼值 / 工作值</div>
-          <div class="set-group glass">
-            <div class="gs-row"><span>摸鱼值累计</span><label class="toggle"><input type="checkbox" id="fish-en"><span class="tk"></span></label></div>
-            <div class="gs-row"><span>工作值累计</span><label class="toggle"><input type="checkbox" id="work-en"><span class="tk"></span></label></div>
-          </div>
-          <div class="gs-sub" style="padding:0 14px 14px">桌面摸鱼小组件两组数值的增长总开关（默认开）。关闭「摸鱼值累计」后：TA 的自动摸鱼、你点摸鱼按钮、番茄钟补偿摸鱼、抓包奖励都不再涨摸鱼值；关闭「工作值累计」后：自动打工、专注期间的工作值等不再涨。已有数值保留不清零，重新打开即恢复累计，各联系人独立保存</div>
         </div>
         <!-- v3.6.x：保存设置按钮——点击把当前所有概率/开关写入本地并提示 -->
         <button class="ta-add-btn gs-save-btn" id="reply-save-btn" style="width:100%;margin:6px 0 10px">
@@ -4379,10 +4356,6 @@
           <div class="cal-sec">
             <div class="cal-sec-title">心情</div>
             <div class="cal-sec-body cal-mine" id="cal-mood"></div>
-          </div>
-          <div class="cal-sec">
-            <div class="cal-sec-title">摸鱼 · 工作</div>
-            <div class="cal-sec-body" id="cal-stats"></div>
           </div>
         </div>
 
@@ -6888,13 +6861,7 @@
            本组不带 data-tag，故不参与 #cs-func-tags 分类过滤（chat-settings.js 只过滤 [data-tag] 成对元素），五个入口一律可见。
            与设置页通用段 #sf-fullscreen 同一状态双向同步（接线在 chat-settings.js）。 -->
       <div class="gs-title">全屏</div>
-      <div class="set-group glass" id="cs-fs-group">
-        <div class="set-row" id="cs-fullscreen-row">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt">全屏模式（隐藏手机状态栏）<span class="sub">手机端切到后台（锁屏 / 切去别的应用）会自动退出全屏，这是设备限制、不是 bug，切回来再开一次即可</span></div>
-          <label class="toggle"><input type="checkbox" id="cs-fullscreen"><span class="tk"></span></label>
-        </div>
-      </div>
+      
       <!-- v3.29.x：功能页二级 tag 分类（形象/消息/显示），点击只显示对应分组；
            交互在 chat-settings.js（#cs-func-tags），分组按 gs-title/set-group 成对 data-tag 过滤。
            v3.34.x 分类改名（用户反馈「分类名字还是有问题，不太合适」）：

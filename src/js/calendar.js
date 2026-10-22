@@ -425,49 +425,7 @@
     if (memoEl) memoEl.textContent = isFuture ? futureTip : (memo || calEmptyTxt('这一天没有备忘'));
     const moodEl = document.getElementById('cal-mood');
     if (moodEl) moodEl.textContent = isFuture ? futureTip : (mood || calEmptyTxt('这一天没有记录心情'));
-    // 摸鱼值 / 工作值（双方当天值）：fish-day-add / work-day-add 按天记录。
-    // 注意 fishDayKey 的日期格式是 YYYY-M-D（无补零），需归一化后与 selDate（YYYY-MM-DD）匹配；
-    // 今天读实时 day-fish-*/day-work-* 键（与桌面周末面板一致），历史日期读按天记录。
-    const statsEl = document.getElementById('cal-stats');
-    if (statsEl) {
-      statsEl.style.whiteSpace = 'pre-line';
-      if (isFuture) {
-        statsEl.textContent = futureTip;
-      } else {
-        const norm = (s) => {
-          const p = String(s).split('-');
-          if (p.length !== 3) return String(s);
-          return p[0] + '-' + String(+p[1]).padStart(2, '0') + '-' + String(+p[2]).padStart(2, '0');
-        };
-        const myName = store.get('lbl-user') || '我';
-        const taName = store.get('lbl-partner') || 'TA';
-        const isToday = selDate === todayStr();
-        const dayKey = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-        const pickDay = (logKey) => {
-          try {
-            const list = JSON.parse(store.get(logKey) || '[]');
-            return list.find(x => x && norm(x.date) === selDate) || null;
-          } catch (e) { return null; }
-        };
-        let fm = 0, ft = 0, wm = 0, wt = 0;
-        if (isToday) {
-          const k = dayKey(dd);
-          fm = parseInt(store.get('day-fish-' + k) || '0', 10) || 0;
-          ft = parseInt(store.get('day-fish-ta-' + k) || '0', 10) || 0;
-          wm = parseInt(store.get('day-work-' + k) || '0', 10) || 0;
-          wt = parseInt(store.get('day-work-ta-' + k) || '0', 10) || 0;
-        } else {
-          const f = pickDay('fish-day-add');
-          const w = pickDay('work-day-add');
-          if (f) { fm = f.mine || 0; ft = f.ta || 0; }
-          if (w) { wm = w.mine || 0; wt = w.ta || 0; }
-        }
-        const lines = [];
-        if (fm || ft || isToday) lines.push('摸鱼值　' + myName + ' +' + fm + ' · ' + taName + ' +' + ft);
-        if (wm || wt || isToday) lines.push('工作值　' + myName + ' +' + wm + ' · ' + taName + ' +' + wt);
-        statsEl.textContent = lines.length ? lines.join('\n') : calEmptyTxt('这一天没有摸鱼 / 工作记录');
-      }
-    }
+
   }
 
   // 心情日记入口卡（#303）：实时预览「我」与「梦角」今日心情，来自 mood-diary.js 的 moodDiaryToday()
@@ -493,7 +451,6 @@
   document.addEventListener('mood-interact-recorded', function () { try { renderMoodEntry(); } catch (e) {} });
 
   function render() {
-    try { ensureFishHeat(); } catch (e) {} // 摸鱼/工作「当日统计」随 selDate 切换刷新
     try { renderMoodEntry(); } catch (e) {}
     const parts = selDate.split('-');
     const dd = new Date(+parts[0], +parts[1] - 1, +parts[2]);
@@ -543,102 +500,6 @@
   // #785：回填真完成时补渲一次——慢机器/走「仍要进入」时首屏停在「正在读取…」，靠它收敛
   //（补渲回调内部的 try/catch 在 mochiOnDataReady 里，此处不再包一层）
   if (window.mochiOnDataReady) window.mochiOnDataReady(render);
-
-  // ===== 日历页·摸鱼/工作「当日统计」条状图 =====
-  // 数据源 fish-day-add / work-day-add（历史通过）+ 当天实时 day-fish-*/day-work-*。
-  // 跟随日历选中日期（selDate）：日历上切到哪一天，本卡片就展示那一整天的完整统计。
-  // 卡片动态创建、插在 #cal-empty-card 之后；render() 每次进入页面 / 切换日期时刷新。
-  let _heatCard = null;
-  function heatNorm(s) {
-    const p = String(s || '').split('-');
-    if (p.length !== 3) return null;
-    const y = +p[0], m = +p[1], d = +p[2];
-    if (!y || !(m >= 1 && m <= 12) || !(d >= 1 && d <= 31)) return null;
-    return new Date(y, m - 1, d);
-  }
-  function ensureFishHeat() {
-    const emptyCard = document.getElementById('cal-empty-card');
-    const meCard = document.getElementById('cal-me-card');
-    const anchor = emptyCard || meCard;
-    if (!anchor) return;
-    if (!_heatCard) {
-      _heatCard = document.createElement('div');
-      _heatCard.className = 'cal-card glass';
-      _heatCard.id = 'cal-fish-heat';
-      _heatCard.innerHTML =
-        '<div class="cal-sec">' +
-          '<div class="cal-sec-head"><div class="cal-sec-title">摸鱼 · 工作（日统计）</div><span class="fh-range" id="fh-range"></span></div>' +
-          '<div class="fh-bars" id="fh-wrap"></div>' +
-        '</div>';
-      anchor.parentNode.insertBefore(_heatCard, anchor.nextSibling);
-    }
-    const rangeEl = document.getElementById('fh-range');
-    const wrap = document.getElementById('fh-wrap');
-    if (!wrap) return;
-    const parts = selDate.split('-');
-    const dd = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-    const n2 = new Date();
-    const today0 = new Date(n2.getFullYear(), n2.getMonth(), n2.getDate());
-    const isFuture = dd > today0;
-    const isBefore = !isFuture && selDate < firstUseDate();
-    // 空态（未来 / 首用日之前）：与日历其余卡片同口径
-    if (isFuture || isBefore) {
-      if (rangeEl) rangeEl.textContent = isFuture ? '这一天还没到来' : '开始使用之前没有记录';
-      wrap.innerHTML = '<div class="fh-empty">' + (isFuture ? '等到了那一天再来看看吧' : '开始使用之前的日子没有摸鱼 / 工作记录') + '</div>';
-      return;
-    }
-    if (rangeEl) rangeEl.textContent = (dd.getMonth() + 1) + ' 月 ' + dd.getDate() + ' 日 · 完整日统计';
-    // 读取当天数值：今天读实时键，历史读按天记录（日期键无补零，需归一化匹配 selDate）
-    const isToday = selDate === todayStr();
-    const dayKey = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-    const norm = (s) => {
-      const p = String(s).split('-');
-      if (p.length !== 3) return String(s);
-      return p[0] + '-' + String(+p[1]).padStart(2, '0') + '-' + String(+p[2]).padStart(2, '0');
-    };
-    const pickDay = (logKey) => {
-      try {
-        const list = JSON.parse(store.get(logKey) || '[]');
-        return list.find(x => x && norm(x.date) === selDate) || null;
-      } catch (e) { return null; }
-    };
-    let fm = 0, ft = 0, wm = 0, wt = 0;
-    if (isToday) {
-      const k = dayKey(dd);
-      fm = parseInt(store.get('day-fish-' + k) || '0', 10) || 0;
-      ft = parseInt(store.get('day-fish-ta-' + k) || '0', 10) || 0;
-      wm = parseInt(store.get('day-work-' + k) || '0', 10) || 0;
-      wt = parseInt(store.get('day-work-ta-' + k) || '0', 10) || 0;
-    } else {
-      const f = pickDay('fish-day-add');
-      const w = pickDay('work-day-add');
-      if (f) { fm = f.mine || 0; ft = f.ta || 0; }
-      if (w) { wm = w.mine || 0; wt = w.ta || 0; }
-    }
-    const myName = store.get('lbl-user') || '我';
-    const taName = store.get('lbl-partner') || 'TA';
-    if (!fm && !ft && !wm && !wt) {
-      wrap.innerHTML = '<div class="fh-empty">这一天没有摸鱼 / 工作记录</div>';
-      return;
-    }
-    const maxV = Math.max(fm, ft, wm, wt, 1);
-    const pct = (v) => Math.max(4, Math.round(v / maxV * 100));
-    const bars = [
-      { label: '摸鱼 · ' + myName, v: fm, cls: 'fish' },
-      { label: '摸鱼 · ' + taName, v: ft, cls: 'fish' },
-      { label: '工作 · ' + myName, v: wm, cls: 'work' },
-      { label: '工作 · ' + taName, v: wt, cls: 'work' }
-    ];
-    let html = '';
-    bars.forEach(b => {
-      html += '<div class="fh-bar-row ' + b.cls + '">' +
-        '<span class="fh-label">' + b.label + '</span>' +
-        '<div class="fh-track"><div class="fh-fill" style="width:' + pct(b.v) + '%"></div></div>' +
-        '<span class="fh-val">+' + b.v + '</span>' +
-      '</div>';
-    });
-    wrap.innerHTML = html;
-  }
 
   // 桌面【日历】图标进入
   const calApp = document.querySelector('.app[data-app="calendar"]');

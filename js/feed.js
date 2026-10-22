@@ -67,6 +67,19 @@ run();
 } catch (e) {}
 })();
 const KEY = 'feed-posts';
+function favoritePostAuthor(p) {
+const mine = (p.role || p.by) === 'me', owner = p.owner || 'default';
+return {sourceId:p.id,authorRole:mine ? 'me' : 'ta',authorOwner:owner,authorName:p.authorName || (mine ? feedUserNameFor(owner) : taFeedNameFor(owner)),authorAv:p.authorAv || (mine ? feedUserAvFor(owner) : taAvFor(owner)),side:mine ? 'out' : 'in'};
+}
+window.feedFavoriteAuthorResolver = function() {
+try {
+const ids = new Map(), messages = new Map();
+const put = (map,key,p) => map.set(key,map.has(key) ? null : p);
+load().forEach(p => { if(p.id) put(ids,p.id,p);put(messages,JSON.stringify([p.ts,String(p.content || '')]),p); });
+return f => { const p = f.sourceId ? ids.get(f.sourceId) : messages.get(JSON.stringify([f.ts,String(f.text || '')]));return p ? favoritePostAuthor(p) : null; };
+} catch(e) { return () => null; }
+};
+window.feedFavoriteAuthor = f => window.feedFavoriteAuthorResolver()(f);
 const SNAP_KEY = 'feed-posts-snap';
 const LS_BIG_LIMIT = 200 * 1024;
 function maxPostTs(arr) { return (Array.isArray(arr) ? arr : []).reduce((m, p) => (p && p.ts > m ? p.ts : m), 0); }
@@ -1672,13 +1685,13 @@ const p = list.find(x => x.id === pid);
 if (!window.addMyFavItem) { toast('收藏功能暂不可用'); return; }
 if (!p) { toast('未找到这条动态'); return; }
 const isMine = (p.role || p.by) === 'me';
-const ok = window.addMyFavItem({
+const ok = window.addMyFavItem(Object.assign({
 kind: 'feed',
 text: p.content || '',
 imgs: (p.imgs || []).slice(),
 ts: p.ts || Date.now(),
 side: isMine ? 'out' : 'in'
-});
+}, favoritePostAuthor(p)));
 toast(ok ? '已收藏这条动态' : '这条动态已收藏过');
 refreshPostCard(pid); // 刷新收藏按钮高亮态
 }));
@@ -2395,7 +2408,7 @@ const list2 = load();
 const mine = list2.filter(x => (x.role || x.by) === 'me');
 if (!mine.length) return;
 const pick = mine[Math.floor(Math.random() * mine.length)];
-const f = { kind: 'feed', text: pick.content || '', imgs: (pick.imgs || []).slice(), ts: pick.ts || Date.now() };
+const f = Object.assign({ kind: 'feed', text: pick.content || '', imgs: (pick.imgs || []).slice(), ts: pick.ts || Date.now(), collectedAt: Date.now() }, favoritePostAuthor(pick));
 const s = window.storeFor(cid);
 if (window.xyBigWriteHold(s, 'fav-msgs')) return;
 let fav = [];

@@ -36,8 +36,26 @@ jobs:
       - name: 二改功能验证
         run: node tools/verify-personal.cjs
 
+      - name: 聊天设置分组排版验证
+        run: node tools/verify-chat-layout.cjs
+
+      - name: 设置分类与说明按钮验证
+        run: node tools/verify-settings-layout.cjs
+
+      - name: 设置细节与遗留项清理验证
+        run: node tools/verify-settings-refinement.cjs
+
+      - name: v4.0 新功能验证
+        run: |
+          node tools/verify-card-library-layout.cjs
+          node tools/verify-calendar-cleanup.cjs
+          node tools/verify-custom-moods.cjs
+          node tools/verify-chat-group-favorites.cjs
+          node tools/verify-favorite-identity.cjs
+          node tools/verify-update-notes.cjs
+
       - name: Chrome 布局验证
-        run: node tools/verify.mjs
+        run: node tools/verify-core-layout.cjs
 
       - name: WebKit 引擎验证
         run: node tools/verify-webkit.mjs

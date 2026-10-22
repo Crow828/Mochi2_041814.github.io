@@ -338,46 +338,6 @@ const memoEl = document.getElementById('cal-memo');
 if (memoEl) memoEl.textContent = isFuture ? futureTip : (memo || calEmptyTxt('这一天没有备忘'));
 const moodEl = document.getElementById('cal-mood');
 if (moodEl) moodEl.textContent = isFuture ? futureTip : (mood || calEmptyTxt('这一天没有记录心情'));
-const statsEl = document.getElementById('cal-stats');
-if (statsEl) {
-statsEl.style.whiteSpace = 'pre-line';
-if (isFuture) {
-statsEl.textContent = futureTip;
-} else {
-const norm = (s) => {
-const p = String(s).split('-');
-if (p.length !== 3) return String(s);
-return p[0] + '-' + String(+p[1]).padStart(2, '0') + '-' + String(+p[2]).padStart(2, '0');
-};
-const myName = store.get('lbl-user') || '我';
-const taName = store.get('lbl-partner') || 'TA';
-const isToday = selDate === todayStr();
-const dayKey = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-const pickDay = (logKey) => {
-try {
-const list = JSON.parse(store.get(logKey) || '[]');
-return list.find(x => x && norm(x.date) === selDate) || null;
-} catch (e) { return null; }
-};
-let fm = 0, ft = 0, wm = 0, wt = 0;
-if (isToday) {
-const k = dayKey(dd);
-fm = parseInt(store.get('day-fish-' + k) || '0', 10) || 0;
-ft = parseInt(store.get('day-fish-ta-' + k) || '0', 10) || 0;
-wm = parseInt(store.get('day-work-' + k) || '0', 10) || 0;
-wt = parseInt(store.get('day-work-ta-' + k) || '0', 10) || 0;
-} else {
-const f = pickDay('fish-day-add');
-const w = pickDay('work-day-add');
-if (f) { fm = f.mine || 0; ft = f.ta || 0; }
-if (w) { wm = w.mine || 0; wt = w.ta || 0; }
-}
-const lines = [];
-if (fm || ft || isToday) lines.push('摸鱼值　' + myName + ' +' + fm + ' · ' + taName + ' +' + ft);
-if (wm || wt || isToday) lines.push('工作值　' + myName + ' +' + wm + ' · ' + taName + ' +' + wt);
-statsEl.textContent = lines.length ? lines.join('\n') : calEmptyTxt('这一天没有摸鱼 / 工作记录');
-}
-}
 }
 function renderMoodEntry() {
 const entry = document.getElementById('cal-mood-entry');
@@ -395,7 +355,6 @@ if (taEl) taEl.textContent = (md && md.ta) ? (md.ta.e + ' ' + md.ta.n)
 }
 document.addEventListener('mood-interact-recorded', function () { try { renderMoodEntry(); } catch (e) {} });
 function render() {
-try { ensureFishHeat(); } catch (e) {} // 摸鱼/工作「当日统计」随 selDate 切换刷新
 try { renderMoodEntry(); } catch (e) {}
 const parts = selDate.split('-');
 const dd = new Date(+parts[0], +parts[1] - 1, +parts[2]);
@@ -438,95 +397,6 @@ renderDayNotes(dd, isFuture);
 renderGrid();
 }
 if (window.mochiOnDataReady) window.mochiOnDataReady(render);
-let _heatCard = null;
-function heatNorm(s) {
-const p = String(s || '').split('-');
-if (p.length !== 3) return null;
-const y = +p[0], m = +p[1], d = +p[2];
-if (!y || !(m >= 1 && m <= 12) || !(d >= 1 && d <= 31)) return null;
-return new Date(y, m - 1, d);
-}
-function ensureFishHeat() {
-const emptyCard = document.getElementById('cal-empty-card');
-const meCard = document.getElementById('cal-me-card');
-const anchor = emptyCard || meCard;
-if (!anchor) return;
-if (!_heatCard) {
-_heatCard = document.createElement('div');
-_heatCard.className = 'cal-card glass';
-_heatCard.id = 'cal-fish-heat';
-_heatCard.innerHTML =
-'<div class="cal-sec">' +
-'<div class="cal-sec-head"><div class="cal-sec-title">摸鱼 · 工作（日统计）</div><span class="fh-range" id="fh-range"></span></div>' +
-'<div class="fh-bars" id="fh-wrap"></div>' +
-'</div>';
-anchor.parentNode.insertBefore(_heatCard, anchor.nextSibling);
-}
-const rangeEl = document.getElementById('fh-range');
-const wrap = document.getElementById('fh-wrap');
-if (!wrap) return;
-const parts = selDate.split('-');
-const dd = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-const n2 = new Date();
-const today0 = new Date(n2.getFullYear(), n2.getMonth(), n2.getDate());
-const isFuture = dd > today0;
-const isBefore = !isFuture && selDate < firstUseDate();
-if (isFuture || isBefore) {
-if (rangeEl) rangeEl.textContent = isFuture ? '这一天还没到来' : '开始使用之前没有记录';
-wrap.innerHTML = '<div class="fh-empty">' + (isFuture ? '等到了那一天再来看看吧' : '开始使用之前的日子没有摸鱼 / 工作记录') + '</div>';
-return;
-}
-if (rangeEl) rangeEl.textContent = (dd.getMonth() + 1) + ' 月 ' + dd.getDate() + ' 日 · 完整日统计';
-const isToday = selDate === todayStr();
-const dayKey = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-const norm = (s) => {
-const p = String(s).split('-');
-if (p.length !== 3) return String(s);
-return p[0] + '-' + String(+p[1]).padStart(2, '0') + '-' + String(+p[2]).padStart(2, '0');
-};
-const pickDay = (logKey) => {
-try {
-const list = JSON.parse(store.get(logKey) || '[]');
-return list.find(x => x && norm(x.date) === selDate) || null;
-} catch (e) { return null; }
-};
-let fm = 0, ft = 0, wm = 0, wt = 0;
-if (isToday) {
-const k = dayKey(dd);
-fm = parseInt(store.get('day-fish-' + k) || '0', 10) || 0;
-ft = parseInt(store.get('day-fish-ta-' + k) || '0', 10) || 0;
-wm = parseInt(store.get('day-work-' + k) || '0', 10) || 0;
-wt = parseInt(store.get('day-work-ta-' + k) || '0', 10) || 0;
-} else {
-const f = pickDay('fish-day-add');
-const w = pickDay('work-day-add');
-if (f) { fm = f.mine || 0; ft = f.ta || 0; }
-if (w) { wm = w.mine || 0; wt = w.ta || 0; }
-}
-const myName = store.get('lbl-user') || '我';
-const taName = store.get('lbl-partner') || 'TA';
-if (!fm && !ft && !wm && !wt) {
-wrap.innerHTML = '<div class="fh-empty">这一天没有摸鱼 / 工作记录</div>';
-return;
-}
-const maxV = Math.max(fm, ft, wm, wt, 1);
-const pct = (v) => Math.max(4, Math.round(v / maxV * 100));
-const bars = [
-{ label: '摸鱼 · ' + myName, v: fm, cls: 'fish' },
-{ label: '摸鱼 · ' + taName, v: ft, cls: 'fish' },
-{ label: '工作 · ' + myName, v: wm, cls: 'work' },
-{ label: '工作 · ' + taName, v: wt, cls: 'work' }
-];
-let html = '';
-bars.forEach(b => {
-html += '<div class="fh-bar-row ' + b.cls + '">' +
-'<span class="fh-label">' + b.label + '</span>' +
-'<div class="fh-track"><div class="fh-fill" style="width:' + pct(b.v) + '%"></div></div>' +
-'<span class="fh-val">+' + b.v + '</span>' +
-'</div>';
-});
-wrap.innerHTML = html;
-}
 const calApp = document.querySelector('.app[data-app="calendar"]');
 if (calApp && page) {
 calApp.addEventListener('click', () => {

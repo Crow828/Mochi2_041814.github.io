@@ -1,4 +1,4 @@
-﻿// ===== 组装脚本 =====
+// ===== 组装脚本 =====
 // 把 src/ 下的模板 + 按页面拆分的 CSS + 按功能拆分的 JS
 // 拼装成单个可直接双击打开的 index.html（完整功能）。
 // 用法：在 mochi 目录下运行  node build.mjs
@@ -69,7 +69,7 @@ if (!CHECK_SENTINELS && !process.argv.includes('--allow-revert') && !process.env
 // ===== 构建信息（开屏显示 + sw 缓存版本号，v3.5.54） =====
 const buildTime = new Date();
 const pad = (n) => (n < 10 ? '0' + n : '' + n);
-const buildInfo = '部署于 ' + buildTime.getFullYear() + '-' + pad(buildTime.getMonth() + 1) + '-' + pad(buildTime.getDate()) +
+const buildInfo = 'v 4.0 · 部署于 ' + buildTime.getFullYear() + '-' + pad(buildTime.getMonth() + 1) + '-' + pad(buildTime.getDate()) +
   ' ' + pad(buildTime.getHours()) + ':' + pad(buildTime.getMinutes());
 const buildStamp = buildTime.getTime().toString(36); // sw 缓存名版本号（每次构建必变）
 // 应用版本号（设置页底部与开屏共用）
@@ -112,8 +112,8 @@ function minifyCss(code) {
 }
 
 // ===== 按顺序拼接样式 / 脚本（顺序即生效顺序） =====
-const cssFiles = ['base.css', 'home.css', 'chat-main.css', 'chat-pages.css', 'market.css', 'group-chat.css', 'setting.css', 'tabbar.css', 'dark.css', 'memo.css', 'memo-arc.css', 'applock.css', 'feature-data.css', 'display-tune.css'];
-const jsFiles = ['feature-policy-config.js', 'feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'usage-days.js', 'legacy-score-history.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data-catalog.js', 'feature-data.js', 'pwa.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js'];
+const cssFiles = ['base.css', 'home.css', 'chat-main.css', 'chat-pages.css', 'market.css', 'group-chat.css', 'setting.css', 'tabbar.css', 'dark.css', 'memo.css', 'memo-arc.css', 'applock.css', 'feature-data.css', 'display-tune.css', 'chat-settings-layout.css', 'settings-layout.css', 'settings-refinement.css', 'card-library-layout.css', 'mood-custom.css', 'chat-group-favorites.css', 'update-notes.css'];
+const jsFiles = ['feature-policy-config.js', 'feature-policy.js', 'device.js', 'idb.js', 'contacts.js', 'applock.js', 'card-lock.js', 'dcp-master.js', 'media-pool.js','storage-slim.js', 'perf-check.js', 'energy-check.js', 'flash-check.js', 'img-compress.js', 'img-ingest.js', 'clock.js', 'tabs.js', 'desktop-slider.js', 'quote-cards.js', 'usage-days.js', 'legacy-score-history.js', 'personalize.js', 'chat.js', 'group-chat.js', 'chatcard.js', 'chat-settings.js', 'reply-settings.js', 'fav-settings.js', 'default-cards-data.js', 'dict-ext-data.js', 'default-cards.js', 'quote-spell.js', 'dream-free.js', 'mood-followup-data.js', 'mood-reply-cards.js', 'ta-mood-data.js', 'ta-mood.js', 'music-player.js', 'calendar.js', 'divination.js', 'avatar-lib.js', 'ta-ask.js', 'ck-question.js', 'incoming-requests.js', 'ta-invite.js', 'bg-keep.js', 'records.js', 'call.js', 'mail.js', 'feed.js', 'loc-lib.js', 'p2-features.js', 'gift-shop.js', 'memo-app.js', 'memo-arc.js', 'my-arc.js', 'period.js', 'accounting.js', 'decision.js', 'group-decision.js', 'pong.js', 'snake-game.js', 'breakout.js', 'connect-four.js', 'coop-mine.js', 'fishing.js', 'memory-game.js', 'gomoku.js', 'linkup.js', 'match3.js', 'auction.js', 'arcade.js', 'mood-diary.js', 'sfx.js', 'fullscreen.js', 'data-backup.js', 'feature-data-catalog.js', 'feature-data.js', 'pwa.js', 'feature-hub.js', 'settings-help.js', 'onboarding.js', 'page-coach.js', 'card-audit.js', 'storage-guide.js', 'mobile-adapt.js', 'chat-settings-layout.js', 'settings-layout.js', 'settings-refinement.js', 'card-library-layout.js', 'update-notes.js'];
 
 // ===== PERF-PLAN 阶段 1：JS 外置化（2026-09-18）=====
 // 首开「3.8MB 内联 JS 主线程整段解析执行」是 iOS/中低端安卓卡顿的结构性大头
@@ -358,7 +358,7 @@ console.log('已生成 index.html（' + html.length + ' 字节，' + (html.split
 // v3.6.x：生成版本文件 version.json（部署到站点根目录）——
 // 手机端靠它检测新版本（fetch 对比时间戳），不依赖 Service Worker 更新机制
 //（sw 只在页面加载/导航时检查、iOS Safari 检测不可靠，开着旧页面永远收不到提醒）。
-const versionJson = JSON.stringify({ ts: buildTime.getTime(), info: buildInfo });
+const versionJson = JSON.stringify({ ts: buildTime.getTime(), info: buildInfo, release: 'v 4.0' });
 writeFileSync(join(root, 'version.json'), versionJson);
 console.log('已生成 version.json（' + versionJson + '）');
 
@@ -652,11 +652,6 @@ const FIX_SENTINELS = [
     "needle": "if (mailBlindRead(cid)) return; // #1442b 回信让路"
   },
   {
-    "name": "#1442e 每周摸鱼小结：让路放在烧周标记之前（删＝标记先烧、这周永不补发）",
-    "file": "js/mail.js",
-    "needle": "if (mailBlindRead(cid)) return; // #1442c 小结让路"
-  },
-  {
     "name": "#1442f 剥图快照走 xyStore 同一句柄＝LS 整域写不进的机器上库里还有这一份（删＝兜底恒 0 字节）",
     "file": "js/mail.js",
     "needle": "const ss = snapStore(cid);"
@@ -847,26 +842,6 @@ const FIX_SENTINELS = [
     "name": "#1293b 存量误迁副本写回根键找回（删＝修复前已被搬进 default: 的偏移永久无人读）",
     "file": "js/contacts.js",
     "needle": "'screen-adj-shift', 'screen-adj-text', 'screen-adj-side'].forEach(function (k) {"
-  },
-  {
-    "name": "#1282a 全屏请求单点闸（在途或已全屏不再另发一次 requestFullscreen；删＝一次点按两段全屏切换事务＝红米所见闪屏后黑屏 2~3 秒）",
-    "file": "js/fullscreen.js",
-    "needle": "if (_fsFlight || isFullscreen()) return _fsFlight;"
-  },
-  {
-    "name": "#1282b 闸的有界释放（内核不返回 promise／落定缺失时最长压 1.5s；删掉这句＝闸可能被永久挂住，全屏再也开不了）",
-    "file": "js/fullscreen.js",
-    "needle": "_fsFlightTimer = setTimeout(closeFsFlight, 1500);"
-  },
-  {
-    "name": "#1282c 手势重入认目标让路（点开关那一下交还给开关自己的 change 流程；删＝touchstart 抢先发一次，点「关」还会被开回来＝全屏关不掉/开关弹回）",
-    "file": "js/fullscreen.js",
-    "needle": "function retryTouch(e) { if (!e.isTrusted || onFsSwitch(e.target)) return; doRetry(); }"
-  },
-  {
-    "name": "#1282d 让路判据取事件落点（开关本体或其 label 装饰层；不是机型/UA 分支，删＝判据失效退回「任何触摸都抢发全屏」）",
-    "file": "js/fullscreen.js",
-    "needle": "if (t.closest('#sf-fullscreen, #cs-fullscreen')) return true;"
   },
   {
     "name": "#1266a 暗色阶段图标填色回收（删＝通用 .period-status-ico 底 #555 回流压平 phase-period/fertile/safe，「填色的图标无法正常显示」复发）",
@@ -1981,11 +1956,6 @@ const FIX_SENTINELS = [
     "name": "设备判定手动布局兜底（__layout-pref）",
     "file": "js/device.js",
     "needle": "pref:mobile"
-  },
-  {
-    "name": "全屏横屏判定改判物理方向（viewportLandscape）",
-    "file": "js/fullscreen.js",
-    "needle": "function viewportLandscape"
   },
   {
     "name": "收藏判重按归属（TA收藏不挡我的收藏）",
@@ -3201,16 +3171,6 @@ const FIX_SENTINELS = [
     "needle": "html.ios-native-fs .phone .page.full .chat-head"
   },
   {
-    "name": "iOS 原生全屏标记类同步（fullscreen.js syncFsClass 给根元素加 ios-native-fs，与之配套的 base.css 收紧规则靠它命中，标记删了修复就哑）",
-    "file": "js/fullscreen.js",
-    "needle": "classList.toggle('ios-native-fs', _fs)"
-  },
-  {
-    "name": "#889 全屏开关 iOS 文案只在 iOS 生效（relabelIosToggle 曾被无条件调用，安卓也被换成 iOS 文案误以为用不了；isIOS 门被删即回归）",
-    "file": "js/fullscreen.js",
-    "needle": "if (isIOS) { try { relabelIosToggle(); } catch (e) {} }"
-  },
-  {
     "name": "#95 朋友圈图片格宽统一：单图/双图容器特判已删除（原 .feed-imgs:has(...) 使 1/2/3+ 图格宽 22%/40%/33% 不一致，加回即回归）",
     "file": "css/chat-pages.css",
     "needle": "feed-imgs:has(",
@@ -4221,21 +4181,6 @@ const FIX_SENTINELS = [
     "needle": "if (isNaN(_curN) || Math.abs(_wantN - _curN) >= 6)"
   },
   {
-    "name": "#189 iPad 全屏误杀·方向监视 iOS 出口（Safari 无 orientation.lock，iPad 横屏持握 ~2s 后被 handleLandscapeForced 退出全屏+误导弹窗）",
-    "file": "js/fullscreen.js",
-    "needle": "function startFsMonitorSafe() { if (isIOS) return; startFsMonitor(); }"
-  },
-  {
-    "name": "#189 iPad 全屏误杀·开关 1500ms 复核跳过 iOS 横屏杀全屏（否则 FB_KEY=1 被永久写坏+退出全屏）",
-    "file": "js/fullscreen.js",
-    "needle": "if (!isIOS && isFullscreen() && viewportLandscape()) {"
-  },
-  {
-    "name": "#189 iPad 全屏误杀·orientationchange iOS 出口（全屏态转横不纠偏、非全屏不弹「请恢复竖屏」误导弹窗）",
-    "file": "js/fullscreen.js",
-    "needle": "if (isIOS) return; // FIX 2026-09-05 #189"
-  },
-  {
     "name": "#189 iPad 全屏可见效果·tablet standalone 全屏隐藏模拟状态栏（#111 手机保留不动；iPad 系统栏网页盖不住，保留=开关零视觉变化「没有生效」）",
     "file": "css/base.css",
     "needle": "html.tablet.ios-pwa-standalone.ios-fs-active .phone .statusbar { display:none; }"
@@ -4504,11 +4449,6 @@ const FIX_SENTINELS = [
     "name": "#211 打开聊天闪动·归一化收尾渲染闸（后台迁移发现改动曾无条件整窗重建=打开聊天偶尔闪一下的第二来源；改动全落在渲染窗口之外时跳过，sysNick 清扫/相邻删除保守整窗）",
     "file": "js/chat.js",
     "needle": "sysNickChanged || removedAll > 0 || changedHi >= renderStart"
-  },
-  {
-    "name": "#212 挖孔屏全屏顶端留白·安卓 enterFs 补 navigationUI hide（Chromium 40723205：挖孔屏默认 auto 不把全屏面铺到挖孔区=页面外系统层 letterbox 顶端露空白、页面内测量全绿无法诊断，iQOO12 等多机型；iOS 路径原有参数不动，老内核忽略选项参数零回归）",
-    "file": "js/fullscreen.js",
-    "needle": "const fsOpts = { navigationUI: 'hide' };"
   },
   {
     "name": "#216 音乐封面全丢·代理封面正则（存量迁移与播放/页面打开迁移全靠它识别 meting 图片代理 URL；被删/改窄=代理封面永不迁移，第三方代理一挂新旧封面全丢——一加Ace3+Edge 实测）",
@@ -13412,25 +13352,10 @@ const FIX_SENTINELS = [
     "needle": "</div><!-- /them-sec basic · row-reset -->"
   },
   {
-    "name": "#927a 设置页全屏行改为通用段首位独立组（.set-row 形态专用 id；搬回系统段 gs-row＝用户要的「最前面一个独立显的地方」回流，行下设备限制小字由 verify-settings-tags S8/B11 判）",
-    "file": "template.html",
-    "needle": "id=\"sf-fullscreen-row\""
-  },
-  {
-    "name": "#927b 聊天设置功能页顶部全屏分组在位（该行原埋在二级标签「显示」里，用户点名「保留开关、提到顶部」；分组 id 消失＝搬回埋藏态）",
-    "file": "template.html",
-    "needle": "id=\"cs-fs-group\""
-  },
-  {
     "name": "#927c 聊天设置顶部全屏分组不得重新挂 data-tag（挂上＝被 #cs-func-tags 过滤埋回「显示」标签里，用户报的「找不到全屏开关」复发）",
     "file": "template.html",
     "needle": "<div class=\"set-group glass\" id=\"cs-fs-group\" data-tag",
     "absent": true
-  },
-  {
-    "name": "#927d iOS 全屏开关文案改走通用段专用标题 span（行搬到通用段首位变成 .set-row＋#sf-fullscreen-label，relabel 仍按旧 .gs-row/span span 取＝要么找不到、要么把「功能说明」标签一起覆盖掉）",
-    "file": "js/fullscreen.js",
-    "needle": "row.querySelector('#sf-fullscreen-label')"
   },
   {
     "name": "#906c 报告点名后台保活（删＝掉帧惯犯之一在采样报告里隐身，用户不知道先关保活对照）",
@@ -15871,11 +15796,6 @@ const FIX_SENTINELS = [
     "name": "#1006m 吃什么「问 TA」走用户发送侧（改回 chatAddIn＝变成 TA 问用户）",
     "file": "js/p2-features.js",
     "needle": "if (window.chatSendMsg) { try { window.chatSendMsg(msg); }"
-  },
-  {
-    "name": "#1006n 摸鱼小结信 TA 口吻（改回「你俩…（我 +x · 名字 +y）」＝TA 把自己算在外、把用户标成「我」）",
-    "file": "js/mail.js",
-    "needle": "'你和我一共摸鱼 ' + totalFish + ' 点（你 +' + fm + ' · 我 +' + ft + '）。'"
   },
   {
     "name": "#1006o 市集标语送给 TA（改回「送给你」＝收礼人写成用户）",

@@ -5109,6 +5109,8 @@ try {
     // 会让用户选浅色后界面仍停留深色（属性在=dark.css 全量生效）
     if (eff === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
+    const modeSwitch=document.getElementById('theme-mode-switch');
+    if(modeSwitch)modeSwitch.checked=eff==='dark';
     if (themeModeVal) themeModeVal.textContent = mode === 'auto' ? '跟随系统' : (mode === 'dark' ? '已开启' : '关闭');
     // #201 浏览器顶部黑边：安卓 Edge/Chromium 用 theme-color 涂页面外的系统区域（页面下移避让形态顶部那 41px），
     // 写死深色在浅色主题下就是一条黑边——这里跟随当前生效主题的 --page-bg 同步刷新
@@ -5125,8 +5127,15 @@ try {
     if (mql && typeof mql.addEventListener === 'function') mql.addEventListener('change', () => { if (getThemeMode() === 'auto') applyThemeMode('auto'); });
     else if (mql && typeof mql.addListener === 'function') mql.addListener(() => { if (getThemeMode() === 'auto') applyThemeMode('auto'); });
   } catch (e) {}
+  const modeSwitch=document.getElementById('theme-mode-switch');
+  if(modeSwitch)modeSwitch.addEventListener('change',()=>{
+    const mode=modeSwitch.checked?'dark':'light';
+    try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
+    applyThemeMode(mode);
+  });
   if (themeModeRow) {
-    themeModeRow.addEventListener('click', () => {
+    themeModeRow.addEventListener('click', (event) => {
+      if(event.target.closest('.toggle'))return;
       if (!window.openModal) {
         // 兜底：openModal 不可用时回退原两档快速切换
         const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';

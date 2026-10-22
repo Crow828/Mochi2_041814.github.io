@@ -2619,8 +2619,8 @@ function refreshChatAvatars() {
 avatarBatchCache = null;
 fillAvatar('chat-user-av', 'cs-avatar-user');
 fillAvatar('chat-partner-av', 'cs-avatar-partner');
-document.querySelectorAll('.msg-in .msg-av').forEach(av => fillAvatar(av, 'cs-avatar-partner'));
-document.querySelectorAll('.msg-out .msg-av').forEach(av => fillAvatar(av, 'cs-avatar-user'));
+document.querySelectorAll('.msg-in .msg-av:not(.fav-feed-avatar)').forEach(av => fillAvatar(av, 'cs-avatar-partner'));
+document.querySelectorAll('.msg-out .msg-av:not(.fav-feed-avatar)').forEach(av => fillAvatar(av, 'cs-avatar-user'));
 }
 window.refreshChatAvatars = refreshChatAvatars;
 fillAvatar('chat-user-av', 'cs-avatar-user');
@@ -8509,7 +8509,7 @@ if (mm.parts && mm.parts.length) favParts = mm.parts.map(p => ({ k: p.k, v: p.v,
 break;
 }
 }
-fav.push({ side: 'out', text: lastMineText, type: favType, ts: Date.now(), by: 'ta', parts: favParts });
+fav.push({ side: 'out', text: lastMineText, type: favType, ts: Date.now(), collectedAt: Date.now(), by: 'ta', parts: favParts });
 saveFav(fav);
 setTimeout(() => { if (!sameCid()) return; toast('TA 收藏了你的一条消息'); }, 1200);
 }
@@ -13032,6 +13032,7 @@ function saveFav(list) {
 // renderFav 重渲染（点全选/切分类/切页签都触发）后全部失配，勾选静默清零＝多选失效
 //（全机型复现，与设备无关）。key 里不含大载荷（text/parts 截断），只作会话内身份比对。
 function favItemKey(f) {
+  if (f.type === 'chat-group' && f.id) return (f.by || 'me') + "|id|" + f.id;
   return (f.by || 'me') + '|' + (f.kind || 'msg') + '|' + (f.ts || 0) + '|' +
     String(f.q || '').slice(0, 120) + '|' + String(f.text || '').slice(0, 120) + '|' +
     (f.special || '') + '|' + (f.mailType || '') + '|' + ((f.side === 'out') ? 'o' : 'i');
@@ -13078,6 +13079,7 @@ const out = new Array(list.length);
 for (let i = 0; i < list.length; i++) {
 let f = list[i];
 try {
+if (f && Array.isArray(f.items)) { const nested = await compressFavListImages(f.items); if (nested) { f = Object.assign({}, f, {items:nested}); changed = true; } }
 if (f && typeof f.text === 'string' && f.text.indexOf('data:image/') === 0) {
 const v = await compressFavDataUrl(f.text);
 if (v) { f = Object.assign({}, f, { text: v }); changed = true; }
@@ -13110,6 +13112,7 @@ const out = new Array(list.length);
 for (let i = 0; i < list.length; i++) {
 let f = list[i];
 try {
+if (f && Array.isArray(f.items)) { const nested = await tokenizeFavList(f.items); if (nested) { f = Object.assign({}, f, {items:nested}); changed = true; } }
 if (f && typeof f.text === 'string' && f.text.indexOf('data:image/') === 0) {
 const t = await window.mochiMediaTokenize(f.text);
 if (t) { f = Object.assign({}, f, { text: t }); changed = true; }
@@ -13205,14 +13208,14 @@ return list.some(x => (x.by || 'me') === by && (x.kind || 'msg') === (f.kind || 
 window.addMyFavItem = function (f) {
 const fav = getFav();
 if (favDup(fav, f, 'me')) return false;
-fav.push(Object.assign({ by: 'me' }, f));
+fav.push(Object.assign({ by: 'me' }, f, {collectedAt: Date.now()}));
 saveFav(fav);
 return true;
 };
 window.addTaFavItem = function (f) {
 const fav = getFav();
 if (favDup(fav, f, 'ta')) return false;
-fav.push(Object.assign({ by: 'ta' }, f));
+fav.push(Object.assign({ by: 'ta' }, f, {collectedAt: Date.now()}));
 saveFav(fav);
 return true;
 };
@@ -13492,6 +13495,7 @@ if (txt.indexOf('撤回了一条消息') >= 0 || txt.indexOf('已读不回') >= 
 return { item, b };
 }
 function openMsgActionsAt(item, b) {
+if (chatFavSelection) return;
 activeMsgEl = item;
 // FIX 2026-09-13 #407 引用/收藏/编辑等按 data-idx 解析消息，但菜单打开后 msgs 可能被
 // 权威读库合并/尾巴日志回放重排（中段插入/删除 ⇒ 后续下标整体位移）而 DOM 未重渲
@@ -13644,6 +13648,87 @@ document.addEventListener('click', (e) => {
 if (msgActions && !msgActions.hidden && !msgActions.contains(e.target)) closeMsgActions();
 });
 }
+// Chat selections keep rendered message identities, never array offsets.
+let chatFavSelection = null;
+const chatFavBar = document.createElement('div');
+chatFavBar.id = 'chat-fav-selection';
+chatFavBar.hidden = true;
+chatFavBar.innerHTML = '<button type="button" data-cfs="cancel">取消</button><span role="status" aria-live="polite"></span><button type="button" data-cfs="save">保存收藏</button>';
+document.getElementById('page-chat').appendChild(chatFavBar);
+function endChatFavSelection() {
+  chatFavSelection = null;
+  chatFavBar.hidden = true;
+  document.getElementById('page-chat').classList.remove('chat-fav-selecting');
+  body.querySelectorAll('.chat-fav-check').forEach(n => n.remove());
+}
+function syncChatFavSelection() {
+  if (!chatFavSelection) return;
+  if (chatFavSelection.cid !== favCid() || document.getElementById('page-chat').hidden) { endChatFavSelection(); return; }
+  const eligible = new Set(msgs.filter(r => r.side === 'in' || r.side === 'out').map(msgKeyOf));
+  body.querySelectorAll('.msg[data-mk]').forEach(row => {
+    const key = row.dataset.mk;
+    if (!eligible.has(key)) return;
+    let check = row.querySelector(':scope > .chat-fav-check');
+    if (!check) {
+      check = document.createElement('button'); check.type = 'button'; check.className = 'chat-fav-check';
+      check.setAttribute('role', 'checkbox'); check.setAttribute('aria-label', '选择这条聊天记录');
+      row.prepend(check);
+    }
+    const on = chatFavSelection.keys.has(key);
+    if (check.getAttribute('aria-checked') !== String(on)) { check.setAttribute('aria-checked', String(on)); check.textContent = on ? '✓' : ''; }
+  });
+  chatFavBar.querySelector('span').textContent = '已选 ' + chatFavSelection.keys.size + ' 条';
+  chatFavBar.querySelector('[data-cfs="save"]').disabled = !chatFavSelection.keys.size;
+}
+function startChatFavSelection(rec) {
+  closeMsgActions();
+  chatFavSelection = { cid: favCid(), keys: new Set(rec ? [msgKeyOf(rec)] : []) };
+  chatFavBar.hidden = false;
+  document.getElementById('page-chat').classList.add('chat-fav-selecting');
+  syncChatFavSelection();
+}
+body.addEventListener('click', e => {
+  if (!chatFavSelection) return;
+  const row = e.target.closest('.msg[data-mk]');
+  if (!row) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (!row.querySelector(':scope > .chat-fav-check')) return;
+  const key = row.dataset.mk;
+  if (chatFavSelection.keys.has(key)) chatFavSelection.keys.delete(key); else chatFavSelection.keys.add(key);
+  syncChatFavSelection();
+}, true);
+body.addEventListener('touchstart', e => { if (chatFavSelection) e.stopImmediatePropagation(); }, {capture:true,passive:true});
+const chatFavObserver = new MutationObserver(() => { if (chatFavSelection) syncChatFavSelection(); });
+chatFavObserver.observe(body, { childList:true, subtree:true });
+new MutationObserver(() => { if (chatFavSelection && document.getElementById('page-chat').hidden) endChatFavSelection(); }).observe(document.getElementById('page-chat'), {attributes:true,attributeFilter:['hidden']});
+document.addEventListener('contact-switched', endChatFavSelection);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && chatFavSelection) endChatFavSelection(); });
+function chatFavSnapshot(rec) {
+  return {side:rec.side,text:rec.text || '',type:rec.type || 'text',ts:rec.ts || Date.now(),by:'me',mood:JSON.parse(JSON.stringify(rec.mood || [])),parts:rec.parts ? JSON.parse(JSON.stringify(rec.parts)) : undefined};
+}
+chatFavBar.addEventListener('click', e => {
+  const action = e.target.closest('[data-cfs]')?.dataset.cfs;
+  if (action === 'cancel') { endChatFavSelection(); return; }
+  if (action !== 'save' || !chatFavSelection) return;
+  if (chatFavSelection.cid !== favCid()) { endChatFavSelection(); return; }
+  const records = msgs.filter(r => chatFavSelection.keys.has(msgKeyOf(r)) && (r.side === 'in' || r.side === 'out'));
+  if (!records.length) { toast('所选消息已不存在，请重新选择'); endChatFavSelection(); return; }
+  const list = getFav(), items = records.map(chatFavSnapshot);
+  if (items.length === 1) {
+    const f = items[0];
+    if (list.some(x => !x.items && (x.by || 'me') === 'me' && x.side === f.side && x.ts === f.ts && x.text === f.text)) { toast('已收藏过这条消息'); endChatFavSelection(); return; }
+    f.collectedAt = Date.now(); list.push(f);
+  } else {
+    list.push({id:'chat-group-' + Date.now() + '-' + Math.random().toString(36).slice(2,9),kind:'msg',type:'chat-group',by:'me',side:'in',ts:Date.now(),collectedAt:Date.now(),text:'聊天记录 · ' + items.length + ' 条',items:items});
+  }
+  saveFav(list); endChatFavSelection(); toast(items.length > 1 ? '已保存为组合收藏' : '已保存到收藏');
+});
+if (msgActions) {
+  const button = document.createElement('button'); button.type = 'button'; button.className = 'ma-btn'; button.dataset.act = 'multi'; button.title = '多选';
+  button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="4" height="4" rx="1"/><rect x="3" y="14" width="4" height="4" rx="1"/><path d="M11 6h10M11 16h10"/></svg><span>多选</span>';
+  msgActions.querySelector('[data-act="fav"]').after(button);
+}
+
 if (msgActions) {
 // FIX 2026-09-14 #480 菜单按钮 touch 直驱——【引用】按钮原来只有 click 一条路，click 被吞族内核
 // 上菜单开了点引用没反应＝「无法引用」。动作体提为 maRunAction，touchend 直驱执行 + maClickGuard
@@ -13655,6 +13740,7 @@ const act = btn.dataset.act;
 const _act = resolveActiveMsg();
 const idx = _act.idx;
 const rec = _act.rec;
+if (act === 'multi') { startChatFavSelection(rec); return; }
 if (act === 'quote') {
 if (rec) {
 const qsnap = quoteTextOf(rec);
@@ -13671,7 +13757,7 @@ const fav = getFav();
 if (fav.some(f => (f.by || 'me') !== 'ta' && f.side === rec.side && (f.text || '') === (rec.text || '') && (!rec.ts || f.ts === rec.ts))) {
 toast('已收藏过这条消息');
 } else {
-fav.push({ side: rec.side, text: rec.text, type: rec.type || 'text', ts: rec.ts || Date.now(), by: 'me', mood: (rec.mood || []).slice(), parts: rec.parts && rec.parts.length ? rec.parts.map(p => ({ k: p.k, v: p.v, sub: p.sub })) : undefined });
+fav.push({ side: rec.side, text: rec.text, type: rec.type || 'text', ts: rec.ts || Date.now(), collectedAt: Date.now(), by: 'me', mood: (rec.mood || []).slice(), parts: rec.parts && rec.parts.length ? rec.parts.map(p => ({ k: p.k, v: p.v, sub: p.sub })) : undefined });
 saveFav(fav);
 toast('已收藏到我的收藏');
 }
@@ -13812,7 +13898,9 @@ if (allBtn) allBtn.textContent = (favBatchVis.length && favBatchSel.length === f
 function renderFav() {    if (!favList) return;
 const fav = getFav();
 favList.innerHTML = '';
-const partnerName = chatPartnerName();
+const rawPartnerName = String(chatPartnerName() || '').trim();
+const legacyPartnerName = String(store.get('lbl-partner') || '').trim();
+const partnerName = rawPartnerName && !['默认','default'].includes(rawPartnerName) ? rawPartnerName : legacyPartnerName && !['默认','default'].includes(legacyPartnerName) ? legacyPartnerName : 'TA';
 const myName = chatUserName();
 const myFav = fav.filter(f => f.by !== 'ta');
 const taFav = fav.filter(f => f.by === 'ta');
@@ -13882,14 +13970,22 @@ last = mm.index + mm[0].length;
 html += escTxt(str.slice(last));
 return html;
 }
+const resolveFeedAuthor = list2.some(f => f.kind === 'feed' && !f.authorRole) && window.feedFavoriteAuthorResolver ? window.feedFavoriteAuthorResolver() : null;
 list2.forEach(f => renderFavItem(f));
-function renderFavItem(f) {
+function renderFavItem(f, nested, destination) {
+const target = destination || favList;
 const kind = f.kind || 'msg';
 const m = document.createElement('div');
 m.className = 'msg ' + (f.side === 'out' ? 'msg-out' : 'msg-in');
 const timeHtml = f.ts ? '<span class="msg-time">' + fmtTime(f.ts) + '</span>' : '';
 const side = '<div class="msg-side"><div class="msg-av"></div>' + timeHtml + '</div>';
-if (kind === 'card') {
+if (Array.isArray(f.items) && f.items.length > 1) {
+m.className = 'msg fav-chat-group';
+const heading = document.createElement('div'); heading.className = 'fav-chat-group-heading';
+heading.textContent = '聊天记录 · ' + f.items.length + ' 条'; m.appendChild(heading);
+const content = document.createElement('div'); content.className = 'fav-chat-group-content'; m.appendChild(content);
+f.items.forEach(item => renderFavItem(item, true, content));
+} else if (kind === 'card') {
 const label = FAV_KIND_LABEL[f.special] || '互动卡片';
 let html = '<div class="fav-item-card">' +
 '<span class="fav-item-tag">互动卡片 · ' + label + '</span>' +
@@ -13912,21 +14008,36 @@ html += '</div>';
 m.innerHTML = html + side;
 fillAvatar(m.querySelector('.msg-av'), 'cs-avatar-user');
 } else if (kind === 'mail') {
-const tag = f.mailType === 'received' ? '信箱来信' : '信箱回信';
-let html = '<div class="fav-item-card">' +
-'<span class="fav-item-tag">' + tag + (f.title ? ' · 《' + escTxt(f.title) + '》' : '') + '</span>' +
-'<div class="fav-item-body">' + favTextHtml(f.text) + '</div>' +
+const senderRole = f.senderRole || (f.mailType === 'received' ? 'ta' : f.mailType === 'sent' || f.by === 'ta' ? 'me' : 'ta');
+const usableSenderName = value => { const name = String(value || '').trim();return name && name !== '默认' && name !== 'default' ? name : ''; };
+const senderName = usableSenderName(f.senderName) || (senderRole === 'me' ? store.get('lbl-user') || chatUserName() : usableSenderName(store.get('lbl-partner')) || usableSenderName(store.get('cs-lbl-partner')) || 'TA');
+const letterDate = new Date(Number(f.ts));
+const letterDateText = f.ts && Number.isFinite(letterDate.getTime()) ? (letterDate.getMonth()+1) + '月' + letterDate.getDate() + '日 ' + String(letterDate.getHours()).padStart(2,'0') + ':' + String(letterDate.getMinutes()).padStart(2,'0') : '';
+let html = '<div class="mail-paper fav-mail-paper">' +
+'<div class="mail-paper-head fav-mail-heading"><strong class="mail-paper-author">' + escTxt(senderName) + '</strong><span class="mail-paper-date">' + escTxt(letterDateText) + '</span></div>' +
+(f.title ? '<div class="mail-paper-title">' + escTxt(f.title) + '</div>' : '') +
+'<div class="mail-paper-body">' + favTextHtml(f.text) + '</div>' +
 '</div>';
 // v3.26.x：信件收藏不显示头像——不再复用聊天行的 .msg-av 头像槽（时间保留），纯卡片观感
-m.innerHTML = html + '<div class="msg-side">' + timeHtml + '</div>';
+m.innerHTML = html;
 } else if (kind === 'feed') {
+const sourceAuthor = !f.authorRole && resolveFeedAuthor ? resolveFeedAuthor(f) : null;
+const author = f.authorRole ? f : sourceAuthor;
+const authorRole = author ? author.authorRole : f.side === 'out' || (!f.side && f.by === 'ta') ? 'me' : f.side === 'in' ? 'ta' : '';
+const authorName = (author && author.authorName) || (authorRole === 'me' ? chatUserName() : authorRole === 'ta' ? chatPartnerName() : '作者信息未记录');
+m.className = 'msg ' + (authorRole === 'me' ? 'msg-out' : 'msg-in');
 let html = '<div class="fav-item-card">' +
-'<span class="fav-item-tag">朋友圈动态</span>' +
+'<div class="fav-feed-author">' + escTxt(authorName) + '</div>' +
 (f.text ? '<div class="fav-item-body">' + favTextHtml(f.text) + '</div>' : '') +
 ((f.imgs && f.imgs.length) ? '<div class="fav-item-imgs">' + f.imgs.map(u => '<img src="' + attrEsc(u) + '" alt="图片" loading="lazy" decoding="async">').join('') + '</div>' : '') +
 '</div>';
-m.innerHTML = html + side;
-fillAvatar(m.querySelector('.msg-av'), 'cs-avatar-user');
+m.innerHTML = authorRole === 'me' ? html + side : side + html;
+const feedAvatar = m.querySelector('.msg-av');
+feedAvatar.classList.add('fav-feed-avatar'); feedAvatar.setAttribute('aria-label',authorName);
+if (author && author.authorAv) { const img = document.createElement('img'); img.src = author.authorAv; img.alt = authorName; feedAvatar.appendChild(img); }
+else if (author) fillAvatar(feedAvatar, '');
+else if (authorRole) fillAvatar(feedAvatar, authorRole === 'me' ? 'cs-avatar-user' : 'cs-avatar-partner');
+else { feedAvatar.textContent = '？'; feedAvatar.setAttribute('aria-label','作者信息未记录'); }
 } else {
 m.innerHTML = f.side === 'out'
 ? '<div class="msg-bubble"></div>' + side
@@ -13978,14 +14089,15 @@ b.innerHTML = '<span style="opacity:.85">' + (window.mochiInlineTextHtml ? windo
 }
 }
 if (f.mood && f.mood.length) {
+  const moodBox = document.createElement('div'); moodBox.className = 'msg-moods';
   f.mood.forEach(md => {
     const dupFav = md.label != null && String(md.label) !== '' && String(md.label) === String(f.text == null ? '' : f.text);
-    if (md.tag === '交流意图') {
-      b.innerHTML += '<div class="msg-mood msg-intent"><span class="msg-mood-tag">' + md.tag + '</span>' + (dupFav ? '' : '<span>' + md.label + '</span>') + '</div>';
-    } else {
-      b.innerHTML += '<div class="msg-mood"><span class="msg-mood-tag">' + md.tag + '</span>' + (dupFav ? '' : '<span>' + md.label + '</span>') + '</div>';
-    }
+    const chip = document.createElement('div'); chip.className = 'msg-mood' + (md.tag === '交流意图' ? ' msg-intent' : '');
+    const tag = document.createElement('span'); tag.className = 'msg-mood-tag'; tag.textContent = md.tag || ''; chip.appendChild(tag);
+    if (!dupFav && md.label != null) { const label = document.createElement('span'); label.textContent = md.label; chip.appendChild(label); }
+    moodBox.appendChild(chip);
   });
+  b.appendChild(moodBox);
 }
 fillAvatar(m.querySelector('.msg-av'), f.side === 'out' ? 'cs-avatar-user' : 'cs-avatar-partner');
 }
@@ -13995,7 +14107,27 @@ e.stopPropagation();
 if (window.viewChatImage) window.viewChatImage(im.src);
 }));
 }
+if (nested) { target.appendChild(m); return; }
+if (!m.classList.contains('fav-chat-group')) {
+  const message = document.createElement('div'); message.className = m.className + ' fav-entry-message';
+  while (m.firstChild) message.appendChild(m.firstChild);
+  m.className = 'msg'; m.appendChild(message);
+}
+m.classList.add('fav-entry-card');
+if (!m.querySelector(':scope > .fav-chat-group-heading')) {
+  const heading = document.createElement('div'); heading.className = 'fav-chat-group-heading fav-entry-heading';
+  heading.textContent = ({msg:'聊天记录',card:'互动卡片',mail:'信件',feed:'朋友圈'})[kind] || '收藏';
+  m.prepend(heading);
+}
+const savedTime = document.createElement('div'); savedTime.className = 'fav-saved-time';
+const hasSavedTime = Number(f.collectedAt) > 0;
+const date = new Date(Number(hasSavedTime ? f.collectedAt : f.ts));
+const pad = n => String(n).padStart(2,'0');
+savedTime.textContent = Number.isFinite(date.getTime()) ? (hasSavedTime ? '收藏于 ' : '原记录时间 ') + date.getFullYear() + '-' + pad(date.getMonth()+1) + '-' + pad(date.getDate()) + ' ' + pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds()) : '收藏时间未记录';
+if (!hasSavedTime) savedTime.title = '旧收藏未单独记录收藏时间，这里显示原记录时间';
+m.appendChild(savedTime);
 function matchFav(x) {
+if (f.type === 'chat-group' && f.id) return x.id === f.id && (x.by || 'me') === (f.by || 'me');
 return (x.kind || 'msg') === kind &&
 (x.q || '') === (f.q || '') && (x.text || '') === (f.text || '') && x.ts === f.ts;
 }
@@ -14006,7 +14138,7 @@ const fk = favItemKey(f); // #314 勾选身份=指纹 key（对象引用跨重�
 const ck = document.createElement('div');
 ck.className = 'fav-check' + (favBatchSel.indexOf(fk) >= 0 ? ' on' : '');
 ck.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
-if (f.side === 'out') m.appendChild(ck); else m.insertBefore(ck, m.firstChild);
+m.insertBefore(ck, m.firstChild);
 m.addEventListener('click', (e) => {
 e.stopPropagation();
 const i = favBatchSel.indexOf(fk);
@@ -14014,9 +14146,27 @@ if (i >= 0) favBatchSel.splice(i, 1); else favBatchSel.push(fk);
 ck.classList.toggle('on', favBatchSel.indexOf(fk) >= 0);
 syncBatchBar();
 }, true);
-favList.appendChild(m);
+target.appendChild(m);
 return;
 }
+const noteButton = document.createElement('button'); noteButton.type = 'button'; noteButton.className = 'fav-note-button';
+noteButton.textContent = f.note ? '编辑备注' : '添加备注';
+const noteBox = document.createElement('div'); noteBox.className = 'fav-note'; noteBox.hidden = !f.note; noteBox.textContent = f.note ? '备注：' + f.note : '';
+const footer = document.createElement('div'); footer.className = 'fav-entry-footer';
+footer.appendChild(noteBox); footer.appendChild(noteButton); footer.appendChild(savedTime); m.appendChild(footer);
+noteButton.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+noteButton.addEventListener('contextmenu', e => e.stopPropagation());
+noteButton.addEventListener('click', e => {
+ e.stopPropagation(); const owner = favCid();
+ if (favHold(owner) || store.get('fav-msgs') === null) { toast('收藏正在读取，请稍后再编辑备注'); return; }
+ window.openModal('收藏备注', f.note || '', value => {
+   if (owner !== favCid()) { toast('联系人已切换，请重新操作'); return; }
+   if (favHold(owner) || store.get('fav-msgs') === null) { toast('收藏正在读取，请稍后重试'); return; }
+   const list = getFav(), index = list.findIndex(matchFav);
+   if (index < 0) { toast('这条收藏已不存在'); return; }
+   list[index].note = String(value || '').trim().slice(0,500); saveFav(list); renderFav();
+ }, {textareaPlaceholder:'写点备注，留空可清除',maxlength:500,textarea:true});
+});
 let pressTimer = null;
 m.addEventListener('touchstart', (e) => {
 pressTimer = setTimeout(() => {
@@ -14047,7 +14197,7 @@ renderFav();
 }, { noInput: true });
 }
 });
-favList.appendChild(m);
+target.appendChild(m);
 }
 }
 const favTabs = document.getElementById('fav-tabs');

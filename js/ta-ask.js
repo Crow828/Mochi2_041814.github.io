@@ -387,6 +387,8 @@ if (s && s.autoPopup === false) return 0;
 return 70;
 }
 function cardPopupBusy() {
+if (document.querySelector('dialog[open]')) return true;
+if (document.querySelector('#page-chat.chat-fav-selecting')) return true;
 return ['modal-mask', 'tc-mask', 'qa-mask'].some(id => {
 const el = document.getElementById(id);
 return el && !el.hidden;

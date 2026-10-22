@@ -195,8 +195,8 @@
       desc: '群抉择历史、成员与设置（全局，所有桌面共用）',
       res: [/^gdec-/] },
     { id: 'mood', name: '心情日记', group: '桌面功能', scope: 'desk', page: 'page-mood',
-      desc: '心情日记条目与记录',
-      res: [/^mood-diary$/] },
+      desc: '心情日记条目、记录与自定义表情',
+      res: [/^mood-diary(?:-custom)?$/] },
     // #1346 审计（desk→both）：游戏音效偏好按设计是全局一份——auction.js:165/1040 直接读写
     // `localStorage['xy-home-v2:au-sound']`，注释写明「音效偏好全局记忆（非联系人维度）」⇒ 旧 desk
     // 在联系人桌面上清不掉也导不出它（换机后每个新桌面都回到默认开）。

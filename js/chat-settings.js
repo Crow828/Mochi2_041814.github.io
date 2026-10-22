@@ -2104,18 +2104,6 @@ document.addEventListener('visibilitychange', want);
 document.addEventListener('contact-switched', function () { if (_csTicker.timer) _csRun(); });
 want();
 })();
-const csFs = document.getElementById('cs-fullscreen');
-const sfFs = document.getElementById('sf-fullscreen');
-if (csFs && sfFs) {
-const syncCsFs = () => { if (sfFs.checked !== csFs.checked) csFs.checked = sfFs.checked; };
-syncCsFs();
-csFs.addEventListener('change', () => {
-if (csFs.checked === sfFs.checked) return;
-sfFs.checked = csFs.checked;
-sfFs.dispatchEvent(new Event('change', { bubbles: true }));
-});
-csAddSync(syncCsFs);
-}
 const csEg = document.getElementById('cs-edge-guard');
 const sfEg = document.getElementById('sf-edge-guard');
 if (csEg && sfEg) {

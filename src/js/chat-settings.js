@@ -2683,24 +2683,6 @@
     want();
   })();
 
-  // v3.7.x：聊天设置顶部的「全屏模式」开关——镜像设置页 #sf-fullscreen（同一状态）。
-  // 本页切换 → 代理到设置页开关并派发 change（走 fullscreen.js 全流程：原生全屏/CSS
-  // 兜底/iOS 分支/失败回滚）；设置页或系统（fullscreenchange/切后台恢复/失败回滚）
-  // 更新 sf-fullscreen 后，轮询把状态同步回本页开关。fullscreen.js 程序化赋值只改
-  // property 不产生 attribute mutation，故用 500ms 轮询而非 MutationObserver。
-  const csFs = document.getElementById('cs-fullscreen');
-  const sfFs = document.getElementById('sf-fullscreen');
-  if (csFs && sfFs) {
-    const syncCsFs = () => { if (sfFs.checked !== csFs.checked) csFs.checked = sfFs.checked; };
-    syncCsFs();
-    csFs.addEventListener('change', () => {
-      if (csFs.checked === sfFs.checked) return;
-      sfFs.checked = csFs.checked;
-      sfFs.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-    csAddSync(syncCsFs);
-  }
-
   // v3.9.x：聊天设置「全屏边缘防误触」开关——镜像设置页 #sf-edge-guard（同一状态双向同步）。
   // 仿 cs-fullscreen 模式：本页切换代理到设置页开关并派发 change（走 fullscreen.js
   // 边缘拦截层启停流程）；设置页变化 500ms 轮询同步回本页。

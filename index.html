@@ -9536,6 +9536,156 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
 .set-row .txt .sub { font-size: calc(11.5px + var(--mochi-text-adj, 0px)); }
 .gc-set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
+#page-chat-settings.cs-grouped-layout { overflow:hidden; }
+#page-chat-settings [data-cs-legacy] { display:none !important; }
+#page-chat-settings.cs-grouped-layout > .chat-head { flex:none; }
+#page-chat-settings .cs-options { flex:1; min-height:0; overflow:auto; overscroll-behavior-y:contain; padding:12px 12px calc(20px + env(safe-area-inset-bottom,0px)); }
+#page-chat-settings .cs-options-group { margin:0 0 12px; border:1px solid var(--card-border,#e7e7e7); border-radius:17px; background:var(--card-bg,#fff); overflow:hidden; }
+#page-chat-settings .cs-options-group > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:54px; box-sizing:border-box; padding:16px; list-style:none; cursor:pointer; font-size:14px; font-weight:600; color:var(--ink,#111); -webkit-tap-highlight-color:transparent; }
+#page-chat-settings .cs-options-group > summary::-webkit-details-marker { display:none; }
+#page-chat-settings .cs-options-group > summary::after { content:''; width:7px; height:7px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); flex:none; margin-right:3px; }
+#page-chat-settings .cs-options-group[open] > summary::after { transform:rotate(225deg); }
+#page-chat-settings .cs-options-group > summary:focus-visible { outline:2px solid var(--ink,#111); outline-offset:-4px; border-radius:15px; }
+#page-chat-settings .cs-options .set-group { margin:0 10px 10px; border:0; border-radius:0; background:transparent; box-shadow:none; }
+#page-chat-settings .cs-options .gs-title { padding:8px 14px 6px; margin:0; font-size:11.5px; line-height:1.5; color:var(--muted,#888); }
+#page-chat-settings .cs-options .set-row { gap:8px; padding:13px 4px; }
+#page-chat-settings .cs-options .set-row[hidden] { display:none !important; }
+#page-chat-settings .cs-options .set-row .txt { min-width:0; font-size:13px; }
+#page-chat-settings .cs-options .set-row .val { min-width:0; max-width:36%; overflow-wrap:anywhere; text-align:right; font-size:11.5px; }
+#page-chat-settings .cs-options .set-row .ico { width:20px; }
+#page-chat-settings .cs-options .set-row .toggle { flex-shrink:0; }
+#page-chat-settings .cs-options .cs-layout-description { display:none; }
+#page-chat-settings .cs-layout-info { position:relative; z-index:1; flex:none; width:30px; height:30px; padding:0; border:1px solid var(--card-border,#ddd); border-radius:50%; background:transparent; color:var(--muted,#777); font:italic 15px Georgia,serif; cursor:pointer; }
+.cs-layout-help { position:fixed; inset:auto 0 0; width:min(100%,560px); box-sizing:border-box; max-height:75dvh; margin:0 auto; padding:20px 20px max(20px,env(safe-area-inset-bottom,0px)); border:1px solid var(--card-border,#ddd); border-radius:24px 24px 0 0; background:var(--card-bg,#fff); color:var(--ink,#111); }
+.cs-layout-help::backdrop { background:rgba(0,0,0,.35); }
+.cs-layout-help header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.cs-layout-help h2 { margin:0; font-size:17px; line-height:1.5; }
+.cs-layout-help header button { flex:none; width:40px; height:40px; padding:0; border:0; background:transparent; color:inherit; font-size:26px; cursor:pointer; }
+.cs-layout-help-body { max-height:50dvh; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px 0; font-size:13px; line-height:1.8; }
+[data-theme="dark"] #page-chat-settings .cs-options-group, [data-theme="dark"] .cs-layout-help { background:var(--dark-card,#242424); border-color:var(--dark-border,#3c3c3c); }
+@media (max-width:360px) { #page-chat-settings .cs-options { padding-left:8px; padding-right:8px; } #page-chat-settings .cs-options .set-row .txt { font-size:12.5px; } }
+#page-setting .settings-group-title { margin:0; padding:14px 17px 5px; color:var(--muted,#888); font-size:11.5px; font-weight:600; line-height:1.5; letter-spacing:.25px; }
+.page .tag.settings-info { position:relative; z-index:1; display:inline-flex; align-items:center; justify-content:center; flex:none; width:27px; height:27px; box-sizing:border-box; margin:0 0 0 6px; padding:0; border:1px solid var(--card-border,#ddd); border-radius:50%; background:transparent; color:var(--muted,#777); font:italic 14px Georgia,serif; vertical-align:middle; cursor:pointer; }
+.page .tag.settings-info:focus-visible { outline:2px solid var(--ink,#111); outline-offset:2px; }
+[data-theme="dark"] .page .tag.settings-info { border-color:var(--dark-border,#444); color:var(--muted,#aaa); }
+#page-setting .set-row .txt { min-width:0; }
+#page-setting .gs-row > :first-child:not(.toggle):not(.settings-info) { flex:1; min-width:0; }
+#page-setting .gs-row > .toggle, #page-setting .set-row > .toggle { flex:none; margin-left:auto; }
+#page-setting .gs-row > .settings-info, #page-setting .set-row > .settings-info { flex:none; margin-left:8px; }
+#page-setting .gs-row > .toggle { order:1; } #page-setting .gs-row > .settings-info { order:2; }
+#page-setting .gs-sub[hidden], #bg-notify-perm-warn:empty, #theme-mode-val[hidden] { display:none !important; }
+#sf-desk-freq .freq-head .txt { flex:1; min-width:0; }
+#sf-desk-freq .freq-head .settings-info { margin-left:auto; }
+#page-setting .offline-status { margin:0 14px 12px; padding:9px 11px; border-radius:10px; background:rgba(128,128,128,.06); line-height:1.6; }
+#page-setting .offline-status b { display:block; font-weight:600; }
+.retired-probabilities { border-top:1px solid rgba(128,128,128,.14); }
+.retired-probabilities > summary { padding:13px 14px; color:var(--muted,#888); font-size:12px; cursor:pointer; }
+.retired-probabilities .gs-row { opacity:.75; }
+.invitation-fold + .invitation-fold { border-top:1px solid rgba(128,128,128,.14); }
+.invitation-fold > .invitation-group-title { display:flex; align-items:center; justify-content:space-between; list-style:none; margin:0; padding:16px 14px; color:var(--ink,#111); font-size:13px; font-weight:500; line-height:1.5; cursor:pointer; }
+.invitation-fold > summary::-webkit-details-marker { display:none; }
+.invitation-fold > summary::after { content:'›'; color:var(--muted,#888); font-size:19px; line-height:1; }
+.invitation-fold[open] > summary::after { transform:rotate(90deg); }
+.invitation-fold > summary:focus-visible { outline:2px solid var(--ink,#111); outline-offset:-3px; border-radius:10px; }
+.invitation-fold[open] > summary { border-bottom:1px solid rgba(128,128,128,.10); }
+.invitation-fold > .gs-row:last-child { border-bottom:0; }
+.invitation-fold > .gs-row { padding-left:26px; }
+.invitation-fold > .gs-row > span:first-child::before { content:"- "; }
+:is(#page-setting, #page-theme, .page[id$="-settings"]):not(#page-chat-settings) .set-group { margin-bottom:22px; }
+#page-chat-settings .cs-options-group { margin-bottom:22px; }
+#page-setting > .them-sec { padding-top:16px; }
+#page-reply-settings .rps-panel[data-rps="reply"] > .gs-title:first-child { padding-bottom:16px; }
+#page-reply-settings .rps-panel { padding-top:12px; }
+#page-reply-settings > .fav-tabs { gap:0; margin:0 18px 8px; padding:8px 4px 0; border-bottom:1px solid rgba(0,0,0,.06); overflow-x:auto; }
+#page-reply-settings > .fav-tabs > .fav-tab { flex:1 0 0; justify-content:center; min-width:0; padding:9px 0 8px; border:0; border-bottom:2px solid transparent; border-radius:0; background:transparent; color:rgba(0,0,0,.35); font-size:12.5px; font-weight:600; line-height:1.5; }
+#page-reply-settings > .fav-tabs > .fav-tab.sel { color:#111; background:transparent; border-bottom-color:#111; }
+#page-reply-settings > .fav-tabs > .fav-tab:focus-visible { outline:2px solid var(--ink,#111); outline-offset:-2px; }
+[data-theme="dark"] #page-reply-settings > .fav-tabs { border-bottom-color:rgba(255,255,255,.12); }
+[data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab { color:rgba(255,255,255,.38); }
+[data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab.sel { color:#fff; border-bottom-color:#fff; }
+#page-chatcard .cc-library-group { margin:12px; padding:0 12px 8px; border:1px solid var(--card-border,#e7e7e7); border-radius:18px; background:var(--card-bg,#fff); }
+#page-chatcard .cc-library-group-title { margin:0; padding:15px 0 5px; color:var(--muted,#888); font-size:12px; font-weight:600; line-height:1.5; }
+#page-chatcard .cc-library-group > .chat-item { margin:0; border:0; border-bottom:1px solid var(--card-border,#e7e7e7); border-radius:0; background:transparent; box-shadow:none; }
+#page-chatcard .cc-library-group > .chat-item:last-child { border-bottom:0; }
+[data-theme="dark"] #page-chatcard .cc-library-group { background:var(--card-bg,var(--dark-card,#202020)); border-color:var(--dark-border,#444); }
+[data-theme="dark"] #page-chatcard .cc-library-group > .chat-item { border-bottom-color:var(--dark-border,#444); }
+#page-mood .mood-custom-add { border:1px dashed var(--card-border,#ddd); background:transparent; }
+#page-mood .mood-emoji-name { display:block; overflow-wrap:anywhere; }
+.mood-custom-dialog { width:min(340px,calc(100vw - 36px)); max-height:calc(100dvh - 48px); overflow:auto; box-sizing:border-box; padding:22px; border:1px solid var(--card-border,#ddd); border-radius:20px; background:var(--card-bg,#fff); color:var(--ink,#111); font-family:inherit; }
+.mood-custom-dialog::backdrop { background:rgba(0,0,0,.35); }
+.mood-custom-dialog h3 { margin:0 0 18px; font-size:17px; }
+.mood-custom-dialog label { display:block; margin:14px 0 7px; font-size:13px; }
+.mood-custom-dialog input,.mood-custom-dialog .ce-box,.mood-custom-dialog select { width:100%; box-sizing:border-box; padding:10px 11px; border:1px solid var(--card-border,#ddd); border-radius:10px; background:var(--card-bg,#fff); color:var(--ink,#111); font:inherit; font-size:14px; }
+.mood-custom-dialog .ce-ghost { display:none !important; }
+.mood-custom-hint { margin-left:8px; color:var(--muted,#888); font-size:11px; }
+#mood-custom-error { margin:10px 0 0; min-height:18px; color:#b3261e; font-size:12px; }
+.mood-custom-actions { display:flex; gap:10px; margin-top:12px; }
+.mood-custom-actions button { flex:1; padding:11px; border:0; border-radius:11px; font:inherit; font-size:14px; cursor:pointer; background:var(--static-bg,#eee); color:var(--ink,#111); }
+#mood-custom-confirm { background:var(--ink,#111); color:var(--card-bg,#fff); }
+.mood-custom-dialog { margin:auto; }
+#chat-fav-selection {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--card-bg,#fff);border-top:1px solid var(--line,#ddd);flex-shrink:0;}
+#chat-fav-selection[hidden] {display:none!important;}
+#chat-fav-selection button {padding:10px 12px;border-radius:12px;background:var(--static-bg,#f1f1f1);color:var(--ink,#111);font-size:13px;}
+#chat-fav-selection [data-cfs="save"] {background:#111;color:#fff;}
+#chat-fav-selection button:disabled {opacity:.4;}
+#chat-fav-selection span {font-size:13px;color:var(--ink,#111);}
+#page-chat.chat-fav-selecting > .chat-input-row {display:none!important;}
+.chat-fav-selecting #chat-body .msg[data-mk] {position:relative;padding-left:34px;width:100%;max-width:100%;}
+.chat-fav-selecting #chat-body .msg-out[data-mk] {justify-content:flex-end;}
+.chat-fav-check {position:absolute;left:3px;top:12px;width:24px;height:24px;border:1.5px solid #aaa;border-radius:50%;background:var(--card-bg,#fff);color:var(--ink,#111);font-size:16px;display:grid;place-items:center;z-index:2;}
+.chat-fav-check[aria-checked="true"] {background:#111;border-color:#111;color:#fff;}
+#fav-list .fav-chat-group {display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;width:100%;max-width:100%;box-sizing:border-box;border:1px solid var(--line,#ddd);border-radius:18px;padding:14px;margin:16px 0;background:var(--card-bg,#fff);gap:10px;box-shadow:0 3px 0 var(--line,#ddd);}
+.fav-chat-group-heading {font-size:14px;font-weight:700;border-bottom:1px solid var(--line,#ddd);padding-bottom:10px;}
+.fav-chat-group-content {display:flex;flex-direction:column;gap:6px;border-left:3px solid #aaa;padding-left:8px;min-width:0;}
+.fav-chat-group-content > .msg {margin:10px 0;}
+.fav-chat-group-time {font-size:11px;opacity:.6;text-align:right;}
+#page-fav .fav-note {font-size:12px;line-height:1.6;color:var(--ink,#111);white-space:pre-wrap;overflow-wrap:anywhere;padding:8px 10px;border-left:2px solid #aaa;flex-basis:100%;}
+#page-fav .fav-note[hidden] {display:none;}
+#page-fav .fav-note-button {font-size:11px;color:var(--ink,#111);background:var(--static-bg,#f1f1f1);border:1px solid var(--line,#ddd);border-radius:12px;padding:5px 10px;align-self:flex-end;margin-top:6px;}
+#page-fav .msg:has(> .fav-note-button) {flex-wrap:wrap;}
+#page-fav .msg > .fav-note-button {margin-left:auto;}
+#page-fav .fav-chat-group > .fav-note-button {margin-left:0;}
+#page-fav .fav-chat-group > .fav-note {flex-basis:auto;}
+#page-fav .msg.fav-chat-group:has(> .fav-note-button) {flex-wrap:nowrap;}
+#fav-list > .fav-entry-card {display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;align-self:stretch;width:100%;max-width:100%;padding:14px;border:1px solid var(--line,#ddd);border-radius:18px;margin:16px 0;background:var(--card-bg,#fff);gap:10px;box-shadow:0 3px 0 var(--line,#ddd);}
+#fav-list > .fav-entry-card:has(> .fav-note-button) {flex-wrap:nowrap;}
+#fav-list > .fav-entry-card > .fav-note {flex-basis:auto;}
+#fav-list .fav-entry-message {max-width:100%;width:100%;min-width:0;}
+#fav-list .fav-entry-message.msg-out {justify-content:flex-end;}
+#fav-list .fav-entry-card > .fav-note-button {margin-left:0;align-self:flex-end;}
+#fav-list .fav-saved-time {font-size:10px;line-height:1.5;color:var(--muted,#888);text-align:right;align-self:flex-end;overflow-wrap:anywhere;}
+#fav-list .msg-bubble > .msg-moods {display:flex;clear:both;width:100%;flex-basis:100%;margin-top:7px;padding-top:7px;}
+#fav-list .msg-moods .msg-mood {white-space:normal;max-width:100%;flex-wrap:wrap;overflow-wrap:anywhere;}
+#fav-list .msg-moods .msg-mood-tag {flex-shrink:0;}
+#fav-list .fav-mail-heading {display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line,#ddd);padding-bottom:10px;margin-bottom:12px;}
+#fav-list .fav-mail-heading strong,#fav-list .fav-feed-author {font-size:14px;font-weight:700;overflow-wrap:anywhere;}
+#fav-list .fav-mail-heading > span {font-size:10px;color:var(--muted,#888);white-space:nowrap;flex-shrink:0;}
+#fav-list .fav-feed-author {margin-bottom:10px;}
+#fav-list .fav-mail-paper {width:100%;min-width:0;margin:0;box-shadow:none;}
+#fav-list .fav-mail-paper .fav-mail-heading {padding:12px 14px;margin:0;}
+#fav-list .fav-mail-paper .mail-paper-title {font-size:14px;font-weight:700;padding:12px 14px 2px;}
+#fav-list .fav-mail-paper .mail-paper-body {font-size:13px;line-height:24px;padding:8px 14px 14px;}
+#fav-list > .fav-entry-card > .fav-check {position:static;order:-1;align-self:center;margin:0 0 4px;}
+#fav-list .fav-entry-footer {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 10px;margin-top:4px;margin-left:-14px;min-width:0;}
+#fav-list .fav-entry-footer .fav-note {grid-column:1;color:#aaa;line-height:1.5;padding:3px 8px 3px 12px;border-left:0;min-width:0;}
+#fav-list .fav-entry-footer .fav-note-button {grid-column:2;align-self:center;margin:0;white-space:nowrap;}
+#fav-list .fav-entry-footer .fav-saved-time {grid-column:1 / -1;justify-self:end;margin:0;}
+[data-theme="dark"] #fav-list .fav-entry-footer .fav-note {color:#929292;border-left-color:#555;}
+#page-fav #fav-tabs {gap:0;margin:0 18px 8px;padding:8px 4px 0;border-bottom:1px solid var(--line,#e6e6e6);}
+#page-fav #fav-tabs > .fav-tab {flex:1 0 0;justify-content:center;min-width:0;padding:9px 0 8px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#aaa;font-size:12.5px;font-weight:600;line-height:1.5;}
+#page-fav #fav-tabs > .fav-tab.sel {color:var(--ink,#111);background:transparent;border-bottom-color:var(--ink,#111);}
+#page-fav #fav-tabs > .fav-tab:focus-visible {outline:2px solid var(--ink,#111);outline-offset:-2px;}
+.update-notes-entry {width:100%;text-align:left;background:transparent;color:var(--ink);border:0;font-family:inherit;}
+.update-notes-entry:focus-visible {outline:2px solid var(--ink);outline-offset:-3px;}
+#page-update-notes .ch-back {color:var(--ink);cursor:pointer;}
+.update-notes-list {overflow-y:auto;flex:1;min-height:0;padding:18px 18px 30px;color:var(--ink);}
+.update-notes-date {border:1px solid var(--card-border);border-radius:18px;background:var(--card-bg);margin-bottom:18px;overflow:hidden;}
+.update-notes-date summary {padding:16px;font-size:14px;font-weight:700;cursor:pointer;}
+.update-notes-date summary:focus-visible {outline:2px solid var(--ink);outline-offset:-3px;}
+.update-notes-date[open] summary {border-bottom:1px solid var(--line);}
+.update-notes-date ul {padding:4px 20px 16px 32px;}
+.update-notes-date li {padding-top:13px;font-size:13px;line-height:1.7;overflow-wrap:anywhere;}
+.update-notes-date p {margin-top:3px;color:var(--soft-ink,#555);font-size:12px;}
 </style>
 
 </head>
@@ -10042,7 +10192,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792608432704" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792693483661" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -11143,14 +11293,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
       <div class="them-sec" data-sec="basic">
       <!-- FIX 2026-09-20 #927：全屏模式自「系统」段提到通用首位、独立成组（用户：设置里的全屏模式要放在最前面一个显眼独立的地方）；
            行下小字首条写明「切后台会自动退出全屏＝设备限制、不是 bug」（原只在常见问题里，用户当 bug 报） -->
-      <div class="set-group glass">
-        <div class="set-row" id="sf-fullscreen-row">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt"><span id="sf-fullscreen-label">全屏模式（隐藏手机状态栏）</span><span class="tag" id="sf-fullscreen-help" role="button" tabindex="0" aria-haspopup="dialog">功能说明</span></div>
-          <label class="toggle"><input type="checkbox" id="sf-fullscreen"><span class="tk"></span></label>
-        </div>
-        <div class="gs-sub" id="sf-fullscreen-sub"><b>手机端切到后台（锁屏 / 切去别的应用）会自动退出全屏，这是设备限制、不是 bug</b>，切回来手动再开一次即可。<br>开启后尽量隐藏手机顶部状态栏/浏览器栏，让内容占满全屏。<br>iOS 限制：iPhone 顶部系统状态栏（时间/电量）由系统控制，任何网页都无法隐藏；从主屏幕打开时本开关会让内容顶满屏幕，应用内模拟状态栏（Mochi/时间/电量）下移到系统状态栏正下方、两栏不重叠。</div>
-      </div>
+      
       <!-- FIX 2026-09-19 #805（工作树被并行旧缓冲打回，2026-09-20 随 #927 重放）：导出数据/导入数据自「工具」段移入通用段——
            备份是防丢的唯一防线，放太靠后的 tag 用户不知道有这个功能；row id 不变，直达跳转按 closest('.them-sec') 动态取 tag -->
       <div class="set-group glass">
@@ -11198,7 +11341,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         <div class="set-row" id="row-theme-mode">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
           <div class="txt">深色模式</div>
-          <div class="val" id="theme-mode-val">关闭</div>
+          <div class="val" id="theme-mode-val" hidden>关闭</div><label class="toggle"><input type="checkbox" id="theme-mode-switch" aria-label="深色模式"><span class="tk"></span></label>
         </div>
         <div class="set-row" id="row-appearance">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg></div>
@@ -11273,12 +11416,13 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         <div class="gs-sub" id="bg-notify-sub"><b>后台弹窗＝页面切到后台（锁屏 / 切到别的应用）时，TA 发消息用系统通知弹横幅。</b>必备：① 本机得有网页通知能力——安卓或电脑上的 Chrome / Edge（Chromium 内核）且 https 打开，或 iPhone / iPad 用 Safari「添加到主屏幕」后从桌面图标打开本站（标签页形态没有这个能力）；小米 / vivo / OPPO 自带浏览器、UC、夸克这些没有通知能力，开不起来；② 允许通知权限（地址栏左侧图标 → 网站设置 → 通知）；③ 本开关（会自动开启「后台保活」——后台不产生消息就无从弹起）；④ 系统设置里给浏览器允许通知、且不限制其后台运行/省电（小米 / 红米还要开「在屏幕上方显示 / 悬浮通知」）。<b>iPhone / iPad：Safari 标签页里没有网页通知能力，要到 Safari「添加到主屏幕」后从桌面图标打开本站，这个开关才开得了</b>——那边能授权、能弹系统通知；但 iOS 不给网页推送服务端，应用被系统收回后不保证弹，所以「后台保活」要一起开着，并可用「桌面消息弹窗」的应用内横幅兜底。点本行「功能说明」看完整步骤与「收不到」的排查，点右侧「测试」＝后台弹窗自测：第一段当场体检（开关/权限/保活/后台服务）并真发一条；成功后再点「现在测（切后台）」按 Home 切后台，第二段会由页面在后台再发一条、回来给结论。<b>⚠ 后台弹窗跟着保活一起：保活被截断/页面被丢弃＝后台弹窗一起停摆</b>（别的 App 刷视频、听歌占用音频；挂后台太久被系统冻结——见上方红字）；失效后彻底关闭网页重新打开，再把两个开关重新打开。<b>还有一条最容易漏：手机开了勿扰 / 免打扰（iPhone 叫「专注模式」）时，通知被系统静默收进通知栏、屏幕上方不弹横幅</b>——网页读不到它，「测试」体检全绿你也可能什么都没看到；先下拉通知栏看那条测试通知在不在，在＝被系统压住（去系统设置关掉勿扰，或把本浏览器 / 桌面上的 Mochi 加进勿扰的允许例外）。</div>
         <!-- #1059：通知逐条弹（关闭内容去重）——用户直派「联系人发来的多条消息我都要看到弹窗」。
              默认关闭＝保持去重（同内容/近期弹过只弹一条）；打开后每条消息都单独弹系统通知。 -->
+        <div class="gs-sub dict-lock-hint" id="bg-notify-perm-warn" hidden></div>
         <div class="gs-row"><span>通知逐条弹（关闭去重）</span><label class="toggle"><input type="checkbox" id="bg-notify-nodedup"><span class="tk"></span></label></div>
         <div class="gs-sub" id="bg-notify-nodedup-sub">默认关闭：内容相同或近期弹过的消息只弹一条（去重，防同句连轰）。<b>打开后每条消息都弹</b>——字卡重复率高时会连环弹同句提示，按需开；聊天记录与未读角标不受影响。</div>
         <!-- FIX 2026-09-22 #1014：权限不到位时不再自动关开关（用户实报「切后台自动关闭」）——
              真实状态与一步到位的方法写在这条标红行里，由 bg-keep.js 按权限读数渲染（granted 时隐藏；
              设备根本没有通知能力时一直显示）。视觉复用 #961 红条族 .dict-lock-hint -->
-        <div class="gs-sub dict-lock-hint" id="bg-notify-perm-warn" hidden></div>
+        
         <!-- FIX 2026-09-20 #927：本段的「全屏模式（隐藏手机状态栏）」行（#sf-fullscreen 及其说明小字）已整体搬到
              「通用」段首位独立成组（用户点名要放最前面显眼处）；本段只留下方「全屏边缘防误触」等配套开关。 -->
         <!-- v3.26.x：布局手动兜底——浏览器「桌面版网站」模式会把 UA / screen / 触摸能力 /
@@ -11303,9 +11447,9 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
              桌面版 Chrome 同样可用，而安卓自带浏览器多数没有这个能力） -->
         <div class="set-row">
           <div class="txt">离线消息提醒<span class="tag" id="psync-help" role="button" tabindex="0" aria-haspopup="dialog">功能说明</span></div>
-          <label class="toggle"><input type="checkbox" id="psync-en"><span class="tk"></span></label>
+          <label class="toggle"><input type="checkbox" id="psync-en" aria-describedby="psync-status-description"><span class="tk"></span></label>
         </div>
-        <div class="gs-row" style="display:block"><span id="psync-status" style="font-size:11px;color:var(--muted,#999);line-height:1.5;white-space:normal">…</span></div>
+        <div class="gs-sub offline-status" id="psync-status-description"><b>离线消息提醒状态：</b><span id="psync-status" style="font-size:11px;color:var(--muted,#999);line-height:1.5;white-space:normal">…</span></div>
       </div>
       </div><!-- /them-sec system -->
       <!-- 工具：屏幕适配 / 字卡自检 / 各功能数据 / 信息诊断 / 存储 / 卡顿优化等数据与诊断工具
@@ -11588,11 +11732,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           <div class="txt">怎么添加字卡<span class="sub">系统预设字卡 + 自定义字卡</span></div>
           <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
         </div>
-        <div class="set-row" id="row-faq-fullscreen">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt">全屏模式失效<span class="sub">切后台会失效 · 怎么恢复</span></div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
+        
         <div class="set-row" id="row-faq-preset">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></div>
           <div class="txt">系统预设字卡与功能设置<span class="sub">建议打开使用 · 原因说明</span></div>
@@ -13155,12 +13295,6 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
             <div class="gs-row"><span>来信内容使用 emoji</span><label class="toggle"><input type="checkbox" id="ml-emoji-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>来信内容使用表情包</span><label class="toggle"><input type="checkbox" id="ml-sticker-en"><span class="tk"></span></label></div>
           </div>
-          <!-- #645：每周摸鱼小结寄信开关——关闭后 TA 不再寄「本周摸鱼小结」（判定在 src/js/mail.js fishWeekReportFor） -->
-          <div class="gs-title">每周摸鱼小结</div>
-          <div class="set-group glass">
-            <div class="gs-row"><span>摸鱼小结寄信</span><label class="toggle"><input type="checkbox" id="ml-fish-week-en"><span class="tk"></span></label></div>
-            <div class="gs-sub">开启后每周日 18 点后 TA 会把「本周摸鱼小结」寄进信箱（周一~周三会补上周的）；关闭后不再寄，主动来信/回信不受影响</div>
-          </div>
         </div>
         <div class="gs-panel" data-rpanel="feed" hidden>
           <!-- #534：内容类型总开关——与信箱页「写信内容类型」同款。关闭后该类型在朋友圈
@@ -13225,7 +13359,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         </div>
         <!-- v3.9.x：查岗——TA 主动查你的岗：随主动发送按概率发查岗问题卡（聊天互动卡 + 概率弹窗，作答后 TA 回应） -->
         <div class="gs-panel" data-rpanel="ck" hidden>
-          <div class="gs-title">TA 主动查岗</div>
+          <div class="gs-title">TA主动查岗与概率</div>
           <div class="set-group glass">
             <div class="gs-row"><span>TA 主动查岗</span><label class="toggle"><input type="checkbox" id="ckq-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>查岗概率</span><div class="stepper" data-k="ckq-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="ckq-prob-val" readonly><button class="stp-max">+</button></div></div>
@@ -13236,7 +13370,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         </div>
         <!-- v3.9.x：其他——联系人主动邀请（猜拳/玩游戏），随 TA 主动找你的消息按概率触发 -->
         <div class="gs-panel" data-rpanel="other" hidden>
-          <div class="gs-title">联系人主动邀请</div>
+          <div class="gs-title">TA主动邀请</div>
           <div class="set-group glass">
             <div class="gs-row"><span>主动邀请猜拳</span><label class="toggle"><input type="checkbox" id="ai-rps-en"><span class="tk"></span></label></div>
             <div class="gs-row"><span>猜拳邀请概率</span><div class="stepper" data-k="ai-rps-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="ai-rps-prob-val" readonly><button class="stp-max">+</button></div></div>
@@ -13261,13 +13395,6 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
             <div class="gs-row"><span>跨桌面来电概率</span><div class="stepper" data-k="desk-call-prob" data-min="0" data-max="100" data-step="5"><button class="stp-min">−</button><input class="stp-val" id="desk-call-prob-val" readonly><button class="stp-max">+</button></div></div>
           </div>
           <div class="gs-sub" style="padding:0 14px 2px">其他桌面的联系人会按各自概率（默认 2%，可在此逐联系人调整）主动给你来电，冷却与查岗一致 30 分钟。全局开关在 设置 →「开启 联系人跨桌面打电话」（默认关闭，需先到那里手动打开，这里调了概率也不会来电）</div>
-          <!-- v3.26.x：摸鱼值 / 工作值累计总开关——桌面摸鱼小组件数值增长闸门（personalize.js addFish/addWork 消费） -->
-          <div class="gs-title" style="margin-top:10px">摸鱼值 / 工作值</div>
-          <div class="set-group glass">
-            <div class="gs-row"><span>摸鱼值累计</span><label class="toggle"><input type="checkbox" id="fish-en"><span class="tk"></span></label></div>
-            <div class="gs-row"><span>工作值累计</span><label class="toggle"><input type="checkbox" id="work-en"><span class="tk"></span></label></div>
-          </div>
-          <div class="gs-sub" style="padding:0 14px 14px">桌面摸鱼小组件两组数值的增长总开关（默认开）。关闭「摸鱼值累计」后：TA 的自动摸鱼、你点摸鱼按钮、番茄钟补偿摸鱼、抓包奖励都不再涨摸鱼值；关闭「工作值累计」后：自动打工、专注期间的工作值等不再涨。已有数值保留不清零，重新打开即恢复累计，各联系人独立保存</div>
         </div>
         <!-- v3.6.x：保存设置按钮——点击把当前所有概率/开关写入本地并提示 -->
         <button class="ta-add-btn gs-save-btn" id="reply-save-btn" style="width:100%;margin:6px 0 10px">
@@ -13888,10 +14015,6 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           <div class="cal-sec">
             <div class="cal-sec-title">心情</div>
             <div class="cal-sec-body cal-mine" id="cal-mood"></div>
-          </div>
-          <div class="cal-sec">
-            <div class="cal-sec-title">摸鱼 · 工作</div>
-            <div class="cal-sec-body" id="cal-stats"></div>
           </div>
         </div>
 
@@ -16397,13 +16520,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            本组不带 data-tag，故不参与 #cs-func-tags 分类过滤（chat-settings.js 只过滤 [data-tag] 成对元素），五个入口一律可见。
            与设置页通用段 #sf-fullscreen 同一状态双向同步（接线在 chat-settings.js）。 -->
       <div class="gs-title">全屏</div>
-      <div class="set-group glass" id="cs-fs-group">
-        <div class="set-row" id="cs-fullscreen-row">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
-          <div class="txt">全屏模式（隐藏手机状态栏）<span class="sub">手机端切到后台（锁屏 / 切去别的应用）会自动退出全屏，这是设备限制、不是 bug，切回来再开一次即可</span></div>
-          <label class="toggle"><input type="checkbox" id="cs-fullscreen"><span class="tk"></span></label>
-        </div>
-      </div>
+      
       <!-- v3.29.x：功能页二级 tag 分类（形象/消息/显示），点击只显示对应分组；
            交互在 chat-settings.js（#cs-func-tags），分组按 gs-title/set-group 成对 data-tag 过滤。
            v3.34.x 分类改名（用户反馈「分类名字还是有问题，不太合适」）：
@@ -16708,7 +16825,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
   // v3.5.123：readonly 起手（防 Chrome 密码弹条破坏表单签名）——这里立即解除，
   // 早于所有功能模块，任何设备都不会出现输入框不可用的情况
   (function () { var _ci = document.getElementById('chat-input'); if (_ci) _ci.readOnly = false; })();
-window.__jsErrors = window.__jsErrors || []; window.__mochiLoaded = window.__mochiLoaded || []; window.__mochiErrLoaded = window.__mochiErrLoaded || []; window.__mochiBootAt = Date.now(); window.__mochiJsFiles = ["feature-policy-config.js","feature-policy.js","device.js","idb.js","contacts.js","applock.js","card-lock.js","dcp-master.js","media-pool.js","storage-slim.js","perf-check.js","energy-check.js","flash-check.js","img-compress.js","img-ingest.js","clock.js","tabs.js","desktop-slider.js","quote-cards.js","usage-days.js","legacy-score-history.js","personalize.js","chat.js","group-chat.js","chatcard.js","chat-settings.js","reply-settings.js","fav-settings.js","default-cards-data.js","dict-ext-data.js","default-cards.js","quote-spell.js","dream-free.js","mood-followup-data.js","mood-reply-cards.js","ta-mood-data.js","ta-mood.js","music-player.js","calendar.js","divination.js","avatar-lib.js","ta-ask.js","ck-question.js","incoming-requests.js","ta-invite.js","bg-keep.js","records.js","call.js","mail.js","feed.js","loc-lib.js","p2-features.js","gift-shop.js","memo-app.js","memo-arc.js","my-arc.js","period.js","accounting.js","decision.js","group-decision.js","pong.js","snake-game.js","breakout.js","connect-four.js","coop-mine.js","fishing.js","memory-game.js","gomoku.js","linkup.js","match3.js","auction.js","arcade.js","mood-diary.js","sfx.js","fullscreen.js","data-backup.js","feature-data-catalog.js","feature-data.js","pwa.js","feature-hub.js","settings-help.js","onboarding.js","page-coach.js","card-audit.js","storage-guide.js","mobile-adapt.js"]; window.__mochiExtFiles = ["idb.js","contacts.js","applock.js","card-lock.js","dcp-master.js","media-pool.js","storage-slim.js","perf-check.js","energy-check.js","flash-check.js","img-compress.js","img-ingest.js","clock.js","tabs.js","desktop-slider.js","quote-cards.js","usage-days.js","legacy-score-history.js","personalize.js","chat.js","group-chat.js","chatcard.js","chat-settings.js","reply-settings.js","fav-settings.js","default-cards-data.js","dict-ext-data.js","default-cards.js","quote-spell.js","dream-free.js","mood-followup-data.js","mood-reply-cards.js","ta-mood-data.js","ta-mood.js","music-player.js","calendar.js","divination.js","avatar-lib.js","ta-ask.js","ck-question.js","incoming-requests.js","ta-invite.js","bg-keep.js","records.js","call.js","mail.js","feed.js","loc-lib.js","p2-features.js","gift-shop.js","memo-app.js","memo-arc.js","my-arc.js","period.js","accounting.js","decision.js","group-decision.js","pong.js","snake-game.js","breakout.js","connect-four.js","coop-mine.js","fishing.js","memory-game.js","gomoku.js","linkup.js","match3.js","auction.js","arcade.js","mood-diary.js","sfx.js","fullscreen.js","data-backup.js","feature-data-catalog.js","feature-data.js","feature-hub.js","settings-help.js","onboarding.js","page-coach.js","card-audit.js","storage-guide.js","mobile-adapt.js"];
+window.__jsErrors = window.__jsErrors || []; window.__mochiLoaded = window.__mochiLoaded || []; window.__mochiErrLoaded = window.__mochiErrLoaded || []; window.__mochiBootAt = Date.now(); window.__mochiJsFiles = ["feature-policy-config.js","feature-policy.js","device.js","idb.js","contacts.js","applock.js","card-lock.js","dcp-master.js","media-pool.js","storage-slim.js","perf-check.js","energy-check.js","flash-check.js","img-compress.js","img-ingest.js","clock.js","tabs.js","desktop-slider.js","quote-cards.js","usage-days.js","legacy-score-history.js","personalize.js","chat.js","group-chat.js","chatcard.js","chat-settings.js","reply-settings.js","fav-settings.js","default-cards-data.js","dict-ext-data.js","default-cards.js","quote-spell.js","dream-free.js","mood-followup-data.js","mood-reply-cards.js","ta-mood-data.js","ta-mood.js","music-player.js","calendar.js","divination.js","avatar-lib.js","ta-ask.js","ck-question.js","incoming-requests.js","ta-invite.js","bg-keep.js","records.js","call.js","mail.js","feed.js","loc-lib.js","p2-features.js","gift-shop.js","memo-app.js","memo-arc.js","my-arc.js","period.js","accounting.js","decision.js","group-decision.js","pong.js","snake-game.js","breakout.js","connect-four.js","coop-mine.js","fishing.js","memory-game.js","gomoku.js","linkup.js","match3.js","auction.js","arcade.js","mood-diary.js","sfx.js","fullscreen.js","data-backup.js","feature-data-catalog.js","feature-data.js","pwa.js","feature-hub.js","settings-help.js","onboarding.js","page-coach.js","card-audit.js","storage-guide.js","mobile-adapt.js","chat-settings-layout.js","settings-layout.js","settings-refinement.js","card-library-layout.js","update-notes.js"]; window.__mochiExtFiles = ["idb.js","contacts.js","applock.js","card-lock.js","dcp-master.js","media-pool.js","storage-slim.js","perf-check.js","energy-check.js","flash-check.js","img-compress.js","img-ingest.js","clock.js","tabs.js","desktop-slider.js","quote-cards.js","usage-days.js","legacy-score-history.js","personalize.js","chat.js","group-chat.js","chatcard.js","chat-settings.js","reply-settings.js","fav-settings.js","default-cards-data.js","dict-ext-data.js","default-cards.js","quote-spell.js","dream-free.js","mood-followup-data.js","mood-reply-cards.js","ta-mood-data.js","ta-mood.js","music-player.js","calendar.js","divination.js","avatar-lib.js","ta-ask.js","ck-question.js","incoming-requests.js","ta-invite.js","bg-keep.js","records.js","call.js","mail.js","feed.js","loc-lib.js","p2-features.js","gift-shop.js","memo-app.js","memo-arc.js","my-arc.js","period.js","accounting.js","decision.js","group-decision.js","pong.js","snake-game.js","breakout.js","connect-four.js","coop-mine.js","fishing.js","memory-game.js","gomoku.js","linkup.js","match3.js","auction.js","arcade.js","mood-diary.js","sfx.js","fullscreen.js","data-backup.js","feature-data-catalog.js","feature-data.js","feature-hub.js","settings-help.js","onboarding.js","page-coach.js","card-audit.js","storage-guide.js","mobile-adapt.js","chat-settings-layout.js","settings-layout.js","settings-refinement.js","card-library-layout.js","update-notes.js"];
 (function () { try {
 (function () {
 'use strict';
@@ -21669,6 +21786,11 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 <script defer src="js/card-audit.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('card-audit.js')"></script>
 <script defer src="js/storage-guide.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('storage-guide.js')"></script>
 <script defer src="js/mobile-adapt.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('mobile-adapt.js')"></script>
+<script defer src="js/chat-settings-layout.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('chat-settings-layout.js')"></script>
+<script defer src="js/settings-layout.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('settings-layout.js')"></script>
+<script defer src="js/settings-refinement.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('settings-refinement.js')"></script>
+<script defer src="js/card-library-layout.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('card-library-layout.js')"></script>
+<script defer src="js/update-notes.js" onerror="window.__mochiExtFail=(window.__mochiExtFail||[]).concat('update-notes.js')"></script>
 <!-- PERF-PLAN 阶段 1：上一行是 ext 外置脚本 defer 注入锚，构建时被整体替换为 35 个外置 js 标签；本行说明必须连同注释符号一起整体留在注释内，勿删。#797 教训：说明若写在注释结尾之外＝变正文裸文本（全页面右侧白色乱码条），其中的标签样本会被浏览器当真开标签，吞掉其后全部尾部 DOM -->
 
   <!-- PWA 安装到桌面按钮（Chrome/Edge 触发 beforeinstallprompt 时显示） -->
@@ -21690,4 +21812,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 <!-- __MOCHI_EOF__ -->
 </body>
 </html>
-<!-- __MOCHI_EOF__ mvigrz28 -->
+<!-- __MOCHI_EOF__ mvjvewst -->

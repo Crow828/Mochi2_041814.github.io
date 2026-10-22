@@ -471,7 +471,8 @@ if (delBtn) delBtn.addEventListener('click', () => deleteLetter(l));
 const favBtn = document.getElementById('mail-fav-btn');
 if (favBtn) favBtn.addEventListener('click', () => {
 if (window.addMyFavItem) {
-const ok = window.addMyFavItem({ kind: 'mail', mailType: 'received', title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
+const own = !!l.fromMe || l.type === 'sent';
+const ok = window.addMyFavItem({ kind: 'mail', mailType: own ? 'sent' : 'received', senderRole: own ? 'me' : 'ta', senderName: own ? myName : name, title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
 toast(ok ? '已收藏到我的收藏' : '这封来信已收藏过');
 if (ok) favBtn.textContent = '已收藏';
 }
@@ -530,7 +531,7 @@ updateBadge();
 if (window.chatAddSystem) window.chatAddSystem('你给 ' + name + ' 回了一封信', { mailNotice: true });
 toast('回信已寄出');
 if (Math.random() * 100 < (window.favCfg ? window.favCfg().taMail : 30) && window.addTaFavItem) {
-window.addTaFavItem({ kind: 'mail', title: l.tt || '', text: val, ts: Date.now() });
+window.addTaFavItem({ kind: 'mail', mailType: 'sent', senderRole: 'me', senderName: store.get('lbl-user') || '我', title: l.tt || '', text: val, ts: Date.now() });
 setTimeout(() => toast(window.taFit ? window.taFit('TA 收藏了你的回信') : 'TA 收藏了你的回信'), 1200);
 }
 }
@@ -756,7 +757,6 @@ return {
 minCards: c['ml-min-cards'] !== undefined ? Number(c['ml-min-cards']) : 20,
 maxCards: c['ml-max-cards'] !== undefined ? c['ml-max-cards'] : 50,
 writeEn: c['ml-write-en'] !== undefined ? Number(c['ml-write-en']) : 1,
-fishWeekEn: c['ml-fish-week-en'] !== undefined ? Number(c['ml-fish-week-en']) : 1,
 writeProb: prob('ml-write-prob', 30),
 writeMin: c['ml-write-min'] !== undefined ? c['ml-write-min'] : 1,
 writeMax: c['ml-write-max'] !== undefined ? c['ml-write-max'] : 120,
@@ -775,7 +775,7 @@ if (!cid || cid === (window.__activeCid || 'default')) return cfg;
 try {
 const s = window.storeFor(cid);
 [['ml-min-cards', 'minCards'], ['ml-max-cards', 'maxCards'],
-['ml-write-en', 'writeEn'], ['ml-fish-week-en', 'fishWeekEn'],
+['ml-write-en', 'writeEn'],
 ['ml-write-prob', 'writeProb'], ['ml-write-min', 'writeMin'], ['ml-write-max', 'writeMax'],
 ['ml-write-daily-max', 'dailyMax'], ['ml-reply-prob', 'replyProb'],
 ['ml-reply-min', 'replyMin'], ['ml-reply-max', 'replyMax'],
@@ -1019,91 +1019,13 @@ function maybeIncomingLetter() {
 const list = (window.getContacts && window.getContacts()) || [{ id: 'default' }];
 list.forEach(c => maybeIncomingLetterFor(c.id));
 }
-function fishWeekReportFor(cid) {
-if (cid === (window.__activeCid || 'default') && !mailDbReady) return;
-if (mailBlindRead(cid)) return; // #1442c 小结让路
-if (!mailCfgFor(cid).fishWeekEn) return;
-const cs = csFor(cid);
-const now = window.__fishWeekNowOverride ? window.__fishWeekNowOverride() : new Date(); // 测试钩子：生产为 null
-const day = now.getDay(); // 0=日
-const cur = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-let sun; // 小结所属周的周日（周一~周日算一周）
-if (day === 0 && now.getHours() >= 18) {
-sun = cur;
-} else {
-const back = ((day + 6) % 7) + 1; // 距上一个周日 1~7 天（周一=2 … 周六=7）
-if (back < 2 || back > 4) return; // 只补最近一周：周一~周三内补发
-sun = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() - back);
-}
-const markKey = 'fish-week-report:' + (sun.getMonth() + 1) + '-' + sun.getDate();
-if (cs.get(markKey)) return;
-cs.set(markKey, '1');
-const start = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate() - 6);
-const startTs = start.getTime();
-const endTs = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate() + 1).getTime();
-const parseDay = (s) => {
-const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(s || ''));
-if (!m) return NaN;
-return Date.parse(m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2) + 'T00:00:00');
-};
-let fm = 0, ft = 0, wm = 0, wt = 0;
-const wdSum = [0, 0, 0, 0, 0, 0, 0]; // 周一..周日 各日双方摸鱼合计
-try {
-JSON.parse(cs.get('fish-day-add') || '[]').forEach(x => {
-const ts = parseDay(x && x.date);
-if (isNaN(ts) || ts < startTs || ts >= endTs) return;
-const m2 = x.mine || 0, t2 = x.ta || 0;
-fm += m2; ft += t2;
-wdSum[(new Date(ts).getDay() + 6) % 7] += m2 + t2;
-});
-} catch (e) {}
-try {
-JSON.parse(cs.get('work-day-add') || '[]').forEach(x => {
-const ts = parseDay(x && x.date);
-if (isNaN(ts) || ts < startTs || ts >= endTs) return;
-wm += x.mine || 0; wt += x.ta || 0;
-});
-} catch (e) {}
-const name = partnerNameFor(cid);
-let bestIdx = 0;
-for (let i = 1; i < 7; i++) if (wdSum[i] > wdSum[bestIdx]) bestIdx = i;
-const wdNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-const totalFish = fm + ft;
-const lines = [
-'本周（' + (start.getMonth() + 1) + '月' + start.getDate() + '日 - ' + (sun.getMonth() + 1) + '月' + sun.getDate() + '日）小结',
-'',
-'你和我一共摸鱼 ' + totalFish + ' 点（你 +' + fm + ' · 我 +' + ft + '）。',
-totalFish > 0 ? '最会摸的一天是' + wdNames[bestIdx] + '，加了 ' + wdSum[bestIdx] + ' 点。' : '这一周还没怎么摸鱼呀，都在认真打工吗？',
-'工作值也一起攒了 ' + (wm + wt) + ' 点（你 +' + wm + ' · 我 +' + wt + '）。',
-'',
-'下周也偷偷一起加油呀。'
-];
-const letter = { id: 'l_' + Date.now() + '_' + cid + '_wk', type: 'received', tt: '本周摸鱼小结', content: lines.join('\n'), tm: Date.now() };
-const list = load(cid);
-list.unshift(letter);
-save(list, cid);
-notifyMailToChat(cid, '<svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>' + name + ' 寄来一份本周摸鱼小结', { mailNotice: true });
-if (cid === (window.__activeCid || 'default')) {
-updateBadge();
-render();
-if (window.showDeskPopup && !mailPageVisible()) {
-window.showDeskPopup({ name: '信箱', notifyKind: 'mail', text: '寄来了一份本周摸鱼小结', onClick: openMailPage, isHidden: document.visibilityState === 'hidden' });
-}
-}
-}
-function fishWeekTick() {
-const list = (window.getContacts && window.getContacts()) || [{ id: 'default' }];
-list.forEach(c => { try { fishWeekReportFor(c.id); } catch (e) {} });
-}
-window.fishWeekTick = fishWeekTick; // v3.13.x：暴露给专项验证脚本（生产内部定时器同样调它）
 checkPendingReply(); // 启动立即补查（当前桌面未就绪由内部守卫跳过，就绪后回调再补）
 setTimeout(() => {
 setInterval(() => {
 if (document.visibilityState === 'hidden' && !window.bgNotifyCheck) return;
-maybeIncomingLetter(); checkPendingReply(); fishWeekTick();
+maybeIncomingLetter(); checkPendingReply();
 }, 60000);
 maybeIncomingLetter();
-fishWeekTick();
 }, (20 + Math.random() * 40) * 1000);
 let lastEagerCheck = 0;
 function eagerCheck() {
@@ -1112,7 +1034,6 @@ if (now - lastEagerCheck < 5000) return;
 lastEagerCheck = now;
 maybeIncomingLetter();
 checkPendingReply();
-fishWeekTick();
 }
 document.addEventListener('visibilitychange', function () {
 if (document.visibilityState === 'visible') eagerCheck();
