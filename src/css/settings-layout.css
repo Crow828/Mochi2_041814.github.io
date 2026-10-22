@@ -1,0 +1,11 @@
+/* Main settings headings and compact help. No behavior or storage changes. */
+#page-setting .settings-group-title { margin:0; padding:14px 17px 5px; color:var(--muted,#888); font-size:11.5px; font-weight:600; line-height:1.5; letter-spacing:.25px; }
+.page .tag.settings-info { position:relative; z-index:1; display:inline-flex; align-items:center; justify-content:center; flex:none; width:27px; height:27px; box-sizing:border-box; margin:0 0 0 6px; padding:0; border:1px solid var(--card-border,#ddd); border-radius:50%; background:transparent; color:var(--muted,#777); font:italic 14px Georgia,serif; vertical-align:middle; cursor:pointer; }
+.page .tag.settings-info:focus-visible { outline:2px solid var(--ink,#111); outline-offset:2px; }
+[data-theme="dark"] .page .tag.settings-info { border-color:var(--dark-border,#444); color:var(--muted,#aaa); }
+#page-setting .set-row .txt { min-width:0; }
+
+#page-setting .gs-row > :first-child:not(.toggle):not(.settings-info) { flex:1; min-width:0; }
+#page-setting .gs-row > .toggle, #page-setting .set-row > .toggle { flex:none; margin-left:auto; }
+#page-setting .gs-row > .settings-info, #page-setting .set-row > .settings-info { flex:none; margin-left:8px; }
+#page-setting .gs-row > .toggle { order:1; } #page-setting .gs-row > .settings-info { order:2; }

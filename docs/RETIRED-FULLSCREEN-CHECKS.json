@@ -1,0 +1,86 @@
+[
+  {
+    "name": "#1282a 全屏请求单点闸（在途或已全屏不再另发一次 requestFullscreen；删＝一次点按两段全屏切换事务＝红米所见闪屏后黑屏 2~3 秒）",
+    "file": "js/fullscreen.js",
+    "needle": "if (_fsFlight || isFullscreen()) return _fsFlight;",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#1282b 闸的有界释放（内核不返回 promise／落定缺失时最长压 1.5s；删掉这句＝闸可能被永久挂住，全屏再也开不了）",
+    "file": "js/fullscreen.js",
+    "needle": "_fsFlightTimer = setTimeout(closeFsFlight, 1500);",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#1282c 手势重入认目标让路（点开关那一下交还给开关自己的 change 流程；删＝touchstart 抢先发一次，点「关」还会被开回来＝全屏关不掉/开关弹回）",
+    "file": "js/fullscreen.js",
+    "needle": "function retryTouch(e) { if (!e.isTrusted || onFsSwitch(e.target)) return; doRetry(); }",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#1282d 让路判据取事件落点（开关本体或其 label 装饰层；不是机型/UA 分支，删＝判据失效退回「任何触摸都抢发全屏」）",
+    "file": "js/fullscreen.js",
+    "needle": "if (t.closest('#sf-fullscreen, #cs-fullscreen')) return true;",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "全屏横屏判定改判物理方向（viewportLandscape）",
+    "file": "js/fullscreen.js",
+    "needle": "function viewportLandscape",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "iOS 原生全屏标记类同步（fullscreen.js syncFsClass 给根元素加 ios-native-fs，与之配套的 base.css 收紧规则靠它命中，标记删了修复就哑）",
+    "file": "js/fullscreen.js",
+    "needle": "classList.toggle('ios-native-fs', _fs)",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#889 全屏开关 iOS 文案只在 iOS 生效（relabelIosToggle 曾被无条件调用，安卓也被换成 iOS 文案误以为用不了；isIOS 门被删即回归）",
+    "file": "js/fullscreen.js",
+    "needle": "if (isIOS) { try { relabelIosToggle(); } catch (e) {} }",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#189 iPad 全屏误杀·方向监视 iOS 出口（Safari 无 orientation.lock，iPad 横屏持握 ~2s 后被 handleLandscapeForced 退出全屏+误导弹窗）",
+    "file": "js/fullscreen.js",
+    "needle": "function startFsMonitorSafe() { if (isIOS) return; startFsMonitor(); }",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#189 iPad 全屏误杀·开关 1500ms 复核跳过 iOS 横屏杀全屏（否则 FB_KEY=1 被永久写坏+退出全屏）",
+    "file": "js/fullscreen.js",
+    "needle": "if (!isIOS && isFullscreen() && viewportLandscape()) {",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#189 iPad 全屏误杀·orientationchange iOS 出口（全屏态转横不纠偏、非全屏不弹「请恢复竖屏」误导弹窗）",
+    "file": "js/fullscreen.js",
+    "needle": "if (isIOS) return; // FIX 2026-09-05 #189",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#212 挖孔屏全屏顶端留白·安卓 enterFs 补 navigationUI hide（Chromium 40723205：挖孔屏默认 auto 不把全屏面铺到挖孔区=页面外系统层 letterbox 顶端露空白、页面内测量全绿无法诊断，iQOO12 等多机型；iOS 路径原有参数不动，老内核忽略选项参数零回归）",
+    "file": "js/fullscreen.js",
+    "needle": "const fsOpts = { navigationUI: 'hide' };",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#927a 设置页全屏行改为通用段首位独立组（.set-row 形态专用 id；搬回系统段 gs-row＝用户要的「最前面一个独立显的地方」回流，行下设备限制小字由 verify-settings-tags S8/B11 判）",
+    "file": "template.html",
+    "needle": "id=\"sf-fullscreen-row\"",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#927b 聊天设置功能页顶部全屏分组在位（该行原埋在二级标签「显示」里，用户点名「保留开关、提到顶部」；分组 id 消失＝搬回埋藏态）",
+    "file": "template.html",
+    "needle": "id=\"cs-fs-group\"",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  },
+  {
+    "name": "#927d iOS 全屏开关文案改走通用段专用标题 span（行搬到通用段首位变成 .set-row＋#sf-fullscreen-label，relabel 仍按旧 .gs-row/span span 取＝要么找不到、要么把「功能说明」标签一起覆盖掉）",
+    "file": "js/fullscreen.js",
+    "needle": "row.querySelector('#sf-fullscreen-label')",
+    "reason": "User-requested removal of application fullscreen and its settings/shortcuts"
+  }
+]

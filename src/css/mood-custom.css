@@ -1,0 +1,14 @@
+#page-mood .mood-custom-add { border:1px dashed var(--card-border,#ddd); background:transparent; }
+#page-mood .mood-emoji-name { display:block; overflow-wrap:anywhere; }
+.mood-custom-dialog { width:min(340px,calc(100vw - 36px)); max-height:calc(100dvh - 48px); overflow:auto; box-sizing:border-box; padding:22px; border:1px solid var(--card-border,#ddd); border-radius:20px; background:var(--card-bg,#fff); color:var(--ink,#111); font-family:inherit; }
+.mood-custom-dialog::backdrop { background:rgba(0,0,0,.35); }
+.mood-custom-dialog h3 { margin:0 0 18px; font-size:17px; }
+.mood-custom-dialog label { display:block; margin:14px 0 7px; font-size:13px; }
+.mood-custom-dialog input,.mood-custom-dialog .ce-box,.mood-custom-dialog select { width:100%; box-sizing:border-box; padding:10px 11px; border:1px solid var(--card-border,#ddd); border-radius:10px; background:var(--card-bg,#fff); color:var(--ink,#111); font:inherit; font-size:14px; }
+.mood-custom-dialog .ce-ghost { display:none !important; }
+.mood-custom-hint { margin-left:8px; color:var(--muted,#888); font-size:11px; }
+#mood-custom-error { margin:10px 0 0; min-height:18px; color:#b3261e; font-size:12px; }
+.mood-custom-actions { display:flex; gap:10px; margin-top:12px; }
+.mood-custom-actions button { flex:1; padding:11px; border:0; border-radius:11px; font:inherit; font-size:14px; cursor:pointer; background:var(--static-bg,#eee); color:var(--ink,#111); }
+#mood-custom-confirm { background:var(--ink,#111); color:var(--card-bg,#fff); }
+.mood-custom-dialog { margin:auto; }

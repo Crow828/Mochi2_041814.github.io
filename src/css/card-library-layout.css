@@ -1,0 +1,7 @@
+/* Library categories modeled on the reference's grouped entry cards. */
+#page-chatcard .cc-library-group { margin:12px; padding:0 12px 8px; border:1px solid var(--card-border,#e7e7e7); border-radius:18px; background:var(--card-bg,#fff); }
+#page-chatcard .cc-library-group-title { margin:0; padding:15px 0 5px; color:var(--muted,#888); font-size:12px; font-weight:600; line-height:1.5; }
+#page-chatcard .cc-library-group > .chat-item { margin:0; border:0; border-bottom:1px solid var(--card-border,#e7e7e7); border-radius:0; background:transparent; box-shadow:none; }
+#page-chatcard .cc-library-group > .chat-item:last-child { border-bottom:0; }
+[data-theme="dark"] #page-chatcard .cc-library-group { background:var(--card-bg,var(--dark-card,#202020)); border-color:var(--dark-border,#444); }
+[data-theme="dark"] #page-chatcard .cc-library-group > .chat-item { border-bottom-color:var(--dark-border,#444); }

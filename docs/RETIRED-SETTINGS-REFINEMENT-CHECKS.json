@@ -1,0 +1,14 @@
+[
+  {
+    "name": "#1442e 每周摸鱼小结：让路放在烧周标记之前（删＝标记先烧、这周永不补发）",
+    "file": "js/mail.js",
+    "needle": "if (mailBlindRead(cid)) return; // #1442c 小结让路",
+    "reason": "Requested removal of fish/work settings and weekly reports, or replacement of settings presentation"
+  },
+  {
+    "name": "#1006n 摸鱼小结信 TA 口吻（改回「你俩…（我 +x · 名字 +y）」＝TA 把自己算在外、把用户标成「我」）",
+    "file": "js/mail.js",
+    "needle": "'你和我一共摸鱼 ' + totalFish + ' 点（你 +' + fm + ' · 我 +' + ft + '）。'",
+    "reason": "Requested removal of fish/work settings and weekly reports, or replacement of settings presentation"
+  }
+]

@@ -1,0 +1,11 @@
+.update-notes-entry {width:100%;text-align:left;background:transparent;color:var(--ink);border:0;font-family:inherit;}
+.update-notes-entry:focus-visible {outline:2px solid var(--ink);outline-offset:-3px;}
+#page-update-notes .ch-back {color:var(--ink);cursor:pointer;}
+.update-notes-list {overflow-y:auto;flex:1;min-height:0;padding:18px 18px 30px;color:var(--ink);}
+.update-notes-date {border:1px solid var(--card-border);border-radius:18px;background:var(--card-bg);margin-bottom:18px;overflow:hidden;}
+.update-notes-date summary {padding:16px;font-size:14px;font-weight:700;cursor:pointer;}
+.update-notes-date summary:focus-visible {outline:2px solid var(--ink);outline-offset:-3px;}
+.update-notes-date[open] summary {border-bottom:1px solid var(--line);}
+.update-notes-date ul {padding:4px 20px 16px 32px;}
+.update-notes-date li {padding-top:13px;font-size:13px;line-height:1.7;overflow-wrap:anywhere;}
+.update-notes-date p {margin-top:3px;color:var(--soft-ink,#555);font-size:12px;}

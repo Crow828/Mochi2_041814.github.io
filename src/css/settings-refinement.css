@@ -1,0 +1,37 @@
+/* Keep dynamic warning areas genuinely hidden when no notice is needed. */
+#page-setting .gs-sub[hidden], #bg-notify-perm-warn:empty, #theme-mode-val[hidden] { display:none !important; }
+#sf-desk-freq .freq-head .txt { flex:1; min-width:0; }
+#sf-desk-freq .freq-head .settings-info { margin-left:auto; }
+#page-setting .offline-status { margin:0 14px 12px; padding:9px 11px; border-radius:10px; background:rgba(128,128,128,.06); line-height:1.6; }
+#page-setting .offline-status b { display:block; font-weight:600; }
+.retired-probabilities { border-top:1px solid rgba(128,128,128,.14); }
+.retired-probabilities > summary { padding:13px 14px; color:var(--muted,#888); font-size:12px; cursor:pointer; }
+.retired-probabilities .gs-row { opacity:.75; }
+.invitation-fold + .invitation-fold { border-top:1px solid rgba(128,128,128,.14); }
+.invitation-fold > .invitation-group-title { display:flex; align-items:center; justify-content:space-between; list-style:none; margin:0; padding:16px 14px; color:var(--ink,#111); font-size:13px; font-weight:500; line-height:1.5; cursor:pointer; }
+.invitation-fold > summary::-webkit-details-marker { display:none; }
+.invitation-fold > summary::after { content:'›'; color:var(--muted,#888); font-size:19px; line-height:1; }
+.invitation-fold[open] > summary::after { transform:rotate(90deg); }
+.invitation-fold > summary:focus-visible { outline:2px solid var(--ink,#111); outline-offset:-3px; border-radius:10px; }
+.invitation-fold[open] > summary { border-bottom:1px solid rgba(128,128,128,.10); }
+.invitation-fold > .gs-row:last-child { border-bottom:0; }
+
+.invitation-fold > .gs-row { padding-left:26px; }
+
+.invitation-fold > .gs-row > span:first-child::before { content:"- "; }
+
+/* Preview: increase space between settings cards, retaining internal row spacing. */
+:is(#page-setting, #page-theme, .page[id$="-settings"]):not(#page-chat-settings) .set-group { margin-bottom:22px; }
+#page-chat-settings .cs-options-group { margin-bottom:22px; }
+#page-setting > .them-sec { padding-top:16px; }
+#page-reply-settings .rps-panel[data-rps="reply"] > .gs-title:first-child { padding-bottom:16px; }
+#page-reply-settings .rps-panel { padding-top:12px; }
+/* Preview: reply settings top navigation matches the main settings underline tabs. */
+#page-reply-settings > .fav-tabs { gap:0; margin:0 18px 8px; padding:8px 4px 0; border-bottom:1px solid rgba(0,0,0,.06); overflow-x:auto; }
+#page-reply-settings > .fav-tabs > .fav-tab { flex:1 0 0; justify-content:center; min-width:0; padding:9px 0 8px; border:0; border-bottom:2px solid transparent; border-radius:0; background:transparent; color:rgba(0,0,0,.35); font-size:12.5px; font-weight:600; line-height:1.5; }
+#page-reply-settings > .fav-tabs > .fav-tab.sel { color:#111; background:transparent; border-bottom-color:#111; }
+#page-reply-settings > .fav-tabs > .fav-tab:focus-visible { outline:2px solid var(--ink,#111); outline-offset:-2px; }
+[data-theme="dark"] #page-reply-settings > .fav-tabs { border-bottom-color:rgba(255,255,255,.12); }
+[data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab { color:rgba(255,255,255,.38); }
+[data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab.sel { color:#fff; border-bottom-color:#fff; }
+
