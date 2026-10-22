@@ -23,6 +23,16 @@
       "sha256": "bcebd263636795cb64e1f889ed8cbf659ce0eb412e54f2ec0e494152a0cce9e8"
     },
     {
+      "path": "LICENSE",
+      "bytes": 312,
+      "sha256": "733778d8ed38e784fe2c08cfefb53733f41bc681fd8498c5f7006e0918352f05"
+    },
+    {
+      "path": "README.md",
+      "bytes": 7292,
+      "sha256": "7245938786bf8c36fe1c0efada3d4732056fe71a358d67795bb2e3207fd85e63"
+    },
+    {
       "path": "build.mjs",
       "bytes": 1196768,
       "sha256": "f65c58778b18290df064ef4817a74187bb215ff4a6bab0e8ebab358abd347bed"
@@ -106,6 +116,11 @@
       "path": "docs/SETTINGS-UI-UPDATE.md",
       "bytes": 2637,
       "sha256": "48864589450bf5426f0676708de5ea64db58a14db6d378616cb97573bb8890db"
+    },
+    {
+      "path": "docs/V4.0-CI-FIX.md",
+      "bytes": 811,
+      "sha256": "e41402a435d13ba0f5117f2377fba6aeca2b9c7ce907acba8e3d020706fe3e62"
     },
     {
       "path": "docs/V4.0-REVIEW.md",
@@ -593,11 +608,6 @@
       "sha256": "a6840ee4f9b6a33f2813f6449f76f7f423373cf7174f65e68a0b75bc1ab41091"
     },
     {
-      "path": "LICENSE",
-      "bytes": 312,
-      "sha256": "733778d8ed38e784fe2c08cfefb53733f41bc681fd8498c5f7006e0918352f05"
-    },
-    {
       "path": "manifest.json",
       "bytes": 690,
       "sha256": "84affccfa12cd83ef45407fc664d91524196af45a1df61c45a7d67f792c2336d"
@@ -616,11 +626,6 @@
       "path": "package.json",
       "bytes": 1313,
       "sha256": "61df9670f8c43ce518145f262b822ebf00e2ce077d74682dd835020e181eddcf"
-    },
-    {
-      "path": "README.md",
-      "bytes": 7292,
-      "sha256": "7245938786bf8c36fe1c0efada3d4732056fe71a358d67795bb2e3207fd85e63"
     },
     {
       "path": "src/css/applock.css",
@@ -2989,8 +2994,8 @@
     },
     {
       "path": "tools/verify-calendar-cleanup.cjs",
-      "bytes": 4682,
-      "sha256": "b576908a52bb3d12504a9190130c8a81f29840548dd4f34b91c4880e5fae859e"
+      "bytes": 4857,
+      "sha256": "accfd63c5a65d004cb84c20e41e165285f89c92eaa454093706a702b604ed8d1"
     },
     {
       "path": "tools/verify-calendar-textonly.mjs",
@@ -5907,5 +5912,6 @@
       "bytes": 1528,
       "sha256": "c0dc19400a120655df246c417115ba6062da22b5532ac321a33b7a1bbf8856c3"
     }
-  ]
+  ],
+  "ciFix": "portable calendar browser selection"
 }
