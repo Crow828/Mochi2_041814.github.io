@@ -675,6 +675,9 @@ html.tablet #page-chat.cs-bg-on > #cs-bg-layer { min-height:100vh; min-height:ma
 .msg-poke.mail-notice { cursor:pointer; }
 .msg-poke.mail-notice > span:first-child { text-decoration:underline dashed rgba(0,0,0,.25); text-underline-offset:3px; }
 .msg-poke.mail-notice:active { background:rgba(0,0,0,.08); }
+.msg-poke.feed-notice {cursor:pointer;}
+.msg-poke.feed-notice > span:first-child {text-decoration:underline dashed rgba(0,0,0,.25);text-underline-offset:3px;}
+.msg-poke.feed-notice:active {background:rgba(0,0,0,.08);}
 
 /* 鏇村鍔熻兘闈㈡澘锛堟偓娴湪杈撳叆鏍忎笂鏂癸級
    v3.5.110锛歜ottom 鍔?safe-area锛屽叏闈㈠睆鍏ㄥ睆妯″紡涓嬩笌杈撳叆鏍忓悓姝ヤ笂绉伙紝涓嶉敊浣?   v3.10.x锛歠ixed 鈫?absolute鈥斺€斿畨鍗?resizes-visual 涓嬮敭鐩樺彧缂?visualViewport锛?   fixed 闈㈡澘閿氬畾鍏ㄩ珮 layout viewport 涓嶅姩锛沘bsolute 閿氬畾 .phone/#page-chat锛?   閿洏寮瑰嚭鏃跺鍣ㄨ syncAndroidKb 鏀剁缉銆侀潰鏉胯窡鐫€鍋滈潬杈撳叆鏍忎笂鏂癸紙鍚﹀垯鎵撳紑鍗?   鑷姩鑱氱劍鐨勫崐妗嗕細鏁翠綋鎺夊埌鍗囪捣鍚庣殑杈撳叆鏍忎笅鏂?閿洏鍚庨潰锛夈€傛墜鏈虹 .phone

@@ -4,8 +4,8 @@
   "files": [
     {
       "path": ".github/workflows/verify.yml",
-      "bytes": 2620,
-      "sha256": "d68142685ec2c8ebe2eb5aaedb7ec64fc849b3baa0206b1c5d42d8dccf3d6ea9"
+      "bytes": 2676,
+      "sha256": "c9f6d20e623f52d05127d57f27784548817babacf6bd91df93ae93f0a1588dc0"
     },
     {
       "path": ".gitignore",
@@ -29,8 +29,8 @@
     },
     {
       "path": "build.mjs",
-      "bytes": 1219057,
-      "sha256": "ade4b50d2e6fc0b689bae35944de900d2d170c29868cc78b6edfd542368ff736"
+      "bytes": 1219094,
+      "sha256": "1eb3d78e682514a92c2de7decf86dfe168302d894d84244f7de53f8b1221da21"
     },
     {
       "path": "diag-ask-records.html",
@@ -118,6 +118,11 @@
       "sha256": "9a17fefdf4f85c1a6693527cb89440aaf4edd3ad981826169068facc141ba405"
     },
     {
+      "path": "docs/UPDATE-2026-10-24.md",
+      "bytes": 633,
+      "sha256": "fed5c672c2f2748dba7fc83adc42f9cea127b2416366001749ee6ec26d151354"
+    },
+    {
       "path": "docs/V4.0-BG-RETRY-FIX.md",
       "bytes": 650,
       "sha256": "93cc4845ad81b0aaee3b0583e8ae8da5799555f366f0772537bb7a48966da64e"
@@ -189,8 +194,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 1635920,
-      "sha256": "a3e1d33c6154a4e57778f480e096bec1094b78c9eb6ff5e0ab64db1b1b244a25"
+      "bytes": 1642612,
+      "sha256": "1b9722c53b715406affe5aed3379cb73f7c37a836c7f51d3e7c0b5d7d3b34def"
     },
     {
       "path": "js/accounting.js",
@@ -264,8 +269,8 @@
     },
     {
       "path": "js/chat.js",
-      "bytes": 635871,
-      "sha256": "bb310e98022ed5007d12253f77eb52d99bcf872d838259f70d7049be4c339050"
+      "bytes": 636750,
+      "sha256": "63136e158a49f91e8fdc73dccff28741dcfe235672668ae0783a68a172b2a4a9"
     },
     {
       "path": "js/chatcard.js",
@@ -354,8 +359,8 @@
     },
     {
       "path": "js/feature-data-catalog.js",
-      "bytes": 11286,
-      "sha256": "0cff6bf720bdee504c6bf0f0e7dd12d6facd1cbe80e1f7bc81ec67ebec8962f6"
+      "bytes": 11484,
+      "sha256": "234c560b3a6e5b76b0ad07000abd4199f8d5b532d7f89ffed84b669a833cf087"
     },
     {
       "path": "js/feature-data.js",
@@ -369,8 +374,8 @@
     },
     {
       "path": "js/feed.js",
-      "bytes": 133960,
-      "sha256": "bc78258c9b23e227ac6ac7b9da1ec39f3a11cf93d08cfbf94e0e37b98c6837e6"
+      "bytes": 135448,
+      "sha256": "3aa87d8fad39f4f75dd3dfff79647dac2f74cf94f2d58571a9d991e1d0782f05"
     },
     {
       "path": "js/fishing.js",
@@ -619,8 +624,8 @@
     },
     {
       "path": "js/update-notes.js",
-      "bytes": 4216,
-      "sha256": "31db68c266a3edc7c585dea2f2545b1b0d585a171a88e9a15c412ee8eb0216a6"
+      "bytes": 5272,
+      "sha256": "b8b4ddd749eaf9fc45c2174f97b6b9e4acf65da97a7804bd38f4248c5114f121"
     },
     {
       "path": "js/usage-days.js",
@@ -664,8 +669,8 @@
     },
     {
       "path": "src/css/chat-date.css",
-      "bytes": 2327,
-      "sha256": "433a87242d4d618796506dbf4ee853e659ab1b3f358f4010b8ca46fa7c1e2412"
+      "bytes": 2342,
+      "sha256": "98576596208b295fd1cf640f13959a9cfd151eb4a2400f234535d1f3330f9a1f"
     },
     {
       "path": "src/css/chat-group-favorites.css",
@@ -674,8 +679,8 @@
     },
     {
       "path": "src/css/chat-main.css",
-      "bytes": 120100,
-      "sha256": "e79b66f9b216c9ba494a079c38d94dfaee9218083cb8bc5940cf5e53bf38b68c"
+      "bytes": 120318,
+      "sha256": "81e2c1dcbf2d0bdc4437eca361df159c160b89120cdfe0d0eaa3cc1fd922b364"
     },
     {
       "path": "src/css/chat-pages.css",
@@ -746,6 +751,11 @@
       "path": "src/css/settings-refinement.css",
       "bytes": 3237,
       "sha256": "6db8326dedd64f7d8a9a6fc0b6f8847f77906179c0297b39d37065892086451b"
+    },
+    {
+      "path": "src/css/sugar-diary.css",
+      "bytes": 6316,
+      "sha256": "1e72e247ee8694a2ee83e5d4da0a853b02decade79812f94bd9ec318f2976a45"
     },
     {
       "path": "src/css/tabbar.css",
@@ -829,8 +839,8 @@
     },
     {
       "path": "src/js/chat.js",
-      "bytes": 1053729,
-      "sha256": "65a49c064dd58589c206de55a4dfd0635a8ffbab6f90a10e58452b855046a1cb"
+      "bytes": 1054538,
+      "sha256": "d1abe0cb11cae3f3778f0eca3ee58b6c58e2c4485f6dd3cccc765aa8438a4cf3"
     },
     {
       "path": "src/js/chatcard.js",
@@ -924,8 +934,8 @@
     },
     {
       "path": "src/js/feature-data-catalog.js",
-      "bytes": 25141,
-      "sha256": "54567810a4a4fa03084a46ac1db361141e198dc0c1c6dbb396cb60567aacbea6"
+      "bytes": 25343,
+      "sha256": "f8beca46815e2806af9d320a1f1beaab6aebe93555ee1e1a1456ff1e51da6ef4"
     },
     {
       "path": "src/js/feature-data.js",
@@ -949,8 +959,8 @@
     },
     {
       "path": "src/js/feed.js",
-      "bytes": 250594,
-      "sha256": "836f2458911d27218c57fd428461d9fad8807930739ce39f98bfb7d0c7fa6eea"
+      "bytes": 252349,
+      "sha256": "dcd48fc6d0b7d069509374e1c07f28aa83eb2b1388a875606ba3f91e128cc426"
     },
     {
       "path": "src/js/fishing.js",
@@ -1178,6 +1188,11 @@
       "sha256": "0399f96401f8fcaebeb636793b196b16ddf9bb1fc564a29f786bbfc3d13674a0"
     },
     {
+      "path": "src/js/sugar-diary.js",
+      "bytes": 16757,
+      "sha256": "3f920cec58bc180b82b7f88e755b571d9b55aec589120de2265935023bd1c135"
+    },
+    {
       "path": "src/js/ta-ask.js",
       "bytes": 373987,
       "sha256": "f068e57237425abe4ed10be949269cd1cee5556b11798fb24dabeb799995efa3"
@@ -1204,8 +1219,8 @@
     },
     {
       "path": "src/js/update-notes.js",
-      "bytes": 3990,
-      "sha256": "25daeccf02ebc355b8eb29c8e0edef76f08a31f8a95fe7efa6eccf3bcc8d3e56"
+      "bytes": 5089,
+      "sha256": "c725c06d47475b3c5144794684f69e37a2382a28bd226890798b092e9661717d"
     },
     {
       "path": "src/js/usage-days.js",
@@ -1254,8 +1269,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 34653,
-      "sha256": "a64a460fdbd6d3a7aa44388a4df3f8e876d18de7f76a200a228a430e8a972260"
+      "bytes": 34675,
+      "sha256": "a4f8d6c11e4103027b4267bb5dcea142dc767fb87175ab7dcb1902f3c52b6249"
     },
     {
       "path": "tools/apply-desk-icon-place-r1.mjs",
@@ -2753,6 +2768,11 @@
       "sha256": "147533dcd50770d1e2bb758238d88cb0dbcc077001acd8de1dec61cf7c384fac"
     },
     {
+      "path": "tools/verify-answered-card-feed-link.cjs",
+      "bytes": 5662,
+      "sha256": "d372b03e9caf10da6bb34662549a4ce6ac9015158351f5a006738a24d1c7de22"
+    },
+    {
       "path": "tools/verify-anti-scam-backfill.mjs",
       "bytes": 16587,
       "sha256": "d14ad9c462b09253801de59ee21bf32749c74fccf0b1a284dbca619af35082c8"
@@ -3314,8 +3334,8 @@
     },
     {
       "path": "tools/verify-chat-date-navigation.cjs",
-      "bytes": 6080,
-      "sha256": "d7859eb79ddc03bf2adb858adf774eb48d45dad3eaa83d398df756f972453ec1"
+      "bytes": 6101,
+      "sha256": "cf855108a066007be923e319fc463608c330068f325923e9b1c8407ae3d6547a"
     },
     {
       "path": "tools/verify-chat-dock-watchdog.mjs",
@@ -5688,6 +5708,11 @@
       "sha256": "af2a68c89c5114324ffc378bf77fe68fa9a315a473242fc655e9c63a4a4c5807"
     },
     {
+      "path": "tools/verify-sugar-diary.cjs",
+      "bytes": 5673,
+      "sha256": "829755a73b945cd79e631d5834f9f4fb3b918714097c9c031a46a51492d58ee8"
+    },
+    {
       "path": "tools/verify-suite-classify.mjs",
       "bytes": 3635,
       "sha256": "8ae886ff7ed390be7284a498c2af5c347c33b2fd5d9c83ab0c9ffea63d73fc39"
@@ -5829,8 +5854,8 @@
     },
     {
       "path": "tools/verify-update-notes.cjs",
-      "bytes": 4933,
-      "sha256": "06ae65547d91170baf9f9005daf191df800f798f9eb5d6dabbed41e01d5f4987"
+      "bytes": 5202,
+      "sha256": "5abdcc547fc2039e9259fd50cf975c29f8c7e2bf11c8a4b1c3e3b3179153dd3b"
     },
     {
       "path": "tools/verify-url-card-text-pool.mjs",
@@ -5950,7 +5975,7 @@
     {
       "path": "version.json",
       "bytes": 83,
-      "sha256": "eaef17372569c6691f486851fa112b76af5873a53c64e8014fe9151acfd4c6ee"
+      "sha256": "a032851dcec8f808bed96db1517bba94a2bdf3969cd34599f3991060e435b234"
     },
     {
       "path": "上传说明.md",
@@ -5960,7 +5985,7 @@
   ],
   "ciFix": "portable calendar browser selection",
   "displayFix": "settings font consistency and favorite sticker thumbnails",
-  "updateDate": "2026-10-23",
+  "updateDate": "2026-10-24",
   "userManagedFiles": [
     "README.md"
   ]

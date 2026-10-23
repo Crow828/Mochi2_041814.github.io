@@ -17,6 +17,7 @@
   // page：该功能自己的页面 id（#679 各功能页内直达入口；跨域声明见 WORKLOG——
   //       只读各功能 template/JS 已有的静态 id，不改任何归属文件）
   var FEATURES = [
+    { id: 'sugar-diary', name: '血糖日记', group: '桌面功能', scope: 'global', page: 'page-calendar', desc: '甜食日期、食物、份量与备注', res: [/^sugar-diary$/, /^sugar-hba1c$/] },
 { id: 'fish', name: '摸鱼与上班天数', group: '桌面功能', scope: 'both',
       desc: '摸鱼累计天数、上班打卡天数、双方各自的摸鱼记录',
       res: [/^fish-/, /^work-/, /^day-fish/, /^day-work/, /^weekend-fish/] },

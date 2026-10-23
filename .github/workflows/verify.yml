@@ -56,6 +56,7 @@ jobs:
           node tools/verify-chat-date-navigation.cjs
           node tools/verify-modal-placeholder.cjs
           node tools/verify-chat-aux-font.cjs
+          node tools/verify-answered-card-feed-link.cjs
           node tools/verify-update-notes.cjs
 
       - name: Chrome 布局验证

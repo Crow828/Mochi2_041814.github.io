@@ -14,9 +14,9 @@ for(const width of [360,390,440]){
  assert.equal(await entry.locator('svg').count(),2);
  await entry.click();assert(await p.locator('#page-update-notes').isVisible());
  const order=await p.evaluate(()=>{const page=document.getElementById('page-update-notes'),bar=document.querySelector('.tabbar');return !!(page.compareDocumentPosition(bar)&Node.DOCUMENT_POSITION_FOLLOWING);});assert(order);
- const details=p.locator('.update-notes-date');assert.equal(await details.count(),1);assert.equal(await details.locator('summary').textContent(),'2026年10月23日');assert.equal(await details.evaluate(e=>e.open),false);
+ assert.equal(await p.locator('.update-notes-date').count(),2);const details=p.locator('.update-notes-date').filter({hasText:'2026年10月23日'});assert.equal(await details.locator('summary').textContent(),'2026年10月23日');assert.equal(await details.evaluate(e=>e.open),false);
  await details.locator('summary').click();assert(await details.evaluate(e=>e.open));assert.equal(await details.locator('li').count(),9);assert((await details.textContent()).includes('自定义心情'));assert((await details.textContent()).includes('聊天多选收藏'));
- assert(await details.evaluate(e=>e.scrollWidth<=e.clientWidth+1));
+ assert(await details.evaluate(e=>e.scrollWidth<=e.clientWidth+1));const latest=p.locator('.update-notes-date').filter({hasText:'2026年10月24日'});assert((await latest.textContent()).includes('血糖日记'));assert.equal(await latest.locator('li').count(),8);
  if(process.env.MOCHI_SCREENSHOT_DIR){fs.mkdirSync(process.env.MOCHI_SCREENSHOT_DIR,{recursive:true});await p.evaluate(()=>{const toast=document.getElementById('cc-toast');if(toast)toast.style.visibility='hidden';});await p.screenshot({path:path.join(process.env.MOCHI_SCREENSHOT_DIR,'update-notes-'+width+'.png')});}
  await details.locator('summary').click();assert.equal(await details.evaluate(e=>e.open),false);
  await p.locator('#update-notes-back').click();assert(await entry.isVisible());await entry.click();await p.evaluate(()=>document.documentElement.setAttribute('data-theme','dark'));assert.notEqual(await details.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');await p.locator('#update-notes-back').click();

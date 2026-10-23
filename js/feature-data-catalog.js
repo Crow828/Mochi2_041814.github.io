@@ -2,6 +2,7 @@
 (function () {
 'use strict';
 var FEATURES = [
+{ id: 'sugar-diary', name: '血糖日记', group: '桌面功能', scope: 'global', page: 'page-calendar', desc: '甜食日期、食物、份量与备注', res: [/^sugar-diary$/, /^sugar-hba1c$/] },
 { id: 'fish', name: '摸鱼与上班天数', group: '桌面功能', scope: 'both',
 desc: '摸鱼累计天数、上班打卡天数、双方各自的摸鱼记录',
 res: [/^fish-/, /^work-/, /^day-fish/, /^day-work/, /^weekend-fish/] },

@@ -6021,6 +6021,13 @@ m.innerHTML = '<span>' + (rec.nickKeep ? escTxt(rec.text) : pokeIconHtml(pokePer
 if (rec.mailNotice) {
 m.addEventListener('click', () => { if (window.openMailPage) window.openMailPage(); });
 }
+if(rec.feedPostId || /发布了一条朋友圈动态/.test(String(rec.text || ''))) {
+  m.classList.add('feed-notice'); m.setAttribute('role','button'); m.tabIndex=0;
+  const feedOwner=rec.feedOwner || window.__activeCid || 'default';
+  const openPost=()=>{if(window.openChatFeedPost) window.openChatFeedPost(rec.feedPostId,feedOwner,rec.ts);};
+  m.addEventListener('click',openPost);
+  m.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ') {e.preventDefault();openPost();}});
+}
 appendMsg(m);
 maybeScrollChatBottom(rec.side);
 return m;
@@ -7225,7 +7232,7 @@ opts = opts || {};
   const _tagExtra = Array.isArray(opts.tagExtra) ? opts.tagExtra.filter(md => md && String(md.tag || '').trim()).map(md => ({ tag: String(md.tag), label: md.label == null ? '' : String(md.label) })) : null;
   const _tagMerged = (_tagExtra && _tagExtra.length) ? (_tagMood ? _tagMood.concat(_tagExtra) : _tagExtra) : _tagMood;
   // v3.16.x：gInv = 联系人主动邀请的游戏类型（pong/snake/rps），随消息持久化供小游戏记录识别
-	return addRec({ side: 'in', text: text, initiative: opts.initiative, special: opts.special, rateAllow: opts.rateAllow, game: opts.game, quote: opts.quote, qidx: opts.qidx, type: opts.type, img: opts.img, parts: opts.parts, mailNotice: opts.mailNotice, gInv: opts.gInv, silent: opts.silent, nightAllow: opts.nightAllow, askQuestion: opts.askQuestion, askStatus: opts.askStatus, askOptions: opts.askOptions, askType: opts.askType, choiceQuestion: opts.choiceQuestion, choiceOptions: opts.choiceOptions, choicePref: opts.choicePref, choiceCat: opts.choiceCat, choiceStatus: opts.choiceStatus, choiceAnswer: opts.choiceAnswer, choiceReply: opts.choiceReply, choiceMatch: opts.choiceMatch, curiousQuestion: opts.curiousQuestion, curiousQuick: opts.curiousQuick, curiousReplies: opts.curiousReplies, curiousFollowup: opts.curiousFollowup, curiousQid: opts.curiousQid, curiousCat: opts.curiousCat, curiousStatus: opts.curiousStatus, curiousAnswer: opts.curiousAnswer, curiousReply: opts.curiousReply, roastText: opts.roastText, roastCat: opts.roastCat, roastStatus: opts.roastStatus, roastAnswer: opts.roastAnswer, roastReply: opts.roastReply, rpAmount: opts.rpAmount, rpWish: opts.rpWish, rpStatus: opts.rpStatus, rpTs: opts.rpTs, rpCover: opts.rpCover, askFen: opts.askFen, askTs: opts.askTs, deskCk: opts.deskCk, deskCkDir: opts.deskCkDir, surveyTs: opts.surveyTs, surveyQs: opts.surveyQs, surveyStatus: opts.surveyStatus, surveyAnswers: opts.surveyAnswers, dedupExempt: opts.dedupExempt, nickKeep: opts.nickKeep, mood: opts.mood || _tagMerged || undefined });
+	return addRec({ side: 'in', text: text, initiative: opts.initiative, special: opts.special, rateAllow: opts.rateAllow, game: opts.game, quote: opts.quote, qidx: opts.qidx, type: opts.type, img: opts.img, parts: opts.parts, mailNotice: opts.mailNotice, feedPostId: opts.feedPostId, feedOwner: opts.feedOwner, gInv: opts.gInv, silent: opts.silent, nightAllow: opts.nightAllow, askQuestion: opts.askQuestion, askStatus: opts.askStatus, askOptions: opts.askOptions, askType: opts.askType, choiceQuestion: opts.choiceQuestion, choiceOptions: opts.choiceOptions, choicePref: opts.choicePref, choiceCat: opts.choiceCat, choiceStatus: opts.choiceStatus, choiceAnswer: opts.choiceAnswer, choiceReply: opts.choiceReply, choiceMatch: opts.choiceMatch, curiousQuestion: opts.curiousQuestion, curiousQuick: opts.curiousQuick, curiousReplies: opts.curiousReplies, curiousFollowup: opts.curiousFollowup, curiousQid: opts.curiousQid, curiousCat: opts.curiousCat, curiousStatus: opts.curiousStatus, curiousAnswer: opts.curiousAnswer, curiousReply: opts.curiousReply, roastText: opts.roastText, roastCat: opts.roastCat, roastStatus: opts.roastStatus, roastAnswer: opts.roastAnswer, roastReply: opts.roastReply, rpAmount: opts.rpAmount, rpWish: opts.rpWish, rpStatus: opts.rpStatus, rpTs: opts.rpTs, rpCover: opts.rpCover, askFen: opts.askFen, askTs: opts.askTs, deskCk: opts.deskCk, deskCkDir: opts.deskCkDir, surveyTs: opts.surveyTs, surveyQs: opts.surveyQs, surveyStatus: opts.surveyStatus, surveyAnswers: opts.surveyAnswers, dedupExempt: opts.dedupExempt, nickKeep: opts.nickKeep, mood: opts.mood || _tagMerged || undefined });
 }
 // v3.27.x：对话型回复补「正在输入」过渡——TA 回应先 showTyping 再落地，消除气泡凭空冒出的突兀感。
 // items 可为单条文本或数组（数组=逐条连发，条与条之间再出一次 typing）。仅当前桌面生效：期间切走
@@ -7321,7 +7328,7 @@ opts = opts || {};
 // 音乐互动等）经此处放行；不透传则调用方写的豁免标记会被本函数的白名单就地吞掉。
 opts.nightAllow = opts.nightAllow === true;
 	opts.rateAllow = opts.rateAllow === true; // #1341：限流的豁免位同要经本白名单透传
-return addIn(text, { special: opts.special || 'poke', silent: opts.silent, nightAllow: opts.nightAllow, rateAllow: opts.rateAllow, img: opts.img, mailNotice: opts.mailNotice, nickKeep: opts.nickKeep, game: opts.game, askQuestion: opts.askQuestion, askStatus: opts.askStatus, askOptions: opts.askOptions, askType: opts.askType, askTs: opts.askTs, choiceQuestion: opts.choiceQuestion, choiceOptions: opts.choiceOptions, choicePref: opts.choicePref, choiceCat: opts.choiceCat, choiceStatus: opts.choiceStatus, choiceAnswer: opts.choiceAnswer, choiceReply: opts.choiceReply, choiceMatch: opts.choiceMatch, curiousQuestion: opts.curiousQuestion, curiousQuick: opts.curiousQuick, curiousReplies: opts.curiousReplies, curiousFollowup: opts.curiousFollowup, curiousQid: opts.curiousQid, curiousCat: opts.curiousCat, curiousStatus: opts.curiousStatus, curiousAnswer: opts.curiousAnswer, curiousReply: opts.curiousReply, roastText: opts.roastText, roastCat: opts.roastCat, roastStatus: opts.roastStatus, roastAnswer: opts.roastAnswer, roastReply: opts.roastReply, rpAmount: opts.rpAmount, rpWish: opts.rpWish, rpStatus: opts.rpStatus, rpTs: opts.rpTs, rpCover: opts.rpCover, askFen: opts.askFen, askTs: opts.askTs, deskCk: opts.deskCk, deskCkDir: opts.deskCkDir, surveyTs: opts.surveyTs, surveyQs: opts.surveyQs, surveyStatus: opts.surveyStatus, surveyAnswers: opts.surveyAnswers });
+return addIn(text, { special: opts.special || 'poke', silent: opts.silent, nightAllow: opts.nightAllow, rateAllow: opts.rateAllow, img: opts.img, mailNotice: opts.mailNotice, feedPostId: opts.feedPostId, feedOwner: opts.feedOwner, nickKeep: opts.nickKeep, game: opts.game, askQuestion: opts.askQuestion, askStatus: opts.askStatus, askOptions: opts.askOptions, askType: opts.askType, askTs: opts.askTs, choiceQuestion: opts.choiceQuestion, choiceOptions: opts.choiceOptions, choicePref: opts.choicePref, choiceCat: opts.choiceCat, choiceStatus: opts.choiceStatus, choiceAnswer: opts.choiceAnswer, choiceReply: opts.choiceReply, choiceMatch: opts.choiceMatch, curiousQuestion: opts.curiousQuestion, curiousQuick: opts.curiousQuick, curiousReplies: opts.curiousReplies, curiousFollowup: opts.curiousFollowup, curiousQid: opts.curiousQid, curiousCat: opts.curiousCat, curiousStatus: opts.curiousStatus, curiousAnswer: opts.curiousAnswer, curiousReply: opts.curiousReply, roastText: opts.roastText, roastCat: opts.roastCat, roastStatus: opts.roastStatus, roastAnswer: opts.roastAnswer, roastReply: opts.roastReply, rpAmount: opts.rpAmount, rpWish: opts.rpWish, rpStatus: opts.rpStatus, rpTs: opts.rpTs, rpCover: opts.rpCover, askFen: opts.askFen, askTs: opts.askTs, deskCk: opts.deskCk, deskCkDir: opts.deskCkDir, surveyTs: opts.surveyTs, surveyQs: opts.surveyQs, surveyStatus: opts.surveyStatus, surveyAnswers: opts.surveyAnswers });
 };
 window.chatAddIn = function (text, opts) {
 // FIX 2026-09-15 #492：opts.follow = 用户主动通道（帮我决定/多人决定结果发到聊天）——落聊天
@@ -7618,7 +7625,7 @@ window.chatAppendToDeskMsg = function (cid, text, opts) {
 opts = opts || {};
 const cur = window.__activeCid || 'default';
 if (cid === cur) {
-if (window.chatAddSystem) window.chatAddSystem(text, { special: opts.special, img: opts.img, mailNotice: opts.mailNotice });
+if (window.chatAddSystem) window.chatAddSystem(text, { special: opts.special, img: opts.img, mailNotice: opts.mailNotice, feedPostId: opts.feedPostId, feedOwner: opts.feedOwner });
 return;
 }
 if (!window.idbGet || !window.idbSet) return;
@@ -7631,7 +7638,7 @@ try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
 // v3.26.x #90：跨桌面追加后同步条数账本（下次冷启动大键读失败时它就是守卫依据）
 try { chatLedgerSave('xy-home-v2:' + cid, arr.length, msgsBytes(arr)); } catch (e) {}
 };
-const mkRec = function () { return { side: 'in', special: opts.special || 'poke', text: text, ts: Date.now(), mailNotice: !!opts.mailNotice }; };
+const mkRec = function () { return { side: 'in', special: opts.special || 'poke', text: text, ts: Date.now(), mailNotice: !!opts.mailNotice, feedPostId: opts.feedPostId, feedOwner: opts.feedOwner }; };
 const attempt = function () {
 tries++;
 if (tries > 5) { deskAppendInbox(cid, [mkRec()]); return; } // #1200：重试预算耗尽改落中转箱，不再静默丢（弹窗已发＝消息必须可达）
@@ -7932,6 +7939,8 @@ if (!rec) return;
 }
 rec.askStatus = 'answered';
 rec.askAnswer = answer;
+const answeredAskKey = msgKeyOf(rec);
+sessionChangedIdx.add(msgIdx); // Keep this answered card through an in-flight history merge.
 let preset = '';
 if (Array.isArray(reply) && reply.length) {
 const arr = reply.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim());
@@ -7994,7 +8003,13 @@ saveMsgsNow();
 addOut(answer);
 addInTyped(finalReply);
 taFavCard(rec);
-const el = body.querySelector('.msg-ask[data-idx="' + msgIdx + '"]');
+const answeredAskIdx = msgs.findIndex(item=>item && msgKeyOf(item)===answeredAskKey);
+let el = Array.from(body.children).find(item=>item.dataset.mk===answeredAskKey);
+if(!el && answeredAskIdx>=renderStart && answeredAskIdx<renderEnd && answeredAskIdx>=0) {
+  el=renderMsg(msgs[answeredAskIdx],answeredAskIdx);
+  const next=Array.from(body.children).find(item=>item!==el && Number(item.dataset.idx)>answeredAskIdx);
+  if(next) body.insertBefore(el,next);
+}
 if (el) {
 el.innerHTML = '<div class="msg-ask-card answered"><div class="msg-ask-q">' + escTxt(rec.askQuestion || rec.text || '') + '</div><div class="msg-ask-a">✓ 已回答：' + escTxt(answer) + '</div><div class="msg-choose-r">' + (window.taFit ? window.taFit('TA：') : 'TA：') + escTxt(window.taFit ? window.taFit(askCardReplyClean(finalReply)) : askCardReplyClean(finalReply)) + '</div>' + favHeartHtml(rec) + '</div>';
 }
@@ -11067,14 +11082,8 @@ document.body.appendChild(chatDates);
 const datePicker = chatDates.querySelector('input');
 const dateMonths = chatDates.querySelector('.chat-date-months');
 function showSelectedChatMonth() {
-  const heading = dateMonths.querySelector('h3:last-of-type');
-  if (!heading) return;
   dateMonths.style.paddingBottom = '0px';
-  const top = heading.getBoundingClientRect().top - dateMonths.getBoundingClientRect().top + dateMonths.scrollTop;
-  const monthHeight = dateMonths.scrollHeight - top;
-  // Leave enough trailing room for even a short month to align at the top.
-  dateMonths.style.paddingBottom = Math.max(0,dateMonths.clientHeight-monthHeight) + 'px';
-  dateMonths.scrollTop = top;
+  dateMonths.scrollTop = 0;
 }
 let dateRetry = null, dateOwner = '';
 const localDateKey = ts => {

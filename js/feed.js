@@ -2067,7 +2067,15 @@ const el = document.getElementById(id);
 return el && !el.hidden;
 });
 }
-function openFeedPage() {
+let feedEntryFromChat = false;
+let feedEntryRound = 0;
+function clearFeedFlash() {
+document.querySelectorAll('.feed-flash').forEach(el => el.classList.remove('feed-flash'));
+}
+function openFeedPage(fromChat = false) {
+feedEntryFromChat = fromChat;
+++feedEntryRound;
+clearFeedFlash();
 clearFeedAppUnread();
 feedRangeKey = 'week'; // #1406：从桌面进朋友圈先落回「本周」那一页（翻去几个月前是临时的）
 render();
@@ -2076,6 +2084,24 @@ document.querySelectorAll('.page').forEach(p => p.hidden = true);
 const fp = document.getElementById('page-feed');
 if (fp) fp.hidden = false;
 }
+window.openChatFeedPost = function (postId, owner, noticeTs) {
+openFeedPage(true);
+const entryRound=feedEntryRound;
+let tries=0;
+const locate=()=>{
+if(entryRound!==feedEntryRound || document.getElementById('page-feed').hidden) return;
+const posts=feedSortedAll();
+let hit=postId ? posts.find(p=>p.id===postId && (!owner || p.owner===owner)) : null;
+if(!postId && owner && Number(noticeTs)>0) {
+const candidates=posts.filter(p=>p.role==='ta' && p.owner===owner && Math.abs(Number(p.ts)-Number(noticeTs))<=5000);
+if(candidates.length===1) hit=candidates[0];
+}
+if(hit) { jumpToPost(hit.id, null, null, true); return; }
+if(++tries<5) {setTimeout(locate,300);return;}
+toast(postId?'这条朋友圈已删除或暂时无法读取':'无法确认这条旧通知对应的动态，已打开朋友圈');
+};
+requestAnimationFrame(locate);
+};
 function addNotice(type, pid, text, owner, loc) {
 const list = notices();
 const item = { type: type, pid: pid, text: text, ts: Date.now(), read: false, owner: owner || '' };
@@ -2118,7 +2144,7 @@ ab.textContent = appN > 99 ? '99+' : String(appN);
 }
 }
 }
-function jumpToPost(pid, ci, ri) {
+function jumpToPost(pid, ci, ri, highlight = false) {
 let el = feedMainPostEl(pid);
 if (!el) {
 const hit = feedSortedAll().find(p => p.id === pid);
@@ -2134,9 +2160,12 @@ target = rEl || cEl;
 }
 }
 target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-target.classList.remove('feed-flash');
+clearFeedFlash();
+if (highlight) {
 void target.offsetWidth;
 target.classList.add('feed-flash');
+target.addEventListener('animationend', () => target.classList.remove('feed-flash'), { once: true });
+}
 }
 function noticeThumbOf(n, posts) {
 try {
@@ -2485,13 +2514,13 @@ function feedToday() {
 const d = new Date();
 return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 }
-function notifyFeedPostToChat(cid, taName) {
+function notifyFeedPostToChat(cid, taName, postId) {
 const cur = window.__activeCid || 'default';
 if (cid === cur) {
-if (window.chatAddSystem) window.chatAddSystem(taName + ' 发布了一条朋友圈动态');
+if (window.chatAddSystem) window.chatAddSystem(taName + ' 发布了一条朋友圈动态', {feedPostId:postId,feedOwner:cid});
 return;
 }
-if (window.chatAppendToDeskMsg) { window.chatAppendToDeskMsg(cid, taName + ' 发布了一条朋友圈动态'); }
+if (window.chatAppendToDeskMsg) { window.chatAppendToDeskMsg(cid, taName + ' 发布了一条朋友圈动态', {feedPostId:postId,feedOwner:cid}); }
 }
 function maybeAutoPostFor(cid) {
 if (window.nightModeActive && window.nightModeActive()) return;
@@ -2523,7 +2552,7 @@ save(list);
 cs.set('feed-last', String(now));
 cs.set('feed-next', String(cfg.minInterval + Math.random() * Math.max(1, cfg.maxInterval - cfg.minInterval)));
 cs.set('feed-day-count', JSON.stringify({ t: today, n: dayCount.n + 1 }));
-notifyFeedPostToChat(cid, taName);
+notifyFeedPostToChat(cid, taName, post.id);
 addNotice('post', post.id, taName + ' 发布了一条新动态', cid);
 renderVisible();
 };
@@ -2871,6 +2900,14 @@ const cb = document.getElementById('feed-comment-bar');
 if (cb) cb.hidden = true;
 const np = document.getElementById('feed-notice-panel');
 if (np) np.hidden = true;
+const returnToChat = feedEntryFromChat;
+feedEntryFromChat = false;
+++feedEntryRound;
+clearFeedFlash();
+if (returnToChat && typeof window.enterChat === 'function') {
+window.enterChat();
+return;
+}
 document.querySelectorAll('.page').forEach(p => p.hidden = true);
 const phone = document.getElementById('page-phone');
 if (phone) phone.hidden = false;

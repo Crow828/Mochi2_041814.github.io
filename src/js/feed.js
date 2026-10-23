@@ -2710,7 +2710,15 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
     });
   }
   // 打开朋友圈页（渲染 + 清桌面未读角标），供朋友圈图标点击与弹窗点击共用
-  function openFeedPage() {
+  let feedEntryFromChat = false;
+  let feedEntryRound = 0;
+  function clearFeedFlash() {
+    document.querySelectorAll('.feed-flash').forEach(el => el.classList.remove('feed-flash'));
+  }
+  function openFeedPage(fromChat = false) {
+    feedEntryFromChat = fromChat;
+    ++feedEntryRound;
+    clearFeedFlash();
     clearFeedAppUnread();
     feedRangeKey = 'week'; // #1406：从桌面进朋友圈先落回「本周」那一页（翻去几个月前是临时的）
     render();
@@ -2719,6 +2727,25 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
     const fp = document.getElementById('page-feed');
     if (fp) fp.hidden = false;
   }
+  window.openChatFeedPost = function (postId, owner, noticeTs) {
+    openFeedPage(true);
+    const entryRound=feedEntryRound;
+    let tries=0;
+    const locate=()=>{
+      if(entryRound!==feedEntryRound || document.getElementById('page-feed').hidden) return;
+      const posts=feedSortedAll();
+      let hit=postId ? posts.find(p=>p.id===postId && (!owner || p.owner===owner)) : null;
+      if(!postId && owner && Number(noticeTs)>0) {
+        const candidates=posts.filter(p=>p.role==='ta' && p.owner===owner && Math.abs(Number(p.ts)-Number(noticeTs))<=5000);
+        // Old notifications have no ID. Only link an unambiguous nearby post from this contact.
+        if(candidates.length===1) hit=candidates[0];
+      }
+      if(hit) { jumpToPost(hit.id, null, null, true); return; }
+      if(++tries<5) {setTimeout(locate,300);return;}
+      toast(postId?'这条朋友圈已删除或暂时无法读取':'无法确认这条旧通知对应的动态，已打开朋友圈');
+    };
+    requestAnimationFrame(locate);
+  };
   // v3.7.x：owner 参数=动态所属联系人（跨桌面通知弹窗/列表头像按发布者取，
   // 不再一律显示当前桌面的 TA 头像/昵称）
   // v3.11.x：loc={ci, ri} 评论/回复定位——通知点击直接滚动闪烁到具体评论/回复，
@@ -2775,7 +2802,7 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
       }
     }
   }
-  function jumpToPost(pid, ci, ri) {
+  function jumpToPost(pid, ci, ri, highlight = false) {
     let el = feedMainPostEl(pid);
     if (!el) {
       // #1406：那条动态折在别的月份页里＝先切到它那一页再找（点旧动态的通知不能啥也不发生）
@@ -2793,9 +2820,12 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
       }
     }
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    target.classList.remove('feed-flash');
-    void target.offsetWidth;
-    target.classList.add('feed-flash');
+    clearFeedFlash();
+    if (highlight) {
+      void target.offsetWidth;
+      target.classList.add('feed-flash');
+      target.addEventListener('animationend', () => target.classList.remove('feed-flash'), { once: true });
+    }
   }
   // v3.11.x：通知项缩略图——按 ci/ri 从动态数据实时取内容里的首张图
   //（不落盘存储，避免撑大通知键；动态已删/无图返回空）
@@ -3256,15 +3286,15 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
   // 「发布了一条朋友圈动态」= 系统消息跨桌面串消息）。与 call.js notifyCallEnd
   // 同模式：当前桌面走内存链路（实时渲染）；非当前桌面直接写该桌面 IDB 聊天记录
   // + LS 快照（该桌面 msgs 已在 contact-switched 时重置，下次进入由 loadMsgs 读回）
-  function notifyFeedPostToChat(cid, taName) {
+  function notifyFeedPostToChat(cid, taName, postId) {
     const cur = window.__activeCid || 'default';
     if (cid === cur) {
-      if (window.chatAddSystem) window.chatAddSystem(taName + ' 发布了一条朋友圈动态');
+      if (window.chatAddSystem) window.chatAddSystem(taName + ' 发布了一条朋友圈动态', {feedPostId:postId,feedOwner:cid});
       return;
     }
     // v3.14.x：改走 chat.js 统一安全追加——原「idbGet→push→整包写回」在读取
     // 超时（返回 undefined）时会把该桌面全部聊天记录覆盖成 [这一条]
-    if (window.chatAppendToDeskMsg) { window.chatAppendToDeskMsg(cid, taName + ' 发布了一条朋友圈动态'); }
+    if (window.chatAppendToDeskMsg) { window.chatAppendToDeskMsg(cid, taName + ' 发布了一条朋友圈动态', {feedPostId:postId,feedOwner:cid}); }
   }
   // 单个联系人的 TA 自动发动态（用该联系人自己的字卡 + TA 身份）
   function maybeAutoPostFor(cid) {
@@ -3304,7 +3334,7 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
         cs.set('feed-last', String(now));
         cs.set('feed-next', String(cfg.minInterval + Math.random() * Math.max(1, cfg.maxInterval - cfg.minInterval)));
         cs.set('feed-day-count', JSON.stringify({ t: today, n: dayCount.n + 1 }));
-        notifyFeedPostToChat(cid, taName);
+        notifyFeedPostToChat(cid, taName, post.id);
         addNotice('post', post.id, taName + ' 发布了一条新动态', cid);
         renderVisible();
       };
@@ -3718,6 +3748,14 @@ if (comInput) comInput.addEventListener('keydown', (e) => { if (e.key === 'Enter
     if (cb) cb.hidden = true;
     const np = document.getElementById('feed-notice-panel');
     if (np) np.hidden = true;
+    const returnToChat = feedEntryFromChat;
+    feedEntryFromChat = false;
+    ++feedEntryRound;
+    clearFeedFlash();
+    if (returnToChat && typeof window.enterChat === 'function') {
+      window.enterChat();
+      return;
+    }
     document.querySelectorAll('.page').forEach(p => p.hidden = true);
     const phone = document.getElementById('page-phone');
     if (phone) phone.hidden = false;
