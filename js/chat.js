@@ -11067,7 +11067,7 @@ let inner = '';
 if (imgs.length) {
 inner += '<div class="msg-parts-imgs' + (imgs.length > 1 ? ' multi' : '') + '">' +
 imgs.map(p => {
-const isSticker = p.sub === 'sticker';
+const isSticker = p.sub === 'sticker' || (p.sub !== 'image' && f.type !== 'image');
 return '<img class="msg-img' + (isSticker ? ' msg-img-sm' : ' msg-img-big') + '" src="' + attrEsc(p.v) + '" alt="' + (isSticker ? '表情' : '图片') + '" loading="lazy" decoding="async">';
 }).join('') + '</div>';
 }

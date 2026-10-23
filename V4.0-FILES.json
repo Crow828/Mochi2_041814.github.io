@@ -123,6 +123,11 @@
       "sha256": "e41402a435d13ba0f5117f2377fba6aeca2b9c7ce907acba8e3d020706fe3e62"
     },
     {
+      "path": "docs/V4.0-DISPLAY-FIX.md",
+      "bytes": 904,
+      "sha256": "daa5480ad23cf76c7635a1c724246882da244308df1430170105b13f87764177"
+    },
+    {
       "path": "docs/V4.0-REVIEW.md",
       "bytes": 3607,
       "sha256": "515a2a9ab64e0fa5eb4357bb4fe6cec4dd17fd19c72e53230b794b73c479f8cf"
@@ -169,8 +174,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 1630892,
-      "sha256": "daa126ea294464501734c4f71f8128842602a86e177bb04f4f1f696a88047166"
+      "bytes": 1631277,
+      "sha256": "58423edf794c1028ef4278f0cc5e8dbbd339fb837d728a3439c27934107543ee"
     },
     {
       "path": "js/accounting.js",
@@ -244,8 +249,8 @@
     },
     {
       "path": "js/chat.js",
-      "bytes": 629568,
-      "sha256": "eb3177be54c6f5fb509a9f6524ca24b819f9c6faeb4c0fb0a1bd7ec21a7cfb42"
+      "bytes": 629613,
+      "sha256": "f03c16847eb3066b748afcc9037d4d51fbd4d5153d78ee880e88a68016f00ea4"
     },
     {
       "path": "js/chatcard.js",
@@ -644,8 +649,8 @@
     },
     {
       "path": "src/css/chat-group-favorites.css",
-      "bytes": 5744,
-      "sha256": "583101c9682c0ef690fb6b91e9a4f341a58f566c42c1095730e1efbd96030ed2"
+      "bytes": 6170,
+      "sha256": "09c507a99fcca73787d3bda135b4dad2c6a6f7c3ed5913a74d69998adae4979f"
     },
     {
       "path": "src/css/chat-main.css",
@@ -659,8 +664,8 @@
     },
     {
       "path": "src/css/chat-settings-layout.css",
-      "bytes": 3793,
-      "sha256": "7c6ecff7f9d0bc61ebfb6bf48ddc561b9ed9105bcbfd4892a5150d373339362b"
+      "bytes": 3785,
+      "sha256": "4c4ca70dc021e969970b8beff1eaca4df17de1955bd151268949618b04645fa7"
     },
     {
       "path": "src/css/dark.css",
@@ -714,8 +719,8 @@
     },
     {
       "path": "src/css/settings-layout.css",
-      "bytes": 1314,
-      "sha256": "748fdfc5e036f84c49b2e063412bf04193025cfd4d9e5cf2da91da2b6d80fe57"
+      "bytes": 1375,
+      "sha256": "50365e8ddee488c1826cbff3b76d700c7dda3738f9f192f07f89cfb8cf0390cc"
     },
     {
       "path": "src/css/settings-refinement.css",
@@ -804,8 +809,8 @@
     },
     {
       "path": "src/js/chat.js",
-      "bytes": 1046567,
-      "sha256": "54cf924e5c5090aed673ee38abd8ce4c9428a9e471e546dcf87d5c0ba3b9438a"
+      "bytes": 1046686,
+      "sha256": "d13370842a9133810540a7ec94afaa843c393d217c540f2e53d2816c314ae23b"
     },
     {
       "path": "src/js/chatcard.js",
@@ -1230,7 +1235,7 @@
     {
       "path": "sw.js",
       "bytes": 34653,
-      "sha256": "e2746c0414c674f3f92fa75ce5e71684070f4c8ed067019b11453dfccb9d8102"
+      "sha256": "d15b35fed69d6e59149d39c1e03bef5cdd55873adb5095c657e3a2aefd3f080e"
     },
     {
       "path": "tools/apply-desk-icon-place-r1.mjs",
@@ -4049,8 +4054,8 @@
     },
     {
       "path": "tools/verify-favorite-identity.cjs",
-      "bytes": 9790,
-      "sha256": "653e672f596b6ec7e7039de9960ce06f208bb18ab25fa29d62049df445b15edb"
+      "bytes": 11735,
+      "sha256": "a3b9c77aa7e4f38f8accfe5007b3a88c4834225a8f070157e99e18a447efbbb9"
     },
     {
       "path": "tools/verify-feature-data-page.mjs",
@@ -5905,7 +5910,7 @@
     {
       "path": "version.json",
       "bytes": 83,
-      "sha256": "038b14121429f6d2275578e8e69fb5f76c4b9f692b8e49a597924b4765e876a2"
+      "sha256": "4635ede3b94325fc72c953ae71a5e81b893f4949876a5b6271a066528aede9f7"
     },
     {
       "path": "上传说明.md",
@@ -5913,5 +5918,6 @@
       "sha256": "c0dc19400a120655df246c417115ba6062da22b5532ac321a33b7a1bbf8856c3"
     }
   ],
-  "ciFix": "portable calendar browser selection"
+  "ciFix": "portable calendar browser selection",
+  "displayFix": "settings font consistency and favorite sticker thumbnails"
 }

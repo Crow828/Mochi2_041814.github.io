@@ -39,6 +39,30 @@ for(const width of [360,390,440]){
  await p.reload();await p.waitForFunction(()=>window.__mochiDataReady);await p.evaluate(()=>document.querySelector('.app[data-app="note"]').click());assert.equal(await card('深夜随想').locator('.fav-mail-heading strong').textContent(),'月');assert.equal(await card('这是月发出的朋友圈').locator('.fav-feed-author').first().textContent(),'月');
  if(process.env.MOCHI_SCREENSHOT_DIR){fs.mkdirSync(process.env.MOCHI_SCREENSHOT_DIR,{recursive:true});await p.evaluate(()=>{document.getElementById('cc-toast').style.visibility='hidden';});await card('深夜随想').screenshot({path:path.join(process.env.MOCHI_SCREENSHOT_DIR,'favorite-mail-'+width+'.png')});await card('这是月发出的朋友圈').first().screenshot({path:path.join(process.env.MOCHI_SCREENSHOT_DIR,'favorite-ta-feed-'+width+'.png')});}
  await p.evaluate(()=>{const st=window.activeStore();st.set('cs-lbl-partner','默认');st.set('lbl-partner','默认');window.renderFav();document.getElementById('fav-tab-ta').click();});assert((await p.locator('#fav-list .ccg-name').textContent()).includes('TA 的收藏'));assert.equal(await p.locator('#fav-tab-ta').evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)');
- assert.deepEqual(errors,[]);console.log('PASS favorite headings, mail sender, legacy and new feed author, avatar refresh, mine/TA separation and reload at '+width);await p.close();
+ // High-resolution legacy stickers must remain thumbnails, including grouped records and mail.
+ await p.evaluate(()=>{
+   const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=800;
+   canvas.getContext('2d').fillRect(0,0,1200,800);const img=canvas.toDataURL();
+   const sticker={kind:'msg',by:'me',side:'in',type:'sticker',text:img,parts:[{k:'img',v:img}],ts:9000};
+   window.activeStore().set('fav-msgs',JSON.stringify([
+     sticker,{...sticker,parts:undefined,ts:9001},
+     {kind:'msg',by:'me',type:'chat-group',id:'media-group',ts:9002,items:[sticker,{...sticker,side:'out'}]},
+     {kind:'mail',by:'me',mailType:'received',text:'信中的表情 '+img,title:'图片测试',ts:9003},
+     {...sticker,type:'image',parts:[{k:'img',v:img,sub:'image'}],ts:9004}
+   ]));document.getElementById('fav-tab-mine').click();window.renderFav();
+ });
+ await p.locator('#fav-list .msg-img,#fav-list .fav-item-img').evaluateAll(imgs=>imgs.forEach(i=>i.loading='eager'));
+ await p.waitForFunction(()=>[...document.querySelectorAll('#fav-list .msg-img,#fav-list .fav-item-img')].every(i=>i.complete&&i.naturalWidth>0));
+ for(const selector of ['#fav-list .msg-img:not(.msg-img-big)','#fav-list .fav-mail-paper .fav-item-img']){
+   assert(await p.locator(selector).count()>0);
+   for(const img of await p.locator(selector).all()){
+     const box=await img.boundingBox();assert(box.width<=100.5&&box.height<=100.5,JSON.stringify(box));
+     assert(Math.abs(box.width/box.height-1.5)<.05,'Preserve sticker aspect ratio');
+   }
+ }
+ assert.equal(await p.locator('#fav-list .msg-img-big').count(),1,'Explicit photos retain photo rendering');
+ const fonts=await p.evaluate(()=>({system:getComputedStyle(document.querySelector('#page-setting [data-sec="system"] .gs-row')).fontSize,chat:getComputedStyle(document.querySelector('#page-chat-settings .cs-options .set-row .txt')).fontSize}));
+ assert.equal(fonts.system,'14px');assert.equal(fonts.chat,'14px');
+ assert.deepEqual(errors,[]);console.log('PASS favorite identity, high-resolution sticker sizing, photo distinction and settings fonts at '+width);await p.close();
 }
 }finally{if(browser)await browser.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

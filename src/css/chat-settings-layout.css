@@ -13,8 +13,9 @@
 #page-chat-settings .cs-options .gs-title { padding:8px 14px 6px; margin:0; font-size:11.5px; line-height:1.5; color:var(--muted,#888); }
 #page-chat-settings .cs-options .set-row { gap:8px; padding:13px 4px; }
 #page-chat-settings .cs-options .set-row[hidden] { display:none !important; }
-#page-chat-settings .cs-options .set-row .txt { min-width:0; font-size:13px; }
-#page-chat-settings .cs-options .set-row .val { min-width:0; max-width:36%; overflow-wrap:anywhere; text-align:right; font-size:11.5px; }
+#page-chat-settings .cs-options .set-row .txt { min-width:0; font-size:14px; }
+#page-chat-settings .cs-options .gs-row { font-size:14px; }
+#page-chat-settings .cs-options .set-row .val { min-width:0; max-width:36%; overflow-wrap:anywhere; text-align:right; font-size:12.5px; }
 #page-chat-settings .cs-options .set-row .ico { width:20px; }
 #page-chat-settings .cs-options .set-row .toggle { flex-shrink:0; }
 #page-chat-settings .cs-options .cs-layout-description { display:none; }
@@ -26,4 +27,4 @@
 .cs-layout-help header button { flex:none; width:40px; height:40px; padding:0; border:0; background:transparent; color:inherit; font-size:26px; cursor:pointer; }
 .cs-layout-help-body { max-height:50dvh; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px 0; font-size:13px; line-height:1.8; }
 [data-theme="dark"] #page-chat-settings .cs-options-group, [data-theme="dark"] .cs-layout-help { background:var(--dark-card,#242424); border-color:var(--dark-border,#3c3c3c); }
-@media (max-width:360px) { #page-chat-settings .cs-options { padding-left:8px; padding-right:8px; } #page-chat-settings .cs-options .set-row .txt { font-size:12.5px; } }
+@media (max-width:360px) { #page-chat-settings .cs-options { padding-left:8px; padding-right:8px; } }
