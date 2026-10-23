@@ -1716,6 +1716,7 @@
     setTimeout(tryShowNotifyHealBar, 800); // 回前台补出条（隐藏期间发生的丢失也提示）；错开回前台渲染高峰
   });
   function showSysNotification(title, opts, chanOut) {
+    const control = arguments[3]; // Optional self-test lifecycle guard; ordinary notifications are unchanged.
     opts = opts || {};
     // #708 自检优化：通道回报支持「每次调用独立收集」——lastNotifyChannel 是全局共享，
     // 真实消息/来电/测试谁后发谁写，自检读全局可能读到别的通知的通道＝结果串台。
@@ -1726,9 +1727,12 @@
     };
     return new Promise(function (resolve) {
       try {
+        const maySend = function () { return !control || !control.canSend || control.canSend(); };
+        if (!maySend()) { note('none'); resolve(false); return; }
         if (!('Notification' in window) || Notification.permission !== 'granted') { note('none'); resolve(false); return; }
         const hidden = document.visibilityState === 'hidden';
         const pageFallback = function () {
+          if (!maySend()) { note('none'); resolve(false); return; }
           // SW 不可用回退页面路径：去掉 image/icon/badge（页面 Notification 对
           // dataURL 图片/图标不稳定，带上会导致整条通知失败，v3.5.118 教训）
           const noMedia = Object.assign({}, opts);
@@ -1756,6 +1760,9 @@
           // v3.14.x：badge 同样走 Blob 直传（prepMediaBlobs 统一转换）
           if (!swOpts.badge) swOpts.badge = BADGE_DATAURL || NOTIFY_ICON || undefined;
           kaSWReady().then(function (reg) {
+            if (!maySend()) { note('none'); resolve(false); return; }
+            // Self-tests must not enter the deferred replay queue after returning to the app.
+            if (!reg && control) { note('none'); resolve(false); return; }
             // #673：SW 未就绪（被回收/弱网注册中）时先挂「就绪即补发」——隐藏态下
             // 页面通道根本不会显示，不补发就是整条丢；前台则直接走页面通道（可见即能弹）
             // #1291（原 #1218 通知批，撞号已改）：隐藏态只走「就绪即补发」单通道，不再同时调
@@ -1771,10 +1778,11 @@
               const attempt = Object.assign({}, swOpts);
               STRIP_LADDER[ladderIdx++].forEach(function (k) { delete attempt[k]; });
               prepMediaBlobs(attempt, function () {
+                if (!maySend()) { note('none'); resolve(false); return; }
                 // #614：showNotification 本身也加超时——防止个别内核返回的 Promise 不落地
                 // #673：thunk 形式——同步 throw 也必须落进超时器的 reject 通道（原写法先求值，
                 //   异常直接穿透回调＝发送链卡死、降级重发不跑）
-                kaWithTimeout(function () { return reg.showNotification(title, attempt); }, 4000)
+                kaWithTimeout(function () { if (!maySend()) throw new Error('Background test no longer active'); if (control && control.onSubmit) control.onSubmit(); return reg.showNotification(title, attempt); }, 4000)
                   .then(function () { note('sw'); resolve(true); }, function (e) {
                     // FIX 2026-09-25 #1241：区分「内核明确拒绝」与「内核始终没给回执」——旧写法两者都
                     //   走 tryNext＝把四级剥媒体阶梯整踩一遍。而雨见浏览器（realme GT Neo6 SE 实报）这类
@@ -1784,6 +1792,7 @@
                     //   回执形态，任何不 settle 的内核都同病、也都一并收口）。明确拒绝（媒体字段被内核
                     //   挑掉）仍是阶梯的正题，照旧逐级剥；未落地＝按「已挂出」结算并就此收手，不再重发。
                     //   同族双向假象见 #1218（大键读空＝已丢失）、#1227（idbSet 超时＝失败）。
+                    if (control && e && e.kaTimeout) { note('sw'); resolve(false); return; } // A diagnostic timeout is not proof of delivery.
                     if (e && e.kaTimeout) { notifyUnsettled++; note('sw'); resolve(true); return; } // #1241 回执未落地＝按已挂出收手，绝不重发（旧写法退回 tryNext＝四级阶梯弹四条）
                     tryNext();
                   });
@@ -2314,7 +2323,7 @@
       if (typeof window.openModal !== 'function') return;
       window.openModal('自检确认', '', function (choice) {
         if (choice === 'seen') {
-          toast(phase2 ? '✓ 后台弹窗链路全通：切后台（锁屏）也能弹横幅' : '✓ 弹窗链路全通：以后后台消息没弹时，先回来点这个测试', 4000);
+          toast(phase2 ? '✓ 已确认本次后台测试通知可见；不代表网页能持续在后台运行' : '✓ 已确认本次前台测试通知可见；后台能力需要继续测试', 4000);
           return;
         }
         if (choice !== 'miss') return;
@@ -2334,7 +2343,7 @@
       }, {
         noInput: true, lock: true,
         staticText: (phase2
-          ? '刚才按 Home 把页面切到后台（或锁屏）之后，屏幕上方弹出「后台通知测试（后台阶段）」这条横幅了吗？\n（通知栏里有小图标 ≠ 屏幕上方弹出；锁屏界面上的通知算弹出）'
+          ? '刚才在重新打开 Mochi 之前，桌面或锁屏上就已看到「后台通知测试（后台阶段）」了吗？\n如果是回到 Mochi 后才出现，请选择「没看到」。本测试只验证这一次，不保证长期后台运行。'
           : '刚才屏幕上方弹出「后台通知测试」横幅了吗？\n（通知栏里有小图标 ≠ 屏幕上方弹出；前台发送通常只进通知栏，要验横幅请用第二段：按 Home 切后台后再测一次）'),
         pills: [{ label: '看到了，顶部弹出', value: 'seen' }, { label: '没看到', value: 'miss' }],
         pillSubmit: true
@@ -2348,14 +2357,16 @@
     //   实测：用户切后台 5 秒（发送刚发起、showNotification 还没落定）就切回本页时，页面当场报
     //   「✗ 页面切到后台后没能发出通知（通道未就绪）」——而那条通知其实**已经提交**；等发送真落定
     //   时报告闸（reported）已关，错的结论再也纠正不回来。现在两处报告都以 done 为前提。
-    const bgT2 = { armed: false, sent: false, done: false, ok: false, chan: '', reported: false, hideT: null, disarmT: null };
+    const bgT2 = { round: 0, armed: false, sent: false, done: false, ok: false, chan: '', reported: false, hideT: null, disarmT: null, hiddenAt: 0, submitted: false, receiptHidden: false, paused: false };
     const bgT2Arm = function () {
-      if (bgT2.armed && !bgT2.sent) return;
+      // Every explicit start is a new round, including retries after an interrupted lock.
+      const round = ++bgT2.round;
       if (bgT2.hideT) { clearTimeout(bgT2.hideT); bgT2.hideT = null; }
       bgT2.armed = true; bgT2.sent = false; bgT2.done = false; bgT2.ok = false; bgT2.chan = ''; bgT2.reported = false;
+      bgT2.hiddenAt = 0; bgT2.submitted = false; bgT2.receiptHidden = false; bgT2.paused = false;
       toast('第二段已就绪：按 Home 把页面切到后台（可锁屏），5 秒后自动发一条；回到本页看结论', 7000);
       if (bgT2.disarmT) clearTimeout(bgT2.disarmT);
-      bgT2.disarmT = setTimeout(function () { if (!bgT2.sent) bgT2.armed = false; }, 180000); // 3 分钟没切后台就作废
+      bgT2.disarmT = setTimeout(function () { if (round === bgT2.round && !bgT2.sent) bgT2.armed = false; }, 180000); // 3 分钟没切后台就作废
     };
     const bgT2Report = function () {
       if (!bgT2.armed || !bgT2.sent || !bgT2.done || bgT2.reported) return;   // #1017：未落定不下结论
@@ -2366,12 +2377,17 @@
       const chTxt = bgT2.chan === 'sw' ? 'Service Worker 通道' : (bgT2.chan === 'page' ? '页面通道（后台会被系统抑制）' : '通道未就绪');
       // #1014：让开一拍——回前台时主 visibilitychange 处理器可能同帧弹自己的提醒 toast，
       //   而 #cc-toast 是同一个元素、后弹的会盖掉先弹的，第二段的结论必须落地可见。
-      const sayIt = function () { toast('第二段（后台阶段）结果：\n'
-        + (bgT2.ok
-          ? '✓ 页面切到后台后发出的通知已提交系统（' + chTxt + '）\n（通知栏里有小图标 ≠ 屏幕上方弹出，下面请如实回答）'
+      const round = bgT2.round;
+      const sayIt = function () { if (round !== bgT2.round) return; toast('第二段（后台阶段）结果：\n'
+        + (bgT2.paused
+          ? '! 已在后台等待超过 5 秒，但网页未执行测试发送，或发送准备在恢复前台后才完成。未补发前台测试通知；本次不能证明后台通知正常。纯网页无法保证系统暂停后继续运行。'
+          : bgT2.ok && !bgT2.receiptHidden
+          ? '! 后台已调用通知接口，但回到前台后才收到接口回执。无法确认通知是否在后台显示，请以锁屏或桌面实际看到的时间为准。'
+          : bgT2.ok
+          ? '✓ 已在后台调用通知接口并收到回执（' + chTxt + '）\n仅验证本次发送，不代表持续保活；下面请确认是否在回到应用之前看到通知。'
           : '✗ 页面切到后台后没能发出通知（' + chTxt + '）——后台弹窗这一半不通，见本行「功能说明」排查'), 8000); };
       setTimeout(sayIt, 700);
-      if (bgT2.ok) setTimeout(function () { askSeen(true); }, 1800);
+      if (bgT2.ok && bgT2.receiptHidden) setTimeout(function () { if (round === bgT2.round) askSeen(true); }, 1800);
     };
     const offerPhase2 = function () {
       if (typeof window.openModal !== 'function') return;
@@ -2391,21 +2407,41 @@
       if (!bgT2.armed) return;
       if (document.visibilityState === 'hidden') {
         if (bgT2.sent || bgT2.hideT) return;
+        bgT2.hiddenAt = Date.now();
+        const round = bgT2.round;
         // 隐藏态才是「后台弹窗」真实发生的场景：等 5 秒再发（避开刚切走那一下的瞬时抖动）
         bgT2.hideT = setTimeout(function () {
+          if (round !== bgT2.round) return;
           bgT2.hideT = null;
           if (!bgT2.armed || bgT2.sent || document.visibilityState !== 'hidden') return;
           bgT2.sent = true;
           try {
             const nm = store.get('lbl-partner') || (window.taWord ? window.taWord() : 'TA');
-            showSysNotification('后台通知测试（后台阶段）', { body: '这条是在页面切到后台之后发出的 · 来自 ' + nm }, function (ch) { bgT2.chan = ch; })
-              .then(function (ok) { bgT2.ok = !!ok; bgT2.done = true; bgT2Report(); });
-          } catch (e) { bgT2.ok = false; bgT2.done = true; bgT2Report(); }
+            showSysNotification('后台通知测试（后台阶段）', { body: '这条是在页面切到后台之后发出的 · 来自 ' + nm }, function (ch) { if (round === bgT2.round) bgT2.chan = ch; }, {
+              canSend: function () { return round === bgT2.round && bgT2.armed && document.visibilityState === 'hidden'; },
+              onSubmit: function () { if (round === bgT2.round) bgT2.submitted = true; }
+            })
+              .then(function (ok) {
+                if (round !== bgT2.round) return;
+                bgT2.ok = !!ok; bgT2.done = true; bgT2.receiptHidden = document.visibilityState === 'hidden';
+                bgT2.paused = !ok && !bgT2.submitted && document.visibilityState !== 'hidden';
+                bgT2Report();
+              }, function () { if (round === bgT2.round) { bgT2.ok = false; bgT2.done = true; bgT2Report(); } });
+          } catch (e) { if (round === bgT2.round) { bgT2.ok = false; bgT2.done = true; bgT2Report(); } }
         }, 5000);
         return;
       }
       // 回到前台：没发出去的那次作废（没在后台待够），发出去的给结论
       if (bgT2.hideT) { clearTimeout(bgT2.hideT); bgT2.hideT = null; }
+      if (!bgT2.sent && bgT2.hiddenAt) {
+        if (Date.now() - bgT2.hiddenAt >= 5000) {
+          bgT2.sent = true; bgT2.done = true; bgT2.paused = true;
+        } else {
+          bgT2.armed = false;
+          if (bgT2.disarmT) { clearTimeout(bgT2.disarmT); bgT2.disarmT = null; }
+          toast('后台停留不足 5 秒，测试未发送。请重新点击「测试 → 现在测」后再切后台。', 6000);
+        }
+      }
       bgT2Report();
     });
     const runTest = function (my) {

@@ -1161,6 +1161,7 @@ if (document.visibilityState !== 'visible') return;
 setTimeout(tryShowNotifyHealBar, 800); // 回前台补出条（隐藏期间发生的丢失也提示）；错开回前台渲染高峰
 });
 function showSysNotification(title, opts, chanOut) {
+const control = arguments[3]; // Optional self-test lifecycle guard; ordinary notifications are unchanged.
 opts = opts || {};
 const note = function (ch) {
 lastNotifyChannel = ch;
@@ -1168,9 +1169,12 @@ if (typeof chanOut === 'function') { try { chanOut(ch); } catch (e) {} }
 };
 return new Promise(function (resolve) {
 try {
+const maySend = function () { return !control || !control.canSend || control.canSend(); };
+if (!maySend()) { note('none'); resolve(false); return; }
 if (!('Notification' in window) || Notification.permission !== 'granted') { note('none'); resolve(false); return; }
 const hidden = document.visibilityState === 'hidden';
 const pageFallback = function () {
+if (!maySend()) { note('none'); resolve(false); return; }
 const noMedia = Object.assign({}, opts);
 delete noMedia.image;
 delete noMedia.icon;
@@ -1186,6 +1190,8 @@ const swOpts = Object.assign({}, opts);
 if (!swOpts.urgency) swOpts.urgency = 'high';
 if (!swOpts.badge) swOpts.badge = BADGE_DATAURL || NOTIFY_ICON || undefined;
 kaSWReady().then(function (reg) {
+if (!maySend()) { note('none'); resolve(false); return; }
+if (!reg && control) { note('none'); resolve(false); return; }
 if (!reg) { if (hidden) { swNotifyLater(title, opts, chanOut); note('none'); resolve(false); } else { pageFallback(); } return; }
 const STRIP_LADDER = [[], ['image'], ['image', 'badge'], ['image', 'badge', 'icon']];
 let ladderIdx = 0;
@@ -1194,8 +1200,10 @@ if (ladderIdx >= STRIP_LADDER.length) { note('none'); resolve(false); return; }
 const attempt = Object.assign({}, swOpts);
 STRIP_LADDER[ladderIdx++].forEach(function (k) { delete attempt[k]; });
 prepMediaBlobs(attempt, function () {
-kaWithTimeout(function () { return reg.showNotification(title, attempt); }, 4000)
+if (!maySend()) { note('none'); resolve(false); return; }
+kaWithTimeout(function () { if (!maySend()) throw new Error('Background test no longer active'); if (control && control.onSubmit) control.onSubmit(); return reg.showNotification(title, attempt); }, 4000)
 .then(function () { note('sw'); resolve(true); }, function (e) {
+if (control && e && e.kaTimeout) { note('sw'); resolve(false); return; } // A diagnostic timeout is not proof of delivery.
 if (e && e.kaTimeout) { notifyUnsettled++; note('sw'); resolve(true); return; } // #1241 回执未落地＝按已挂出收手，绝不重发（旧写法退回 tryNext＝四级阶梯弹四条）
 tryNext();
 });
@@ -1586,7 +1594,7 @@ const askSeen = function (phase2) {
 if (typeof window.openModal !== 'function') return;
 window.openModal('自检确认', '', function (choice) {
 if (choice === 'seen') {
-toast(phase2 ? '✓ 后台弹窗链路全通：切后台（锁屏）也能弹横幅' : '✓ 弹窗链路全通：以后后台消息没弹时，先回来点这个测试', 4000);
+toast(phase2 ? '✓ 已确认本次后台测试通知可见；不代表网页能持续在后台运行' : '✓ 已确认本次前台测试通知可见；后台能力需要继续测试', 4000);
 return;
 }
 if (choice !== 'miss') return;
@@ -1606,20 +1614,21 @@ staticText: steps.join('\n')
 }, {
 noInput: true, lock: true,
 staticText: (phase2
-? '刚才按 Home 把页面切到后台（或锁屏）之后，屏幕上方弹出「后台通知测试（后台阶段）」这条横幅了吗？\n（通知栏里有小图标 ≠ 屏幕上方弹出；锁屏界面上的通知算弹出）'
+? '刚才在重新打开 Mochi 之前，桌面或锁屏上就已看到「后台通知测试（后台阶段）」了吗？\n如果是回到 Mochi 后才出现，请选择「没看到」。本测试只验证这一次，不保证长期后台运行。'
 : '刚才屏幕上方弹出「后台通知测试」横幅了吗？\n（通知栏里有小图标 ≠ 屏幕上方弹出；前台发送通常只进通知栏，要验横幅请用第二段：按 Home 切后台后再测一次）'),
 pills: [{ label: '看到了，顶部弹出', value: 'seen' }, { label: '没看到', value: 'miss' }],
 pillSubmit: true
 });
 };
-const bgT2 = { armed: false, sent: false, done: false, ok: false, chan: '', reported: false, hideT: null, disarmT: null };
+const bgT2 = { round: 0, armed: false, sent: false, done: false, ok: false, chan: '', reported: false, hideT: null, disarmT: null, hiddenAt: 0, submitted: false, receiptHidden: false, paused: false };
 const bgT2Arm = function () {
-if (bgT2.armed && !bgT2.sent) return;
+const round = ++bgT2.round;
 if (bgT2.hideT) { clearTimeout(bgT2.hideT); bgT2.hideT = null; }
 bgT2.armed = true; bgT2.sent = false; bgT2.done = false; bgT2.ok = false; bgT2.chan = ''; bgT2.reported = false;
+bgT2.hiddenAt = 0; bgT2.submitted = false; bgT2.receiptHidden = false; bgT2.paused = false;
 toast('第二段已就绪：按 Home 把页面切到后台（可锁屏），5 秒后自动发一条；回到本页看结论', 7000);
 if (bgT2.disarmT) clearTimeout(bgT2.disarmT);
-bgT2.disarmT = setTimeout(function () { if (!bgT2.sent) bgT2.armed = false; }, 180000); // 3 分钟没切后台就作废
+bgT2.disarmT = setTimeout(function () { if (round === bgT2.round && !bgT2.sent) bgT2.armed = false; }, 180000); // 3 分钟没切后台就作废
 };
 const bgT2Report = function () {
 if (!bgT2.armed || !bgT2.sent || !bgT2.done || bgT2.reported) return;   // #1017：未落定不下结论
@@ -1628,12 +1637,17 @@ bgT2.reported = true;
 bgT2.armed = false;
 if (bgT2.disarmT) { clearTimeout(bgT2.disarmT); bgT2.disarmT = null; }
 const chTxt = bgT2.chan === 'sw' ? 'Service Worker 通道' : (bgT2.chan === 'page' ? '页面通道（后台会被系统抑制）' : '通道未就绪');
-const sayIt = function () { toast('第二段（后台阶段）结果：\n'
-+ (bgT2.ok
-? '✓ 页面切到后台后发出的通知已提交系统（' + chTxt + '）\n（通知栏里有小图标 ≠ 屏幕上方弹出，下面请如实回答）'
+const round = bgT2.round;
+const sayIt = function () { if (round !== bgT2.round) return; toast('第二段（后台阶段）结果：\n'
++ (bgT2.paused
+? '! 已在后台等待超过 5 秒，但网页未执行测试发送，或发送准备在恢复前台后才完成。未补发前台测试通知；本次不能证明后台通知正常。纯网页无法保证系统暂停后继续运行。'
+: bgT2.ok && !bgT2.receiptHidden
+? '! 后台已调用通知接口，但回到前台后才收到接口回执。无法确认通知是否在后台显示，请以锁屏或桌面实际看到的时间为准。'
+: bgT2.ok
+? '✓ 已在后台调用通知接口并收到回执（' + chTxt + '）\n仅验证本次发送，不代表持续保活；下面请确认是否在回到应用之前看到通知。'
 : '✗ 页面切到后台后没能发出通知（' + chTxt + '）——后台弹窗这一半不通，见本行「功能说明」排查'), 8000); };
 setTimeout(sayIt, 700);
-if (bgT2.ok) setTimeout(function () { askSeen(true); }, 1800);
+if (bgT2.ok && bgT2.receiptHidden) setTimeout(function () { if (round === bgT2.round) askSeen(true); }, 1800);
 };
 const offerPhase2 = function () {
 if (typeof window.openModal !== 'function') return;
@@ -1651,19 +1665,39 @@ document.addEventListener('visibilitychange', function () {
 if (!bgT2.armed) return;
 if (document.visibilityState === 'hidden') {
 if (bgT2.sent || bgT2.hideT) return;
+bgT2.hiddenAt = Date.now();
+const round = bgT2.round;
 bgT2.hideT = setTimeout(function () {
+if (round !== bgT2.round) return;
 bgT2.hideT = null;
 if (!bgT2.armed || bgT2.sent || document.visibilityState !== 'hidden') return;
 bgT2.sent = true;
 try {
 const nm = store.get('lbl-partner') || (window.taWord ? window.taWord() : 'TA');
-showSysNotification('后台通知测试（后台阶段）', { body: '这条是在页面切到后台之后发出的 · 来自 ' + nm }, function (ch) { bgT2.chan = ch; })
-.then(function (ok) { bgT2.ok = !!ok; bgT2.done = true; bgT2Report(); });
-} catch (e) { bgT2.ok = false; bgT2.done = true; bgT2Report(); }
+showSysNotification('后台通知测试（后台阶段）', { body: '这条是在页面切到后台之后发出的 · 来自 ' + nm }, function (ch) { if (round === bgT2.round) bgT2.chan = ch; }, {
+canSend: function () { return round === bgT2.round && bgT2.armed && document.visibilityState === 'hidden'; },
+onSubmit: function () { if (round === bgT2.round) bgT2.submitted = true; }
+})
+.then(function (ok) {
+if (round !== bgT2.round) return;
+bgT2.ok = !!ok; bgT2.done = true; bgT2.receiptHidden = document.visibilityState === 'hidden';
+bgT2.paused = !ok && !bgT2.submitted && document.visibilityState !== 'hidden';
+bgT2Report();
+}, function () { if (round === bgT2.round) { bgT2.ok = false; bgT2.done = true; bgT2Report(); } });
+} catch (e) { if (round === bgT2.round) { bgT2.ok = false; bgT2.done = true; bgT2Report(); } }
 }, 5000);
 return;
 }
 if (bgT2.hideT) { clearTimeout(bgT2.hideT); bgT2.hideT = null; }
+if (!bgT2.sent && bgT2.hiddenAt) {
+if (Date.now() - bgT2.hiddenAt >= 5000) {
+bgT2.sent = true; bgT2.done = true; bgT2.paused = true;
+} else {
+bgT2.armed = false;
+if (bgT2.disarmT) { clearTimeout(bgT2.disarmT); bgT2.disarmT = null; }
+toast('后台停留不足 5 秒，测试未发送。请重新点击「测试 → 现在测」后再切后台。', 6000);
+}
+}
 bgT2Report();
 });
 const runTest = function (my) {

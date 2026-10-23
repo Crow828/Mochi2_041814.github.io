@@ -52,6 +52,7 @@ jobs:
           node tools/verify-custom-moods.cjs
           node tools/verify-chat-group-favorites.cjs
           node tools/verify-favorite-identity.cjs
+          node tools/verify-bg-notify-retry.cjs
           node tools/verify-update-notes.cjs
 
       - name: Chrome 布局验证

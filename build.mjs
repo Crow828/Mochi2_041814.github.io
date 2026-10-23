@@ -9553,7 +9553,7 @@ const FIX_SENTINELS = [
   {
     "name": "#614/#673 showNotification 超时用 thunk 形式（删掉 thunk 退回先求值写法＝同步 throw 穿透回调，发送链卡死且降级重发不跑）",
     "file": "js/bg-keep.js",
-    "needle": "kaWithTimeout(function () { return reg.showNotification(title, attempt); }, 4000)"
+    "needle": "kaWithTimeout(function () { if (!maySend()) throw new Error('Background test no longer active'); if (control && control.onSubmit) control.onSubmit(); return reg.showNotification(title, attempt); }, 4000)"
   },
   {
     "name": "#1241a 回执未落地不再重发（删掉＝退回无条件 tryNext，四级剥媒体阶梯被「Promise 永不 settle 但通知已挂出」的内核整踩一遍＝同一条消息弹 4 次复发）",

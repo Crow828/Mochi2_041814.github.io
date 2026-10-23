@@ -4,8 +4,8 @@
   "files": [
     {
       "path": ".github/workflows/verify.yml",
-      "bytes": 2423,
-      "sha256": "b87917943d8c5c16aefeb9b1e0ecbdbc8329733983600498f2b848c320c295c1"
+      "bytes": 2471,
+      "sha256": "487c6616f18d0b5b6d28e183876f6efea2c1249c91924b780cc40855d452ed38"
     },
     {
       "path": ".gitignore",
@@ -34,8 +34,8 @@
     },
     {
       "path": "build.mjs",
-      "bytes": 1196768,
-      "sha256": "f65c58778b18290df064ef4817a74187bb215ff4a6bab0e8ebab358abd347bed"
+      "bytes": 1219040,
+      "sha256": "53249d66d5c7834389a008f36aa552b1c54f2d713edc8908b9fba4ad507965df"
     },
     {
       "path": "diag-ask-records.html",
@@ -118,9 +118,24 @@
       "sha256": "48864589450bf5426f0676708de5ea64db58a14db6d378616cb97573bb8890db"
     },
     {
+      "path": "docs/V4.0-BG-RETRY-FIX.md",
+      "bytes": 650,
+      "sha256": "93cc4845ad81b0aaee3b0583e8ae8da5799555f366f0772537bb7a48966da64e"
+    },
+    {
+      "path": "docs/V4.0-BG-SUSPEND-FIX.md",
+      "bytes": 1294,
+      "sha256": "3afc3caa8cc80c86c58959082a1d1e76e9530ed74967bb7a8803af366807484b"
+    },
+    {
       "path": "docs/V4.0-CI-FIX.md",
       "bytes": 811,
       "sha256": "e41402a435d13ba0f5117f2377fba6aeca2b9c7ce907acba8e3d020706fe3e62"
+    },
+    {
+      "path": "docs/V4.0-COMBINED-FIX.md",
+      "bytes": 793,
+      "sha256": "e5889a2f5133b4c2f3024f555376514787c793e796a721c92bd7945421767877"
     },
     {
       "path": "docs/V4.0-DISPLAY-FIX.md",
@@ -175,7 +190,7 @@
     {
       "path": "index.html",
       "bytes": 1631452,
-      "sha256": "a1860b56775dc989332d24ed2bb4269b2daed3b29c67fa8b730f5126ffe36acc"
+      "sha256": "9ce18a753fe8ffea1c5635bee073904540ec2f2215d1b91afd2127940d88f813"
     },
     {
       "path": "js/accounting.js",
@@ -204,8 +219,8 @@
     },
     {
       "path": "js/bg-keep.js",
-      "bytes": 108039,
-      "sha256": "92e4b1d193925ad8f18a86f661ffd34d36f2d92e7c719e5227be050541ee487a"
+      "bytes": 110536,
+      "sha256": "ea197e95b5174e9fccc716632e2b87b2073c4afa5419465b67b9c9653ff7df6c"
     },
     {
       "path": "js/breakout.js",
@@ -764,8 +779,8 @@
     },
     {
       "path": "src/js/bg-keep.js",
-      "bytes": 232131,
-      "sha256": "f34f38630e0c0abd509457b88ec87d678269eea23fcdb892e353fe7c13b73abd"
+      "bytes": 238551,
+      "sha256": "32841b3887af26f4254201782edf09a967bcda1c067addb5b55e00dd332b4117"
     },
     {
       "path": "src/js/breakout.js",
@@ -1235,7 +1250,7 @@
     {
       "path": "sw.js",
       "bytes": 34653,
-      "sha256": "fed34f19c451818e8c450fe7d4abd7dc55c1b1b9544555c1e3cc30d888d1764f"
+      "sha256": "3dbc889560406149ec6cc4f831da5b02289292350f0974acefb14f5fe8136dcb"
     },
     {
       "path": "tools/apply-desk-icon-place-r1.mjs",
@@ -2941,6 +2956,11 @@
       "path": "tools/verify-bg-notify-dedupe.mjs",
       "bytes": 13569,
       "sha256": "55fd22a27af639b3b0c647c552be64e2a8cdee7046ef9ae36e779927ee81bfad"
+    },
+    {
+      "path": "tools/verify-bg-notify-retry.cjs",
+      "bytes": 4730,
+      "sha256": "1239b72425843117919069ba76a67eacf5e96ab1e4a173b1cc2f77b94a537e9e"
     },
     {
       "path": "tools/verify-bg-notify-send.mjs",
@@ -5204,8 +5224,8 @@
     },
     {
       "path": "tools/verify-personal.cjs",
-      "bytes": 17298,
-      "sha256": "9370082bd84534e47fec926d5e27e96ca589bcf2e72a52b134c1a2c75c33c7db"
+      "bytes": 18005,
+      "sha256": "22b7c378a986b2951d3218c2e21a9af985b439692b610364602c7e2375424f1c"
     },
     {
       "path": "tools/verify-pick-fire-all.mjs",
@@ -5910,7 +5930,7 @@
     {
       "path": "version.json",
       "bytes": 83,
-      "sha256": "d88342990efb80974d904827cb05602727f45979cbb7f6cf0c3427a119f82f75"
+      "sha256": "79ddb3e36898e0c834bb62cdb6f6fbfbbd59f48938fe4e690bd7e5abedc89d6c"
     },
     {
       "path": "上传说明.md",

@@ -16,6 +16,12 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  browser=await chromium.launch(options);
  for(const width of [390,440]){
  const page=await browser.newPage({viewport:{width,height:956},serviceWorkers:'block'});
+ // These fixtures test navigation/counts, not the one-time legacy library migration.
+ // Complete migration before seeding to prevent its deferred IDB copy from moving the fixture.
+ await page.addInitScript(()=>{
+   localStorage.setItem('xy-home-v2:cc-scope-migrated','1');
+   localStorage.setItem('xy-home-v2:cc-scope-notice-done','1');
+ });
  await page.addInitScript(()=>{window.__sfxContexts=0;const Base=window.AudioContext||window.webkitAudioContext;if(Base){const Wrapped=new Proxy(Base,{construct(target,args,newTarget){if(new Error().stack.includes('/js/sfx.js'))window.__sfxContexts++;return Reflect.construct(target,args,newTarget)}});if(window.AudioContext)window.AudioContext=Wrapped;if(window.webkitAudioContext)window.webkitAudioContext=Wrapped;}});
  await page.addInitScript(()=>{window.__automaticDiagTimers=0;const original=window.setInterval;window.setInterval=function(fn,ms,...args){if(fn&&fn.name==='sdTick')window.__automaticDiagTimers++;return original.call(this,fn,ms,...args);};});
  await page.goto('http://127.0.0.1:'+server.address().port+'/');
@@ -29,7 +35,10 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  console.log('PASS silent/default and configured sound initialization at '+width+'px');
  // Seed a small private library in this disposable browser context.
  await page.evaluate(()=>{window.xyStore('xy-home-v2').set('cc-groups-public',JSON.stringify({text:[['public-test',['one','two']]]}));window.activeStore().set('cc-groups',JSON.stringify({text:[['own-test',['three']]]}));document.querySelector('.tabbar [data-page="page-chatcard"]').click();});
- await page.waitForFunction(()=>document.getElementById('cc-pub-count').textContent==='2'&&document.getElementById('cc-list-count').textContent==='1');
+ await page.waitForFunction(()=>document.getElementById('cc-pub-count').textContent==='2'&&document.getElementById('cc-list-count').textContent==='1').catch(async error=>{
+   console.error('Library count fixture state',await page.evaluate(()=>({publicCount:document.getElementById('cc-pub-count').textContent,privateCount:document.getElementById('cc-list-count').textContent,publicData:window.xyStore('xy-home-v2').get('cc-groups-public'),privateData:window.activeStore().get('cc-groups')})));
+   throw error;
+ });
  const repeated=await page.evaluate(async()=>{const page=document.getElementById('page-chatcard');let count=0;const mo=new MutationObserver(rows=>count+=rows.length);mo.observe(page,{attributes:true,attributeFilter:['hidden']});document.querySelector('.tabbar [data-page="page-chatcard"]').click();await Promise.resolve();mo.disconnect();return count;});
  assert.equal(repeated,0,'Repeated tab clicks must not hide/reopen the current page');
  await page.evaluate(()=>{for(const id of ['page-setting','page-chatcard','page-setting','page-phone'])document.querySelector('.tabbar [data-page="'+id+'"]').click();});
