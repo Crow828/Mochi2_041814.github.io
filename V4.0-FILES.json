@@ -4,8 +4,8 @@
   "files": [
     {
       "path": ".github/workflows/verify.yml",
-      "bytes": 2471,
-      "sha256": "487c6616f18d0b5b6d28e183876f6efea2c1249c91924b780cc40855d452ed38"
+      "bytes": 2620,
+      "sha256": "d68142685ec2c8ebe2eb5aaedb7ec64fc849b3baa0206b1c5d42d8dccf3d6ea9"
     },
     {
       "path": ".gitignore",
@@ -28,14 +28,9 @@
       "sha256": "733778d8ed38e784fe2c08cfefb53733f41bc681fd8498c5f7006e0918352f05"
     },
     {
-      "path": "README.md",
-      "bytes": 7292,
-      "sha256": "7245938786bf8c36fe1c0efada3d4732056fe71a358d67795bb2e3207fd85e63"
-    },
-    {
       "path": "build.mjs",
-      "bytes": 1219040,
-      "sha256": "53249d66d5c7834389a008f36aa552b1c54f2d713edc8908b9fba4ad507965df"
+      "bytes": 1219057,
+      "sha256": "ade4b50d2e6fc0b689bae35944de900d2d170c29868cc78b6edfd542368ff736"
     },
     {
       "path": "diag-ask-records.html",
@@ -118,6 +113,11 @@
       "sha256": "48864589450bf5426f0676708de5ea64db58a14db6d378616cb97573bb8890db"
     },
     {
+      "path": "docs/UPDATE-2026-10-23.md",
+      "bytes": 1702,
+      "sha256": "9a17fefdf4f85c1a6693527cb89440aaf4edd3ad981826169068facc141ba405"
+    },
+    {
       "path": "docs/V4.0-BG-RETRY-FIX.md",
       "bytes": 650,
       "sha256": "93cc4845ad81b0aaee3b0583e8ae8da5799555f366f0772537bb7a48966da64e"
@@ -189,8 +189,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 1631452,
-      "sha256": "9ce18a753fe8ffea1c5635bee073904540ec2f2215d1b91afd2127940d88f813"
+      "bytes": 1635920,
+      "sha256": "a3e1d33c6154a4e57778f480e096bec1094b78c9eb6ff5e0ab64db1b1b244a25"
     },
     {
       "path": "js/accounting.js",
@@ -259,13 +259,13 @@
     },
     {
       "path": "js/chat-settings.js",
-      "bytes": 164773,
-      "sha256": "bccd4b3144ccff11e2317bf98ab91abbbdc46f5e78bab0ae5abb23d4f958f369"
+      "bytes": 166217,
+      "sha256": "94074e819762b9c668726aa198f08000d3697e6d496a889bb9578e53e4dce267"
     },
     {
       "path": "js/chat.js",
-      "bytes": 629613,
-      "sha256": "f03c16847eb3066b748afcc9037d4d51fbd4d5153d78ee880e88a68016f00ea4"
+      "bytes": 635871,
+      "sha256": "bb310e98022ed5007d12253f77eb52d99bcf872d838259f70d7049be4c339050"
     },
     {
       "path": "js/chatcard.js",
@@ -529,8 +529,8 @@
     },
     {
       "path": "js/personalize.js",
-      "bytes": 430299,
-      "sha256": "b07b5211b8a370ec5c957ba54ca03ff9aaacc8eb20c6301a585b02fb42013acf"
+      "bytes": 430565,
+      "sha256": "b9dc926ee404b7035f88e76ed2fe69f04572753e1d66a8c3a540bfa4bedd2183"
     },
     {
       "path": "js/pong.js",
@@ -663,14 +663,19 @@
       "sha256": "11106b5666c3e4f559dd20205943325d5177722062db4414368b156800f16627"
     },
     {
+      "path": "src/css/chat-date.css",
+      "bytes": 2327,
+      "sha256": "433a87242d4d618796506dbf4ee853e659ab1b3f358f4010b8ca46fa7c1e2412"
+    },
+    {
       "path": "src/css/chat-group-favorites.css",
       "bytes": 6170,
       "sha256": "09c507a99fcca73787d3bda135b4dad2c6a6f7c3ed5913a74d69998adae4979f"
     },
     {
       "path": "src/css/chat-main.css",
-      "bytes": 119950,
-      "sha256": "74be24f033fb022f1020cad9f35808bc2280cfb714f4e20c13bb7d7f83501fde"
+      "bytes": 120100,
+      "sha256": "e79b66f9b216c9ba494a079c38d94dfaee9218083cb8bc5940cf5e53bf38b68c"
     },
     {
       "path": "src/css/chat-pages.css",
@@ -679,8 +684,8 @@
     },
     {
       "path": "src/css/chat-settings-layout.css",
-      "bytes": 3925,
-      "sha256": "a4f68b51292ea3bb400f0356e6ba6baf37614269253ecea790e893a62d7cbe06"
+      "bytes": 4093,
+      "sha256": "f8413bf577903c1647d3c978809035e9f0782541004c26889d2fc634e41537e0"
     },
     {
       "path": "src/css/dark.css",
@@ -819,13 +824,13 @@
     },
     {
       "path": "src/js/chat-settings.js",
-      "bytes": 274925,
-      "sha256": "3ad1b5e3d5e0823588056d705b6feb216b7e15e5af08d05e03c11ec24580a7ac"
+      "bytes": 276478,
+      "sha256": "9486a99017009f27f5be086a0122f6767eda6855529deb52ed6ec018f95bdaab"
     },
     {
       "path": "src/js/chat.js",
-      "bytes": 1046686,
-      "sha256": "d13370842a9133810540a7ec94afaa843c393d217c540f2e53d2816c314ae23b"
+      "bytes": 1053729,
+      "sha256": "65a49c064dd58589c206de55a4dfd0635a8ffbab6f90a10e58452b855046a1cb"
     },
     {
       "path": "src/js/chatcard.js",
@@ -1104,8 +1109,8 @@
     },
     {
       "path": "src/js/personalize.js",
-      "bytes": 702353,
-      "sha256": "347a30835b262272dcf942f69292709e05b9f36ca569f7461909044e0f697868"
+      "bytes": 702918,
+      "sha256": "72b8d74b62ab60c3bdeaf7b44bc877313400c51999f5c1ec46dbba3cae1ed800"
     },
     {
       "path": "src/js/pong.js",
@@ -1244,13 +1249,13 @@
     },
     {
       "path": "src/template.html",
-      "bytes": 773392,
-      "sha256": "8e4e75b20a60526144dbf693d6e4c26b8044747ad94e36600edec27ca5056bd8"
+      "bytes": 775215,
+      "sha256": "919d37c0ec6f6141692781254769afabeb4eabcd97740826711ffe6511c20e61"
     },
     {
       "path": "sw.js",
       "bytes": 34653,
-      "sha256": "3dbc889560406149ec6cc4f831da5b02289292350f0974acefb14f5fe8136dcb"
+      "sha256": "a64a460fdbd6d3a7aa44388a4df3f8e876d18de7f76a200a228a430e8a972260"
     },
     {
       "path": "tools/apply-desk-icon-place-r1.mjs",
@@ -3263,6 +3268,11 @@
       "sha256": "0d0b2efcdea6919ea453daef1ecf59b2a65676d9e83077ed74a3472257653f1a"
     },
     {
+      "path": "tools/verify-chat-aux-font.cjs",
+      "bytes": 4812,
+      "sha256": "5f8151a43a190fe6d0b6f51d722abe17889137ad85e9afcde3e58c150048274a"
+    },
+    {
       "path": "tools/verify-chat-backup-scope.mjs",
       "bytes": 24303,
       "sha256": "2894c7ff1298dc4a04aa21190b1b9e51e5df202351fff32e5bf779d026499ae5"
@@ -3301,6 +3311,11 @@
       "path": "tools/verify-chat-card-enter.mjs",
       "bytes": 12075,
       "sha256": "31a8850338f8310532d016ab0f8d0e079bdaa146c437d0746910e6108d5ceaac"
+    },
+    {
+      "path": "tools/verify-chat-date-navigation.cjs",
+      "bytes": 6080,
+      "sha256": "d7859eb79ddc03bf2adb858adf774eb48d45dad3eaa83d398df756f972453ec1"
     },
     {
       "path": "tools/verify-chat-dock-watchdog.mjs",
@@ -4878,6 +4893,11 @@
       "sha256": "eba00b25c65c8475b6133223bb95b8bde7139408f8851a31d1ef45bc832b2b5f"
     },
     {
+      "path": "tools/verify-modal-placeholder.cjs",
+      "bytes": 3696,
+      "sha256": "72af9cdb768f9913889821c20383db047006b0496dfe86fea337de227be89d2a"
+    },
+    {
       "path": "tools/verify-modal-scroll-chain.mjs",
       "bytes": 16869,
       "sha256": "bc41c40697ca106e60765a2241a4596f0df833b7c15b340f5dc934e7f460d3e9"
@@ -5930,7 +5950,7 @@
     {
       "path": "version.json",
       "bytes": 83,
-      "sha256": "79ddb3e36898e0c834bb62cdb6f6fbfbbd59f48938fe4e690bd7e5abedc89d6c"
+      "sha256": "eaef17372569c6691f486851fa112b76af5873a53c64e8014fe9151acfd4c6ee"
     },
     {
       "path": "上传说明.md",
@@ -5939,5 +5959,9 @@
     }
   ],
   "ciFix": "portable calendar browser selection",
-  "displayFix": "settings font consistency and favorite sticker thumbnails"
+  "displayFix": "settings font consistency and favorite sticker thumbnails",
+  "updateDate": "2026-10-23",
+  "userManagedFiles": [
+    "README.md"
+  ]
 }

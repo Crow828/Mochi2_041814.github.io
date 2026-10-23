@@ -315,6 +315,13 @@ let sliderInitPill = null;
 let _openSeq = 0;
 let _openedAt = 0;
 let pillClicked = false;
+function setModalPlaceholder(value) {
+const text = value == null ? '' : String(value);
+input.setAttribute('placeholder', text);
+try { input.placeholder = text; } catch (e) {}
+const box = ceBoxOf(input);
+if (box) { if (text) box.setAttribute('data-ph', text); else box.removeAttribute('data-ph'); }
+}
 window.openModal = function (t, v, fn, opts) {
 opts = opts || {};
 _modalOpts = opts;
@@ -351,7 +358,7 @@ input.hidden = noInput || !!opts.textarea;
 input.value = v || '';
 if (opts.maxlength) input.maxLength = opts.maxlength;
 else input.removeAttribute('maxlength');
-if ('placeholder' in opts) { try { input.placeholder = opts.placeholder || ''; } catch (e) {} }
+setModalPlaceholder('placeholder' in opts ? (opts.placeholder || '') : '输入内容');
 var _im = ('inputmode' in opts) ? (opts.inputmode || '') : '';
 try { if (_im) input.setAttribute('inputmode', _im); else input.removeAttribute('inputmode'); } catch (e) {}
 try { const _b = ceBoxOf(input); if (_b) { if (_im) _b.setAttribute('inputmode', _im); else _b.removeAttribute('inputmode'); } } catch (e) {}
@@ -505,7 +512,7 @@ return '';
 try { input.value = s || ''; } catch (e) {}
 },
 maxLen: function (n) { try { if (n) input.maxLength = n; else input.removeAttribute('maxlength'); } catch (e) {} },
-ph: function (s) { try { input.placeholder = s || ''; } catch (e) {} },
+ph: function (s) { setModalPlaceholder(s); },
 okText: function (s) { if (okBtn) okBtn.textContent = s || '确定'; },
 focus: function () {
 setTimeout(function () {

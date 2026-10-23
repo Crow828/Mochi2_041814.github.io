@@ -1669,6 +1669,8 @@ background: rgba(255,255,255,.92); border:1px solid rgba(0,0,0,.1);
 display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
 }
 .ch-settings svg { width:18px; height:18px; }
+.ch-call { padding:0; box-sizing:content-box; color:var(--ink,#111); }
+.ch-call:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .ch-av {
 width:34px; height:34px; border-radius:var(--msg-av-radius, 50%); flex-shrink:0;
 background:#e9e9e9; overflow:hidden;
@@ -9536,6 +9538,8 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
 .set-row .txt .sub { font-size: calc(11.5px + var(--mochi-text-adj, 0px)); }
 .gc-set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
+#chat-body .msg-time,#chat-body .msg-time-divider span {font-size:var(--chat-time-font-size,10px);}
+#chat-body .msg-poke {font-size:var(--chat-notice-font-size,12px);}
 #page-chat-settings.cs-grouped-layout { overflow:hidden; }
 #page-chat-settings [data-cs-legacy] { display:none !important; }
 #page-chat-settings.cs-grouped-layout > .chat-head { flex:none; }
@@ -9690,6 +9694,28 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .update-notes-date ul {padding:4px 20px 16px 32px;}
 .update-notes-date li {padding-top:13px;font-size:13px;line-height:1.7;overflow-wrap:anywhere;}
 .update-notes-date p {margin-top:3px;color:var(--soft-ink,#555);font-size:12px;}
+#chat-date-dialog {width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 48px);box-sizing:border-box;margin:auto;padding:16px;border:1px solid var(--line,#ddd);border-radius:22px;background:var(--card-bg,#fff);color:var(--ink,#111);overflow:auto;}
+#chat-date-dialog::backdrop {background:rgba(0,0,0,.3);}
+#chat-date-dialog header {display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;}
+#chat-date-dialog header strong {font-size:17px;}
+#chat-date-dialog header button,#chat-date-dialog header > span {width:36px;height:36px;flex:none;}
+#chat-date-dialog button {font-family:inherit;color:inherit;cursor:pointer;}
+#chat-date-dialog header button {border:1px solid var(--line,#ddd);border-radius:50%;background:transparent;font-size:28px;line-height:1;}
+.chat-date-controls {display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.chat-date-controls input {flex:1;min-width:0;box-sizing:border-box;padding:10px;border:1px solid var(--line,#ddd);border-radius:12px;background:transparent;color:inherit;font:inherit;font-size:16px;}
+.chat-date-controls button {padding:10px 14px;border:1px solid var(--line,#ddd);border-radius:12px;background:transparent;font-size:13px;}
+.chat-date-week,.chat-date-grid {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;}
+.chat-date-week {font-size:12px;color:var(--muted,#888);margin-bottom:6px;}
+.chat-date-months {max-height:52dvh;box-sizing:border-box;overflow:auto;overscroll-behavior:contain;}
+.chat-date-months h3 {font-size:14px;margin:14px 4px 10px;}
+.chat-date-grid button {height:40px;border:0;border-radius:10px;background:transparent;font-size:14px;font-weight:600;}
+.chat-date-grid button:disabled {color:var(--muted,#aaa);opacity:.45;cursor:default;font-weight:400;}
+.chat-date-grid button:not(:disabled) {background:transparent;box-shadow:none;}
+.chat-date-grid button.chat-date-today {background:#f4f4f4;box-shadow:none;}
+.chat-date-grid button:focus-visible {outline:2px solid currentColor;outline-offset:-2px;}
+.chat-date-status {font-size:12px;line-height:1.6;color:var(--muted,#888);margin:14px 2px 0;}
+[data-theme="dark"] #chat-date-dialog {background:#242424;color:#eee;border-color:#444;}
+[data-theme="dark"] .chat-date-grid button.chat-date-today {background:#383838;box-shadow:none;}
 </style>
 
 </head>
@@ -10196,7 +10222,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792746107665" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792753409983" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -10311,7 +10337,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           <div class="app-name">信箱</div>
         </div>
         <div class="app" data-app="feed" data-desk-widget="app-feed">
-          <div class="app-badge-box"><div class="app-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div><span class="app-badge" id="feed-app-badge" hidden></span></div>
+          <div class="app-badge-box"><div class="app-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.00 3.00L17.66 5.01L15.50 10.06L13.50 8.29Z"/><path d="M18.36 5.64L20.95 11.06L15.85 13.10L15.68 10.44Z"/><path d="M21.00 12.00L18.99 17.66L13.94 15.50L15.71 13.50Z"/><path d="M18.36 18.36L12.94 20.95L10.90 15.85L13.56 15.68Z"/><path d="M12.00 21.00L6.34 18.99L8.50 13.94L10.50 15.71Z"/><path d="M5.64 18.36L3.05 12.94L8.15 10.90L8.32 13.56Z"/><path d="M3.00 12.00L5.01 6.34L10.06 8.50L8.29 10.50Z"/><path d="M5.64 5.64L11.06 3.05L13.10 8.15L10.44 8.32Z"/></svg></div><span class="app-badge" id="feed-app-badge" hidden></span></div>
           <div class="app-name">朋友圈</div>
         </div>
         <div class="app" data-app="calendar" data-desk-widget="app-calendar">
@@ -14941,6 +14967,9 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         </span>
         <span class="ch-av" id="chat-partner-av" title="点击查看 TA 的日常"></span>
         <span class="ch-name" id="chat-partner-name" title="点击让对方继续说">TA</span>
+        <button class="ch-settings ch-call" id="chat-call-btn" type="button" title="拨打语音通话" aria-label="拨打语音通话">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.35 1.9.69 2.79a2 2 0 0 1-.45 2.11L8.09 9.89a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.89.34 1.83.57 2.79.69A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
         <span class="ch-settings" id="chat-settings-btn" title="聊天设置">
           <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
         </span>
@@ -14983,7 +15012,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/><path d="M9 11h6M9 14h4"/></svg>
         </button>
         <button class="ch-input-btn" id="chat-more-btn" data-io="more" title="更多功能">
-          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <button class="ch-input-btn" id="chat-emoji-btn" data-io="emoji" title="表情包">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5l.01.01M15 9.5l.01.01"/></svg>
@@ -16446,6 +16475,16 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
           <div class="txt">聊天气泡字体大小</div>
           <div class="val" id="cs-font-size-val">14px</div>
+        </div>
+        <div class="set-row" id="cs-time-font-size">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="txt">时间标签字号</div>
+          <div class="val" id="cs-time-font-size-val">默认 10px</div>
+        </div>
+        <div class="set-row" id="cs-notice-font-size">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"/><path d="M8 12h8"/></svg></div>
+          <div class="txt">互动提示字号</div>
+          <div class="val" id="cs-notice-font-size-val">默认 12px</div>
         </div>
         <div class="set-row" id="cs-bubble-size">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7 10h.01M10 10h.01M13 10h.01"/></svg></div>
@@ -21816,4 +21855,5 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 <!-- __MOCHI_EOF__ -->
 </body>
 </html>
-<!-- __MOCHI_EOF__ mvkqqtqp -->
+
+<!-- __MOCHI_EOF__ mvkv3c8v -->

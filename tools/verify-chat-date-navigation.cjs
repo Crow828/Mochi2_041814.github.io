@@ -1,0 +1,30 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const {chromium}=require('playwright');const root=path.resolve(__dirname,'..');
+const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!f.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(f,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',f.endsWith('.js')?'application/javascript':f.endsWith('.json')?'application/json':'text/html');res.end(b);});});
+(async()=>{let browser;try{await new Promise(r=>server.listen(0,'127.0.0.1',r));browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','/usr/bin/google-chrome','/usr/bin/chromium'].find(p=>fs.existsSync(p))});
+for(const [width,height] of [[390,844],[360,640],[440,956]]){
+ const p=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,hasTouch:true,serviceWorkers:'block'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.addLocatorHandler(p.locator('#tc-mask:visible'),async()=>{await p.evaluate(()=>document.getElementById('tc-mask-close').click());});await p.addLocatorHandler(p.locator('#qa-mask:visible'),async()=>{await p.evaluate(()=>document.getElementById('qa-mask-close').click());});
+ await p.addInitScript(()=>{localStorage.setItem('xy-home-v2:storage-guide-shown','1250');for(const pre of ['xy-home-v2','xy-home-v2:default']){localStorage.setItem(pre+':reply-as-en','0');for(const k of ['ta-ask','ta-choose','ta-curious','ta-roast','ta-checkin','ta-invite','ta-ask-card'])localStorage.setItem(pre+':'+k,JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));localStorage.setItem(pre+':interact-card-last',String(Date.now()));localStorage.setItem(pre+':ta-choose',JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));const now=new Date();localStorage.setItem(pre+':greeted-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),'1');localStorage.setItem(pre+':__last-backup',String(Date.now()));localStorage.setItem(pre+':__last-backup-remind',String(Date.now()));}});
+ await p.goto('http://127.0.0.1:'+server.address().port+'/');await p.waitForFunction(()=>window.__mochiDataReady);
+ await p.addLocatorHandler(p.locator('#modal-mask:visible').filter({hasNotText:/收藏备注|删除选中的/}),async()=>{console.log('Dismiss unrelated fixture notice:',await p.locator('#modal-mask .modal-title').textContent());await p.evaluate(()=>document.getElementById('modal-cancel').click());});
+
+ await p.evaluate(async()=>{const now=new Date(),old=new Date(now.getFullYear(),now.getMonth()-1,5,9).getTime();const items=Array.from({length:240},(_,i)=>({side:i%2?'out':'in',text:'日期定位记录 '+i,special:i===0?'poke':undefined,ts:old+i*1000}));items.push({side:'in',text:'今天的消息',ts:Date.now()});window.activeStore().set('chat-msgs',JSON.stringify(items));await window.idbSet(window.activePrefix()+':chat-msgs',JSON.stringify(items));window.enterChat();});
+ await p.waitForFunction(()=>window.getChatMsgs().length===241);
+ const before=await p.evaluate(()=>window.activeStore().get('chat-msgs'));
+ await p.locator('#chat-more-btn').click();await p.locator('.more-tab[data-mcat="tool"]').click();await p.locator('#more-date').click();
+ await p.waitForFunction(()=>document.querySelectorAll('#chat-date-dialog .chat-date-grid button:not(:disabled)').length===2);
+ assert.equal(await p.locator('#chat-date-dialog .chat-date-grid').count(),2);const monthPos=await p.locator('.chat-date-months').evaluate(e=>{const h=e.querySelector('h3:last-of-type');return {scroll:e.scrollTop,offset:h.getBoundingClientRect().top-e.getBoundingClientRect().top};});assert(monthPos.scroll>0&&Math.abs(monthPos.offset)<3,JSON.stringify(monthPos));if(process.env.MOCHI_SCREENSHOT_DIR && width===390)await p.locator('#chat-date-dialog').screenshot({path:'outputs/chat-date-current-month-preview.png'});
+ const target=await p.locator('#chat-date-dialog button[data-date]:not(:disabled)').first().getAttribute('data-date');
+ await p.locator('#chat-date-dialog button[data-date="'+target+'"]').click();await p.waitForFunction(()=>document.querySelector('#chat-body [data-idx].highlight')?.textContent.includes('日期定位记录 0'));
+ assert(await p.locator('#chat-date-dialog').isHidden());await p.evaluate(()=>document.querySelector('#chat-body [data-idx].highlight').remove());await p.evaluate(()=>document.getElementById('more-date').click());await p.locator('#chat-date-dialog button[data-date="'+target+'"]').click();await p.waitForFunction(()=>document.querySelector('#chat-body [data-idx].highlight')?.textContent.includes('日期定位记录 0'),{},{timeout:4000});
+ await p.evaluate(()=>document.getElementById('more-date').click());
+ if(process.env.MOCHI_SCREENSHOT_DIR && width===390){await p.locator('#chat-date-dialog').screenshot({path:'outputs/chat-date-preview.png'});}
+ await p.locator('#chat-date-dialog input').fill('2024-02');await p.locator('#chat-date-dialog input').dispatchEvent('change');assert.equal(await p.locator('#chat-date-dialog button[data-date="2024-02-29"]').count(),1);
+ await p.locator('[data-date-today]').click();assert.equal(await p.locator('#chat-date-dialog input').inputValue(),new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'));
+ assert.equal(await p.evaluate(()=>window.activeStore().get('chat-msgs')),before,'Date navigation must not rewrite stored messages');
+ await p.evaluate(()=>document.dispatchEvent(new Event('contact-switched')));assert(await p.locator('#chat-date-dialog').isHidden());assert.deepEqual(errors,[]);
+ console.log('PASS date tool, day counts, old virtual-window jump, leap February, today, read-only storage, contact-close at '+width);
+ await p.close();
+}
+}finally{if(browser)await browser.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

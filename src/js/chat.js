@@ -11059,6 +11059,97 @@ const moreRp = document.getElementById('more-rp');
 if (moreRp) {
 moreRp.addEventListener('click', (e) => { e.stopPropagation(); openRpPanel(); });
 }
+// Read-only date navigation uses the same complete-history source as chat search.
+const chatDates = document.createElement('dialog');
+chatDates.id = 'chat-date-dialog';
+chatDates.innerHTML = '<header><button type="button" data-date-back aria-label="返回聊天">‹</button><strong>按日期查找</strong><span></span></header><div class="chat-date-controls"><input type="month" aria-label="选择年月"><button type="button" data-date-today>今天</button></div><div class="chat-date-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="chat-date-months"></div><p class="chat-date-status" role="status"></p>';
+document.body.appendChild(chatDates);
+const datePicker = chatDates.querySelector('input');
+const dateMonths = chatDates.querySelector('.chat-date-months');
+function showSelectedChatMonth() {
+  const heading = dateMonths.querySelector('h3:last-of-type');
+  if (!heading) return;
+  dateMonths.style.paddingBottom = '0px';
+  const top = heading.getBoundingClientRect().top - dateMonths.getBoundingClientRect().top + dateMonths.scrollTop;
+  const monthHeight = dateMonths.scrollHeight - top;
+  // Leave enough trailing room for even a short month to align at the top.
+  dateMonths.style.paddingBottom = Math.max(0,dateMonths.clientHeight-monthHeight) + 'px';
+  dateMonths.scrollTop = top;
+}
+let dateRetry = null, dateOwner = '';
+const localDateKey = ts => {
+  const d = new Date(Number(ts));
+  if (!Number.isFinite(d.getTime()) || Number(ts) <= 0) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+function closeChatDates() { clearTimeout(dateRetry); dateRetry = null; if (chatDates.open) chatDates.close(); }
+function renderChatDates() {
+  clearTimeout(dateRetry);
+  if (!chatDates.open || dateOwner !== window.activePrefix()) { closeChatDates(); return; }
+  loadMsgs();
+  try { chatColdEnsureHydrated(); } catch (e) {}
+  const records = chatSearchSource(), counts = Object.create(null);
+  records.forEach(m => { const k = m && localDateKey(m.ts); if (k) counts[k] = (counts[k] || 0) + 1; });
+  const loading = !chatAuthSettled() || !chatColdDone || (chatLedger[window.activePrefix()] || 0) > records.length;
+  const dates = Object.keys(counts).sort(), today = localDateKey(Date.now());
+  // Future-dated imports remain reachable as well as today's records.
+  datePicker.min = dates.length ? dates[0].slice(0,7) : today.slice(0,7);
+  datePicker.max = dates.length && dates[dates.length-1] > today ? dates[dates.length-1].slice(0,7) : today.slice(0,7);
+  const [year,month] = datePicker.value.split('-').map(Number);
+  if (!year || !month) return;
+  const scroll = dateMonths.scrollTop; dateMonths.replaceChildren();
+  for (let offset=-1; offset<=0; offset++) {
+    const first = new Date(year,month-1+offset,1), y=first.getFullYear(), m=first.getMonth();
+    const heading=document.createElement('h3'); heading.textContent=y+'年'+(m+1)+'月'; dateMonths.appendChild(heading);
+    const grid=document.createElement('div'); grid.className='chat-date-grid';
+    for(let i=0;i<first.getDay();i++) grid.appendChild(document.createElement('span'));
+    for(let day=1;day<=new Date(y,m+1,0).getDate();day++) {
+      const key=localDateKey(new Date(y,m,day).getTime()), b=document.createElement('button');
+      b.type='button'; b.textContent=day; b.dataset.date=key; b.disabled=loading || !counts[key];
+      b.setAttribute('aria-label',key+(counts[key]?' '+counts[key]+'条消息':' 无聊天记录'));
+      if(key===today) b.className='chat-date-today';
+      b.addEventListener('click',()=>{
+        if(dateOwner!==window.activePrefix()) { closeChatDates(); return; }
+        const all=chatSearchSource(), idx=all.findIndex(rec=>rec && localDateKey(rec.ts)===key);
+        if(idx<0) { renderChatDates(); return; }
+        const anchor=msgKeyOf(all[idx]), owner=dateOwner; closeChatDates();
+        let attempts=0;
+        const navigateDate=()=>{
+          if(owner!==window.activePrefix() || !chatVisible()) return;
+          // A pending window swap owns the DOM; let it finish before resolving the anchor.
+          if(batchRendering && attempts++<75) { setTimeout(navigateDate,80); return; }
+          const fresh=chatSearchSource(), position=fresh.findIndex(rec=>rec && msgKeyOf(rec)===anchor);
+          if(position<0) { toast('这条记录已发生变化，请重新选择日期'); return; }
+          // An index inside the current window may still lack its node after a reload/merge.
+          // jumpToMsg only expands outside that window, so explicitly repair this stale window.
+          if(!body.querySelector('[data-idx="'+position+'"]') && position>=renderStart && position<renderEnd) {
+            renderWindow(true,false,true);
+          }
+          if(!jumpToMsg(position,anchor)) toast('未能定位到当天记录，请通过「搜索记录」查找');
+        };
+        requestAnimationFrame(()=>requestAnimationFrame(navigateDate));
+      }); grid.appendChild(b);
+    }
+    dateMonths.appendChild(grid);
+  }
+  dateMonths.scrollTop=scroll;
+  chatDates.querySelector('.chat-date-status').textContent=loading?'正在读取更早的本地记录…':dates.length?'深色日期有聊天记录，点击可跳到当天第一条':'还没有带日期的聊天记录';
+  if(loading) dateRetry=setTimeout(renderChatDates,800);
+}
+const moreDate = document.createElement('button'); moreDate.type='button'; moreDate.id='more-date'; moreDate.className='more-item'; moreDate.dataset.mcat='tool';
+moreDate.innerHTML='<span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 11h18M8 15h2M14 15h2"/></svg></span><span>按日期查找</span>';
+const datesSearchAnchor = document.getElementById('more-search');
+if(datesSearchAnchor) datesSearchAnchor.after(moreDate);
+moreDate.addEventListener('click',e=>{
+  e.stopPropagation(); if(morePanel) morePanel.hidden=true; closeChatSearch(); closeIme();
+  dateOwner=window.activePrefix(); datePicker.value=localDateKey(Date.now()).slice(0,7);
+  chatDates.showModal(); renderChatDates(); showSelectedChatMonth();
+});
+chatDates.querySelector('[data-date-back]').addEventListener('click',closeChatDates);
+chatDates.addEventListener('close',()=>{clearTimeout(dateRetry);dateRetry=null;});
+datePicker.addEventListener('change',()=>{if(datePicker.value) {renderChatDates();showSelectedChatMonth();}});
+chatDates.querySelector('[data-date-today]').addEventListener('click',()=>{datePicker.value=localDateKey(Date.now()).slice(0,7);renderChatDates();showSelectedChatMonth();});
+document.addEventListener('contact-switched',closeChatDates);
 const chatDivinePanel = document.getElementById('chat-divine-panel');
 const chatDivineBody = document.getElementById('chat-divine-body');
 const chatDivineClose = document.getElementById('chat-divine-close');
@@ -12765,8 +12856,7 @@ if (say) addRec({ side: 'in', text: say, nightAllow: true, rateAllow: true });
 }, randInt(900, 1600));
 };
 if (chatCallClose) chatCallClose.addEventListener('click', (e) => { e.stopPropagation(); closeChatCall(); });
-if (callPanelDial) callPanelDial.addEventListener('click', (e) => {
-e.stopPropagation();
+function dialChatVoice() {
 if (window.placeCall) window.placeCall();
 else {
 const name = chatPartnerName();
@@ -12774,6 +12864,16 @@ addRec({ side: 'out', text: '拨打 ' + name + ' 语音通话', special: 'call' 
 if (window.logUsageDay) window.logUsageDay();
 }
 setTimeout(updateCallPanel, 120);
+}
+if (callPanelDial) callPanelDial.addEventListener('click', (e) => {
+e.stopPropagation();
+dialChatVoice();
+});
+const chatCallShortcut = document.getElementById('chat-call-btn');
+if (chatCallShortcut) chatCallShortcut.addEventListener('click', (e) => {
+e.stopPropagation();
+closeIme();
+dialChatVoice();
 });
 if (callPanelHang) callPanelHang.addEventListener('click', (e) => {
 e.stopPropagation();
@@ -13357,10 +13457,10 @@ for (let i = 0; i < msgs.length; i++) { if (msgs[i] && msgKeyOf(msgs[i]) === key
 if (found >= 0) idx = found;
 }
 }
-let target = body.querySelector('.msg[data-idx="' + idx + '"]');
+let target = body.querySelector('[data-idx="' + idx + '"]');
 if (key && target && target.dataset.mk && target.dataset.mk !== msgKeyOf(msgs[idx])) {
 try { renderWindow(true, false); } catch (e) {}
-target = body.querySelector('.msg[data-idx="' + idx + '"]');
+target = body.querySelector('[data-idx="' + idx + '"]');
 }
 if (!target) {
 if (idx < renderStart) {
@@ -13375,7 +13475,7 @@ while (renderEnd <= idx && renderEnd < limit) {
 loadNewerIncremental(Math.min(idx + JUMP_VIEW + 1, limit));
 }
 }
-target = body.querySelector('.msg[data-idx="' + idx + '"]');
+target = body.querySelector('[data-idx="' + idx + '"]');
 }
 if (!target) return false;
 unpinChatAndAnchor(); // FIX 2026-09-11 #334：跳转=用户定位历史浏览，与手动上翻同权解除贴底钉住——钉住态下旧区 lazy 图 onload 触发 #162 图片补滚把视图拽回底部，搜索/引用跳转表现「点了没反应」

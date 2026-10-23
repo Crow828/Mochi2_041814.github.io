@@ -1,4 +1,6 @@
 /* Four compact, native disclosure groups; scoped to chat settings only. */
+#chat-body .msg-time,#chat-body .msg-time-divider span {font-size:var(--chat-time-font-size,10px);}
+#chat-body .msg-poke {font-size:var(--chat-notice-font-size,12px);}
 #page-chat-settings.cs-grouped-layout { overflow:hidden; }
 #page-chat-settings [data-cs-legacy] { display:none !important; }
 #page-chat-settings.cs-grouped-layout > .chat-head { flex:none; }

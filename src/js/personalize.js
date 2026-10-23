@@ -473,6 +473,15 @@ try {
     // 修复：今天的心情/字体大小等「pills + 输入框 + pill 预设」弹窗里，用户输入文字点确定时，
     // fire() 的 pills 分支误把预设的旧 pillVal 传回回调，输入的文本被丢弃（卡片不更新）。
     let pillClicked = false;
+    function setModalPlaceholder(value) {
+      const text = value == null ? '' : String(value);
+      // The CE adapter overrides .placeholder without updating the native attribute.
+      // Keep both surfaces in sync so native and replacement inputs cannot diverge.
+      input.setAttribute('placeholder', text);
+      try { input.placeholder = text; } catch (e) {}
+      const box = ceBoxOf(input);
+      if (box) { if (text) box.setAttribute('data-ph', text); else box.removeAttribute('data-ph'); }
+    }
     window.openModal = function (t, v, fn, opts) {
       opts = opts || {};
       _modalOpts = opts;
@@ -526,7 +535,8 @@ try {
       // v3.13.x：opts.placeholder——单行输入占位符（此前调用方传了也被静默忽略，
       // 如 pomo 设时长/单选题选项；ce-box 转换后 placeholder 走代理 setter 同步
       // 到 box 的 data-ph，原生输入框与安卓转换框两端一致生效）
-      if ('placeholder' in opts) { try { input.placeholder = opts.placeholder || ''; } catch (e) {} }
+      // Shared modal input: a new prompt must never inherit the previous prompt's hint.
+      setModalPlaceholder('placeholder' in opts ? (opts.placeholder || '') : '输入内容');
       // v3.13.x：opts.inputmode——金额等数字弹窗弹数字键盘；ghost 与已生成的
       // ce-box 都要写（转换器只在转换瞬间复制一次该属性）
       // v3.26.x：必须无条件归一化——#modal-input 是全站共用的同一个元素，某次金额弹窗
@@ -721,7 +731,7 @@ try {
           try { input.value = s || ''; } catch (e) {}
         },
         maxLen: function (n) { try { if (n) input.maxLength = n; else input.removeAttribute('maxlength'); } catch (e) {} },
-        ph: function (s) { try { input.placeholder = s || ''; } catch (e) {} },
+        ph: function (s) { setModalPlaceholder(s); },
         okText: function (s) { if (okBtn) okBtn.textContent = s || '确定'; },
         focus: function () {
           setTimeout(function () {

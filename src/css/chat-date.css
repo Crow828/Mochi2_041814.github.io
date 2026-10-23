@@ -1,0 +1,22 @@
+#chat-date-dialog {width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 48px);box-sizing:border-box;margin:auto;padding:16px;border:1px solid var(--line,#ddd);border-radius:22px;background:var(--card-bg,#fff);color:var(--ink,#111);overflow:auto;}
+#chat-date-dialog::backdrop {background:rgba(0,0,0,.3);}
+#chat-date-dialog header {display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;}
+#chat-date-dialog header strong {font-size:17px;}
+#chat-date-dialog header button,#chat-date-dialog header > span {width:36px;height:36px;flex:none;}
+#chat-date-dialog button {font-family:inherit;color:inherit;cursor:pointer;}
+#chat-date-dialog header button {border:1px solid var(--line,#ddd);border-radius:50%;background:transparent;font-size:28px;line-height:1;}
+.chat-date-controls {display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.chat-date-controls input {flex:1;min-width:0;box-sizing:border-box;padding:10px;border:1px solid var(--line,#ddd);border-radius:12px;background:transparent;color:inherit;font:inherit;font-size:16px;}
+.chat-date-controls button {padding:10px 14px;border:1px solid var(--line,#ddd);border-radius:12px;background:transparent;font-size:13px;}
+.chat-date-week,.chat-date-grid {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;}
+.chat-date-week {font-size:12px;color:var(--muted,#888);margin-bottom:6px;}
+.chat-date-months {max-height:52dvh;box-sizing:border-box;overflow:auto;overscroll-behavior:contain;}
+.chat-date-months h3 {font-size:14px;margin:14px 4px 10px;}
+.chat-date-grid button {height:40px;border:0;border-radius:10px;background:transparent;font-size:14px;font-weight:600;}
+.chat-date-grid button:disabled {color:var(--muted,#aaa);opacity:.45;cursor:default;font-weight:400;}
+.chat-date-grid button:not(:disabled) {background:transparent;box-shadow:none;}
+.chat-date-grid button.chat-date-today {background:#f4f4f4;box-shadow:none;}
+.chat-date-grid button:focus-visible {outline:2px solid currentColor;outline-offset:-2px;}
+.chat-date-status {font-size:12px;line-height:1.6;color:var(--muted,#888);margin:14px 2px 0;}
+[data-theme="dark"] #chat-date-dialog {background:#242424;color:#eee;border-color:#444;}
+[data-theme="dark"] .chat-date-grid button.chat-date-today {background:#383838;box-shadow:none;}

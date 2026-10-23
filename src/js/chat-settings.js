@@ -497,6 +497,11 @@
     };
     Object.keys(labels).forEach(id => { const el = document.getElementById(id); if (el && el.textContent !== labels[id]) el.textContent = labels[id]; });
   }
+  function auxiliaryFontSize(key, fallback) {
+    const raw = store.get(key);
+    const value = parseFloat(raw);
+    return raw == null || raw === '' || !Number.isFinite(value) ? fallback : Math.max(8,Math.min(24,Math.round(value)));
+  }
   function applySettings() {
     // 设置页值写入（定义在最前，避免暂时性死区）
     // #938：同值也走一遍「先比对」——textContent 赋值会换掉文本节点，抽屉里点一下要为十来个回显标签
@@ -514,6 +519,12 @@
     setVar(root, '--msg-out-bg', outBg);
     setVar(root, '--msg-out-ink', outInk);
     setVar(root, '--chat-font-size', fs);
+    const timeFont = auxiliaryFontSize('cs-time-font-size',10);
+    const noticeFont = auxiliaryFontSize('cs-notice-font-size',12);
+    setVar(root,'--chat-time-font-size',timeFont+'px');
+    setVar(root,'--chat-notice-font-size',noticeFont+'px');
+    set('cs-time-font-size-val',(store.get('cs-time-font-size') ? '' : '默认 ')+timeFont+'px');
+    set('cs-notice-font-size-val',(store.get('cs-notice-font-size') ? '' : '默认 ')+noticeFont+'px');
     setVar(root, '--chat-bubble-pad', pad);
     // 聊天气泡边缘（四角圆角大小）
     const rad = store.get('cs-bubble-radius') || BUBBLE_RADIUS_DEFAULT;
@@ -1556,6 +1567,20 @@
       });
     });
   }
+  [
+    ['cs-time-font-size','时间标签字号',10,'调整居中时间标签及头像旁时间文字'],
+    ['cs-notice-font-size','互动提示字号',12,'调整拍一拍、提问及来电等居中提示文字']
+  ].forEach(([key,title,fallback,label])=>{
+    const target=row(key);
+    if(target) target.addEventListener('click',()=>{
+      if(!window.openModal) return;
+      window.openModal(title,'',value=>{
+        if(value==='default') store.remove(key);
+        else { const n=Number(value); if(!Number.isFinite(n)) return; store.set(key,String(Math.max(8,Math.min(24,Math.round(n))))); }
+        applySettings();
+      },{noInput:true,slider:{min:8,max:24,step:1,value:auxiliaryFontSize(key,fallback),label:label,unit:'px'},pills:[{label:'恢复默认（'+fallback+'px）',value:'default'}]});
+    });
+  });
   const csPad = row('cs-bubble-size');
   if (csPad) {
     csPad.addEventListener('click', () => {
@@ -2026,7 +2051,7 @@
   const gStoreChat = window.xyStore('xy-home-v2');
   const CHAT_SCHEMES_KEY = 'chat-beauty-schemes';
   const CHAT_BEAUTY_KEYS = [
-    'cs-bg', 'cs-bubble-css', 'cs-font', 'cs-font-size', 'cs-bubble-size',
+    'cs-bg', 'cs-bubble-css', 'cs-font', 'cs-font-size', 'cs-time-font-size', 'cs-notice-font-size', 'cs-bubble-size',
     'cs-bubble-radius', 'cs-av-shape', 'cs-time-style', 'cs-time-ink', 'cs-typing-ink',
     'cs-out-bg', 'cs-out-ink', 'cs-in-bg', 'cs-in-ink',
     'cs-send-bg', 'cs-send-ink', 'cs-send-show',
