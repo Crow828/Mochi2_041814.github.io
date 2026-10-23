@@ -63,6 +63,19 @@ for(const width of [360,390,440]){
  assert.equal(await p.locator('#fav-list .msg-img-big').count(),1,'Explicit photos retain photo rendering');
  const fonts=await p.evaluate(()=>({system:getComputedStyle(document.querySelector('#page-setting [data-sec="system"] .gs-row')).fontSize,chat:getComputedStyle(document.querySelector('#page-chat-settings .cs-options .set-row .txt')).fontSize}));
  assert.equal(fonts.system,'14px');assert.equal(fonts.chat,'14px');
+ for(const adjustment of [-2,2,4]){
+   const sizes=await p.evaluate(adj=>{
+     document.documentElement.style.setProperty('--mochi-text-adj',adj+'px');
+     const size=s=>getComputedStyle(document.querySelector(s)).fontSize;
+     return {reference:size('#page-setting [data-sec="chat"] .set-row .txt'),
+       system:[...document.querySelectorAll('#page-setting [data-sec="system"] .gs-row > span:first-child,#page-setting [data-sec="system"] .set-row .txt')].map(e=>getComputedStyle(e).fontSize),
+       chat:size('#page-chat-settings .cs-options .set-row .txt')};
+   },adjustment);
+   assert.equal(sizes.reference,(14+adjustment)+'px');
+   for(const size of sizes.system)assert.equal(size,sizes.reference,'All system row labels follow text adjustment');
+   assert.equal(sizes.chat,sizes.reference);
+ }
+ await p.evaluate(()=>document.documentElement.style.removeProperty('--mochi-text-adj'));
  assert.deepEqual(errors,[]);console.log('PASS favorite identity, high-resolution sticker sizing, photo distinction and settings fonts at '+width);await p.close();
 }
 }finally{if(browser)await browser.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

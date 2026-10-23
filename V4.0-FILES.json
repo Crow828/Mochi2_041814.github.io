@@ -124,8 +124,8 @@
     },
     {
       "path": "docs/V4.0-DISPLAY-FIX.md",
-      "bytes": 904,
-      "sha256": "daa5480ad23cf76c7635a1c724246882da244308df1430170105b13f87764177"
+      "bytes": 1155,
+      "sha256": "39addf66bf68f995c1aa47b89c73c8f79da2717e4f6ee56e49c61047e8fba817"
     },
     {
       "path": "docs/V4.0-REVIEW.md",
@@ -174,8 +174,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 1631277,
-      "sha256": "58423edf794c1028ef4278f0cc5e8dbbd339fb837d728a3439c27934107543ee"
+      "bytes": 1631452,
+      "sha256": "a1860b56775dc989332d24ed2bb4269b2daed3b29c67fa8b730f5126ffe36acc"
     },
     {
       "path": "js/accounting.js",
@@ -664,8 +664,8 @@
     },
     {
       "path": "src/css/chat-settings-layout.css",
-      "bytes": 3785,
-      "sha256": "4c4ca70dc021e969970b8beff1eaca4df17de1955bd151268949618b04645fa7"
+      "bytes": 3925,
+      "sha256": "a4f68b51292ea3bb400f0356e6ba6baf37614269253ecea790e893a62d7cbe06"
     },
     {
       "path": "src/css/dark.css",
@@ -719,8 +719,8 @@
     },
     {
       "path": "src/css/settings-layout.css",
-      "bytes": 1375,
-      "sha256": "50365e8ddee488c1826cbff3b76d700c7dda3738f9f192f07f89cfb8cf0390cc"
+      "bytes": 1410,
+      "sha256": "8dac10f6512d51f4a74dfc316ee47b8e708b477dd9b6f618092e4c40a2efb147"
     },
     {
       "path": "src/css/settings-refinement.css",
@@ -1235,7 +1235,7 @@
     {
       "path": "sw.js",
       "bytes": 34653,
-      "sha256": "d15b35fed69d6e59149d39c1e03bef5cdd55873adb5095c657e3a2aefd3f080e"
+      "sha256": "fed34f19c451818e8c450fe7d4abd7dc55c1b1b9544555c1e3cc30d888d1764f"
     },
     {
       "path": "tools/apply-desk-icon-place-r1.mjs",
@@ -4054,8 +4054,8 @@
     },
     {
       "path": "tools/verify-favorite-identity.cjs",
-      "bytes": 11735,
-      "sha256": "a3b9c77aa7e4f38f8accfe5007b3a88c4834225a8f070157e99e18a447efbbb9"
+      "bytes": 12630,
+      "sha256": "f16e2eeaf322ab019c546fe833fcdbb0ad6e56a142f2ac664c1b1761441e107c"
     },
     {
       "path": "tools/verify-feature-data-page.mjs",
@@ -5910,7 +5910,7 @@
     {
       "path": "version.json",
       "bytes": 83,
-      "sha256": "4635ede3b94325fc72c953ae71a5e81b893f4949876a5b6271a066528aede9f7"
+      "sha256": "d88342990efb80974d904827cb05602727f45979cbb7f6cf0c3427a119f82f75"
     },
     {
       "path": "上传说明.md",

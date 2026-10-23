@@ -5,7 +5,7 @@
 [data-theme="dark"] .page .tag.settings-info { border-color:var(--dark-border,#444); color:var(--muted,#aaa); }
 #page-setting .set-row .txt { min-width:0; }
 
-#page-setting .gs-row { font-size:14px; line-height:1.45; }
+#page-setting .gs-row { font-size:calc(14px + var(--mochi-text-adj, 0px)); line-height:1.45; }
 #page-setting .gs-row > :first-child:not(.toggle):not(.settings-info) { flex:1; min-width:0; }
 #page-setting .gs-row > .toggle, #page-setting .set-row > .toggle { flex:none; margin-left:auto; }
 #page-setting .gs-row > .settings-info, #page-setting .set-row > .settings-info { flex:none; margin-left:8px; }
