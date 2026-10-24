@@ -2182,18 +2182,20 @@ if (!hasLocal) {
   });
   localNew.forEach(m => { try { delete m._lsLite; } catch (e) {} });
   merged = idbArr.concat(localNew).sort((a, b) => ((a && a.ts || 0) - (b && b.ts || 0)));
-  if (merged.length === curArr.length) {
-    curArr.forEach((m, i) => {
-      if (!m || i >= merged.length) return;
-      if (sessionChangedIdx.has(i)) merged[i] = m;
-    });
-  }
+  // Merge state only into the same message. Array offsets change when the DB
+  // contains older messages missing from the local snapshot.
+  const mergedByIdentity = new Map();
+  merged.forEach((m, i) => { if (m) { const k=msgKeyOf(m); const list=mergedByIdentity.get(k)||[]; list.push(i); mergedByIdentity.set(k,list); } });
   curArr.forEach((m, i) => {
-    if (!m || i >= merged.length) return;
-    if (!answeredRec(m) || answeredRec(merged[i])) return;
-    merged[i] = m;
+    if (!m) return;
+    const hits=mergedByIdentity.get(msgKeyOf(m));
+    if (!hits || hits.length!==1) return;
+    const j=hits[0];
+    if (sessionChangedIdx.has(i) || (answeredRec(m) && !answeredRec(merged[j]))) {
+      if (merged[j]!==m) { merged[j]=m; changed=true; }
+    }
   });
-  changed = localNew.length > 0 || merged.length !== msgs.length;
+  changed = changed || localNew.length > 0 || merged.length !== msgs.length;
   if (!changed && merged.length === msgs.length && msgs.length) {
     changed = msgs.some(m => m && (m.img === '' || m.voice === ''));
   }
@@ -4238,9 +4240,10 @@ const card = e.target.closest('.msg-ask-card, .msg-choose-card');
 if (!card) return;
 const item = card.closest('.msg-ask');
 if (!item || item.dataset.idx === undefined) return;
-const idx = Number(item.dataset.idx);
-const rec = msgs[idx];
-if (!rec) return;
+const hit = msgRecFromEl(item);
+if (!hit) return;
+const idx = hit.idx;
+const rec = hit.rec;
 if (card.classList.contains('answered') && rec.special === 'ask' && (rec.askType === 'single' || rec.askType === 'multi') && Array.isArray(rec.askOptions) && rec.askOptions.length) {
 e.stopPropagation();
 const hadFav = card.classList.contains('show-fav');
