@@ -287,7 +287,26 @@
   }
   // 显示更新条（版本轮询 + SW 检测共用）：跨通道一次性去重 + 已确认过本版本不再提醒
   // FIX 2026-09-07 #225v2：追加 verSeen 一版一弹（同版本不重复弹；新版本立即弹，无任何时间窗）
+  let updateDialogVersion = 0;
+  function offerVersionUpdate(onlineTs) {
+    const ts=Number(onlineTs), current=Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;
+    if (!ts || (current && ts<=current)) return false;
+    if (updateDialogVersion>=ts) return true;
+    updateDialogVersion=ts;
+    let dialog=document.getElementById('startup-update-dialog');
+    if(!dialog){
+      dialog=document.createElement('dialog');dialog.id='startup-update-dialog';dialog.setAttribute('aria-labelledby','startup-update-title');
+      dialog.innerHTML='<h2 id="startup-update-title">发现新版本</h2><p>有新的更新可用，刷新后即可使用。</p><div><button type="button" data-update-later>稍等</button><button type="button" data-update-refresh>刷新更新</button></div>';
+      const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}';
+      document.head.appendChild(style);document.body.appendChild(dialog);
+    }
+    dialog.querySelector('[data-update-later]').onclick=()=>{dialog.close();};
+    dialog.querySelector('[data-update-refresh]').onclick=()=>{dialog.close();refreshNow(false,0,ts);};
+    if(!dialog.open)dialog.showModal();
+    return true;
+  }
   function showVerBar(onlineTs) {
+    if (Number(onlineTs)>0 && offerVersionUpdate(onlineTs)) return;
     if (_verBarShown || !verShouldNotify(onlineTs) || verSeen(onlineTs)) return;
     _verBarShown = true;
     verMarkNotify(onlineTs);
@@ -308,8 +327,8 @@
   // 服务器时间戳更新即认为有新版本，显示常驻提示条，点击「刷新使用新版」立即刷新。
   // 当前页面读到的时间戳作为基线（首次 fetch 即最新 → 不误报）。
   (function () {
-    const bar = document.getElementById('ver-update-bar');
-    if (!bar) return;
+    // Version detection remains active even without the retired banner.
+    const bar = document.getElementById('ver-update-bar') || document.createElement('div');
     // #386：file:// 直开本地文件时浏览器禁止 fetch 同目录 json（origin 'null'），
     // 版本轮询只会每 5s 刷一条 CORS 报错并误弹「网络异常」，直接跳过（线上 http/https 才启用）。
     if (location.protocol === 'file:') return;
@@ -654,6 +673,7 @@
   // 避免打断用户会话中途的操作（发消息/编辑中）。
   const AUTO_UPGRADE_KEY = 'xy-home-v2:auto-upgrade-session';
   function tryAutoUpgrade(autoTs) {
+    if (Number(autoTs)>0) return offerVersionUpdate(autoTs);
     const _ts = Number(autoTs) || 0;
     try {
       // #965：会话守卫从「每会话一次」改为「每个版本 ts 一次」——长开的会话撞上第二次
@@ -1027,7 +1047,7 @@
       document.body.appendChild(bar);
       barTxt = bar.querySelector('.vub-txt');
     }
-    barTxt.textContent = miss.length + ' 个功能包没加载成功（网络波动），功能可能不全——';
+    barTxt.textContent = miss.length + ' 个功能包未加载（文件缺失或网络异常），功能可能不全——';
     bar.hidden = false;
   }
   function pass() {

@@ -10233,7 +10233,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792866476517" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792868311425" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -21186,7 +21186,26 @@ return fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
 .then(function (r) { if (timer) clearTimeout(timer); if (!r.ok) throw new Error('bad'); return r.json(); })
 .catch(function (err) { if (timer) clearTimeout(timer); throw err; });
 }
+let updateDialogVersion = 0;
+function offerVersionUpdate(onlineTs) {
+const ts=Number(onlineTs), current=Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;
+if (!ts || (current && ts<=current)) return false;
+if (updateDialogVersion>=ts) return true;
+updateDialogVersion=ts;
+let dialog=document.getElementById('startup-update-dialog');
+if(!dialog){
+dialog=document.createElement('dialog');dialog.id='startup-update-dialog';dialog.setAttribute('aria-labelledby','startup-update-title');
+dialog.innerHTML='<h2 id="startup-update-title">发现新版本</h2><p>有新的更新可用，刷新后即可使用。</p><div><button type="button" data-update-later>稍等</button><button type="button" data-update-refresh>刷新更新</button></div>';
+const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}';
+document.head.appendChild(style);document.body.appendChild(dialog);
+}
+dialog.querySelector('[data-update-later]').onclick=()=>{dialog.close();};
+dialog.querySelector('[data-update-refresh]').onclick=()=>{dialog.close();refreshNow(false,0,ts);};
+if(!dialog.open)dialog.showModal();
+return true;
+}
 function showVerBar(onlineTs) {
+if (Number(onlineTs)>0 && offerVersionUpdate(onlineTs)) return;
 if (_verBarShown || !verShouldNotify(onlineTs) || verSeen(onlineTs)) return;
 _verBarShown = true;
 verMarkNotify(onlineTs);
@@ -21199,8 +21218,7 @@ const closeBtn = document.getElementById('ver-update-close');
 if (closeBtn) closeBtn.onclick = function () { verMarkAck(onlineTs); barEl.hidden = true; };
 }
 (function () {
-const bar = document.getElementById('ver-update-bar');
-if (!bar) return;
+const bar = document.getElementById('ver-update-bar') || document.createElement('div');
 if (location.protocol === 'file:') return;
 function askSwUpdate() {
 try {
@@ -21433,6 +21451,7 @@ if (!ts || isNaN(ts) || ts > localTs) showVerBar(ts);
 }
 const AUTO_UPGRADE_KEY = 'xy-home-v2:auto-upgrade-session';
 function tryAutoUpgrade(autoTs) {
+if (Number(autoTs)>0) return offerVersionUpdate(autoTs);
 const _ts = Number(autoTs) || 0;
 try {
 const last = Number(sessionStorage.getItem(AUTO_UPGRADE_KEY)) || 0;
@@ -21722,7 +21741,7 @@ bar.hidden = true;
 document.body.appendChild(bar);
 barTxt = bar.querySelector('.vub-txt');
 }
-barTxt.textContent = miss.length + ' 个功能包没加载成功（网络波动），功能可能不全——';
+barTxt.textContent = miss.length + ' 个功能包未加载（文件缺失或网络异常），功能可能不全——';
 bar.hidden = false;
 }
 function pass() {
@@ -21868,4 +21887,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 </body>
 </html>
 
-<!-- __MOCHI_EOF__ mvmqeqxx -->
+<!-- __MOCHI_EOF__ mvmri2rl -->
