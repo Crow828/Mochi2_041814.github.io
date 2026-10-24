@@ -17651,7 +17651,7 @@ const FIX_SENTINELS = [
   {
     "name": "#1301b 桌面落位只在真不在位时写 scrollLeft（改回无条件 pages.scrollLeft = idx * pageStep()＝每次切回桌面一次同步布局＋打断吸附动画）",
     "file": "js/desktop-slider.js",
-    "needle": "if (Math.abs(pages.scrollLeft - want) > 1) pages.scrollLeft = want;"
+    "needle": "if (Math.abs(left - want) > 1) pages.scrollLeft = want;"
   },
   {
     "name": "#1301c 删除型：refreshCache 不得再顺手作废 gapCache（回流＝每次回桌面/点圆点都重读一次 getComputedStyle，强制样式重算回到切页那一帧）",
@@ -20655,7 +20655,7 @@ const FIX_SENTINELS = [
   {
     "name": "#1466m 回桌面先 sync 再落位（删＝idx 陈旧时 snapToIdx 照陈旧值把 scrollLeft 写回别的页＝「自己弹回去」）",
     "file": "js/desktop-slider.js",
-    "needle": "sync(); // #1466：先按真实落点校正 idx 再落位"
+    "needle": "sync(width, left); // #1466：先按真实落点校正 idx 再落位"
   },
   {
     "name": "#1466n 滑动期提层 CSS（删＝.swipe-warm 挂了也没有层，半屏白块复发）",

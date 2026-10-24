@@ -9,11 +9,11 @@
     },
     {
       "path": "build.mjs",
-      "sha256": "1eb3d78e682514a92c2de7decf86dfe168302d894d84244f7de53f8b1221da21"
+      "sha256": "714638c25a6cd5689275f38d563fdeb2ca672d9b988fe1bb6448424da17a5b80"
     },
     {
       "path": "index.html",
-      "sha256": "7a3555d978d6fc23585460f2055394cb86846562659ec67a00757512dbc88640"
+      "sha256": "914fd33137e328c7871bd2745879ba1853aada694a73d622138cd807a71e4efe"
     },
     {
       "path": "js/accounting.js",
@@ -121,7 +121,7 @@
     },
     {
       "path": "js/desktop-slider.js",
-      "sha256": "bd69fdd9586a40e9df8d05baf83e2cede90e33cb6045ff6efeae6d9312f727f8"
+      "sha256": "8e63481532671eb663e82a6500e9ae149fcf00a9b7b4fa6371ebcc9ff36ecdea"
     },
     {
       "path": "js/dict-ext-data.js",
@@ -241,7 +241,7 @@
     },
     {
       "path": "js/mobile-adapt.js",
-      "sha256": "fac5c08d3a2b92021cd50c5985862c7f3459b9586e5e8cc9b981709ff8c06c80"
+      "sha256": "61ed6657ab6e2c9d10a17840c22b3dfb932c0aa9a7a822a7a1246c003543c1a8"
     },
     {
       "path": "js/mood-diary.js",
@@ -361,7 +361,7 @@
     },
     {
       "path": "js/update-notes.js",
-      "sha256": "b8b4ddd749eaf9fc45c2174f97b6b9e4acf65da97a7804bd38f4248c5114f121"
+      "sha256": "877ee606ef050dd8adfb74e01c00123f575affa0da5fffa9f7fd9523639e75eb"
     },
     {
       "path": "js/usage-days.js",
@@ -573,7 +573,7 @@
     },
     {
       "path": "src/js/desktop-slider.js",
-      "sha256": "7d377b4f2a2f09691c1463a87eebcc878c9b288c06e59b3e46ad03db87b76226"
+      "sha256": "3a09ff66748842365489f8a42de2afec28ee2808ba23810ea673e7f4a05bd5e8"
     },
     {
       "path": "src/js/device.js",
@@ -705,7 +705,7 @@
     },
     {
       "path": "src/js/mobile-adapt.js",
-      "sha256": "5997ae5bb320663e106a872912db86667d0c3474e7468c58bc338c9a696c9033"
+      "sha256": "9cf503536dfc020fada99aad2e7200c0dcde03a3e84bb2947e442870be7ca9b2"
     },
     {
       "path": "src/js/mood-diary.js",
@@ -829,7 +829,7 @@
     },
     {
       "path": "src/js/update-notes.js",
-      "sha256": "c725c06d47475b3c5144794684f69e37a2382a28bd226890798b092e9661717d"
+      "sha256": "57cd37d73245c4d6663497fd0a342b7296f20867c4fdda0945fe1fb1c66ba5c6"
     },
     {
       "path": "src/js/usage-days.js",
@@ -841,7 +841,7 @@
     },
     {
       "path": "sw.js",
-      "sha256": "a9762873ba5301367db11b00d8a2560d0d8aeb53e3b9e3a3538b70bf623a8a9f"
+      "sha256": "5db24c28339beb96b001fabb0f6f135bb826d4c4a741475e0074578a79a42721"
     },
     {
       "path": "tools/verify-answered-card-feed-link.cjs",
@@ -869,11 +869,12 @@
     },
     {
       "path": "tools/verify-update-notes.cjs",
-      "sha256": "5abdcc547fc2039e9259fd50cf975c29f8c7e2bf11c8a4b1c3e3b3179153dd3b"
+      "sha256": "e9b9164a16b01b7446f0e1c6079ea87eaa10c8f9fd062afb91579150be690aad"
     },
     {
       "path": "version.json",
-      "sha256": "f664aa9f7214dfa7f0cfaab3cba400902cc09fdd6eb5daaeaf2fa927c2e1db9b"
+      "sha256": "07de15b88aee95d35baddd07e3cac76d5a0d9625db8ed2315fec1321b9f020d1"
     }
-  ]
+  ],
+  "note": "Includes 2026-10-25 dated update notes, complete functional scripts and all prior fixes"
 }

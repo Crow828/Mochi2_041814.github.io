@@ -35,13 +35,14 @@ let gapCache = null;
 function refreshCache() {
 dotsCache = getDots();
 }
-function pageStep() {
+function pageStep(knownWidth) {
 if (gapCache === null) gapCache = parseFloat(getComputedStyle(pages).columnGap) || 0;
-return pages.clientWidth + gapCache;
+return (knownWidth === undefined ? pages.clientWidth : knownWidth) + gapCache;
 }
-function snapToIdx() {
-const want = idx * pageStep();
-if (Math.abs(pages.scrollLeft - want) > 1) pages.scrollLeft = want;
+function snapToIdx(knownWidth, knownLeft) {
+const want = idx * pageStep(knownWidth);
+const left = knownLeft === undefined ? pages.scrollLeft : knownLeft;
+if (Math.abs(left - want) > 1) pages.scrollLeft = want;
 }
 function paint(cur) {
 if (cur === idx) return;
@@ -49,12 +50,13 @@ idx = cur;
 deskIdxSave(); // #1466：页码落定即持久化（回收重载后回到这一页）
 for (let k = 0; k < dotsCache.length; k++) dotsCache[k].classList.toggle('active', k === idx);
 }
-function sync() {
-if (!pages.clientWidth) return;
-const step = pageStep();
+function sync(knownWidth, knownLeft) {
+const width = knownWidth === undefined ? pages.clientWidth : knownWidth;
+if (!width) return;
+const step = pageStep(width);
 if (!(step > 0)) return;
 const max = Math.max(dotsCache.length - 1, 0);
-paint(Math.max(0, Math.min(max, Math.round(pages.scrollLeft / step))));
+paint(Math.max(0, Math.min(max, Math.round((knownLeft === undefined ? pages.scrollLeft : knownLeft) / step))));
 }
 function go(i) {
 refreshCache(); // 圆点可能刚被重建过（点击落在 deskRebuild 之后的首帧）
@@ -288,11 +290,12 @@ if (phonePage) {
 const mo = new MutationObserver(() => {
 if (phonePage.hidden) { deskColdArm(true); return; }
 deskColdArm(false);
-if (pages.clientWidth) {
+const width = pages.clientWidth;
+const left = pages.scrollLeft;
+if (width) {
 refreshCache();
-sync(); // #1466：先按真实落点校正 idx 再落位——回桌面那一刻若 idx 因滚动事件被节流而陈旧，旧序会照陈旧值把 scrollLeft 写回别的页＝「自己弹回去」；sync 只切圆点不写滚动位，先它一步零成本
-snapToIdx(); // #1301：已经在位就不写（旧写法每次切回桌面必写一次＝把同步布局压进这一帧）
-sync();
+sync(width, left); // #1466：先按真实落点校正 idx 再落位——回桌面那一刻若 idx 因滚动事件被节流而陈旧，旧序会照陈旧值把 scrollLeft 写回别的页＝「自己弹回去」；sync 只切圆点不写滚动位，先它一步零成本
+snapToIdx(width, left); // Same position is a no-op; sync already painted the resolved index.
 pageScrollGuard.later(60); // #989：回桌面复核一次（残留滚动量在进桌面当帧就修掉）
 swSample(); // #884：从聊天/其他页切回桌面那一刻现场采一段帧耗时
 }

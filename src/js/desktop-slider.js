@@ -83,9 +83,9 @@
   // v3.6.x：页间有 gap 缝隙，每页滚动步长 = clientWidth + gap
   // gap 是 CSS 固定值（.desktop-pages 的 flex gap），不随布局变化，但元素
   // display:none 时 getComputedStyle 仍返回 CSS 值，可安全读取
-  function pageStep() {
+  function pageStep(knownWidth) {
     if (gapCache === null) gapCache = parseFloat(getComputedStyle(pages).columnGap) || 0;
-    return pages.clientWidth + gapCache;
+    return (knownWidth === undefined ? pages.clientWidth : knownWidth) + gapCache;
   }
 
   // #1301：把「按当前 idx 落位」收成一个函数，且**只在确实不在位时**写 scrollLeft。
@@ -95,9 +95,10 @@
   // 去聊天看了一眼回来）。真正需要重设的是「旋转后页宽变了」「重建过桌面」——那些改动之后
   // 读数与目标值差得远，条件写入照常生效；已经在位时（>1px 容差吸收 snap 的亚像素终点）
   // 一次都不写。393×852 DPR3＋6× 节流实测：本观察器闭包在 20 次切页里自耗 934ms。
-  function snapToIdx() {
-    const want = idx * pageStep();
-    if (Math.abs(pages.scrollLeft - want) > 1) pages.scrollLeft = want;
+  function snapToIdx(knownWidth, knownLeft) {
+    const want = idx * pageStep(knownWidth);
+    const left = knownLeft === undefined ? pages.scrollLeft : knownLeft;
+    if (Math.abs(left - want) > 1) pages.scrollLeft = want;
   }
 
   // 只切 class，不读任何样式（每帧只走到这里，见 syncFrame）
@@ -109,13 +110,14 @@
   }
 
   // 按当前 scrollLeft 校正圆点（松手吸附后、旋转、外部重建时调用）
-  function sync() {
+  function sync(knownWidth, knownLeft) {
     // v3.5.132：隐藏时跳过（防抖窗口内切页 → clientWidth=0 → idx 写坏、圆点全灭）
-    if (!pages.clientWidth) return;
-    const step = pageStep();
+    const width = knownWidth === undefined ? pages.clientWidth : knownWidth;
+    if (!width) return;
+    const step = pageStep(width);
     if (!(step > 0)) return;
     const max = Math.max(dotsCache.length - 1, 0);
-    paint(Math.max(0, Math.min(max, Math.round(pages.scrollLeft / step))));
+    paint(Math.max(0, Math.min(max, Math.round((knownLeft === undefined ? pages.scrollLeft : knownLeft) / step))));
   }
 
   function go(i) {
@@ -504,11 +506,13 @@
       // 再跑原有的位置校正——两者互不依赖，校正逻辑一字未动。
       if (phonePage.hidden) { deskColdArm(true); return; }
       deskColdArm(false);
-      if (pages.clientWidth) {
+      // Read layout once before changing dot classes or scroll position.
+      const width = pages.clientWidth;
+      const left = pages.scrollLeft;
+      if (width) {
         refreshCache();
-        sync(); // #1466：先按真实落点校正 idx 再落位——回桌面那一刻若 idx 因滚动事件被节流而陈旧，旧序会照陈旧值把 scrollLeft 写回别的页＝「自己弹回去」；sync 只切圆点不写滚动位，先它一步零成本
-        snapToIdx(); // #1301：已经在位就不写（旧写法每次切回桌面必写一次＝把同步布局压进这一帧）
-        sync();
+        sync(width, left); // #1466：先按真实落点校正 idx 再落位——回桌面那一刻若 idx 因滚动事件被节流而陈旧，旧序会照陈旧值把 scrollLeft 写回别的页＝「自己弹回去」；sync 只切圆点不写滚动位，先它一步零成本
+        snapToIdx(width, left); // Same position is a no-op; sync already painted the resolved index.
         pageScrollGuard.later(60); // #989：回桌面复核一次（残留滚动量在进桌面当帧就修掉）
         swSample(); // #884：从聊天/其他页切回桌面那一刻现场采一段帧耗时
       }

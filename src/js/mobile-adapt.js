@@ -3294,6 +3294,8 @@
   function floatIsOpen(el) {
     try {
       if (!el || el.hidden) return false;
+      // Hidden ancestors already prove the float is invisible; avoid forced layout.
+      if (el.closest('[hidden]')) return false;
       return el.getClientRects().length > 0;
     } catch (e) { return false; }
   }

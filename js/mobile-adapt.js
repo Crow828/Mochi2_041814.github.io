@@ -1904,6 +1904,7 @@ const MANUAL_LOCK_IDS = ['period-day-pop', 'period-care-pop', 'period-report-pop
 function floatIsOpen(el) {
 try {
 if (!el || el.hidden) return false;
+if (el.closest('[hidden]')) return false;
 return el.getClientRects().length > 0;
 } catch (e) { return false; }
 }
