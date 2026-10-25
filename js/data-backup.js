@@ -846,6 +846,8 @@ return Math.round(n) + ' B';
 }
 function exportCoverage() {
 const RULES = [
+[/^xy-home-v2:(?:default:)?sugar-diary$/,  '血糖日记饮食记录', arr => arr.length + ' 条'],
+[/^xy-home-v2:(?:default:)?sugar-hba1c$/,  '预估糖化记录', obj => Object.keys(obj).length + ' 天'],
 [/:chat-msgs$/, '聊天记录', arr => arr.length + ' 条'],
 [/:group-chat-msgs$|:gc-msgs-/, '群聊记录', arr => arr.length + ' 条'],
 [/mail-letters/, '信箱', arr => arr.length + ' 封'],
@@ -877,7 +879,7 @@ see(k, v) {
 if (v === null || v === undefined) return;
 const bigStr = typeof v === 'string' && v.length > BIG_STR;
 for (let i = 0; i < RULES.length; i++) {
-if (desc[i] !== null && from[i] !== k) continue;
+if (desc[i] !== null && from[i] !== k && !/^xy-home-v2:sugar-(?:diary|hba1c)$/.test(k)) continue;
 if (!RULES[i][0].test(k)) continue;
 if (bigStr) { desc[i] = RULES[i][2] ? '✓有（数据较大）' : '✓有'; from[i] = k; continue; }
 const parsed = unwrap(v);

@@ -54,11 +54,23 @@ jobs:
       - name: 聊天设置分组排版验证
         run: node tools/verify-chat-layout.cjs
 
+      - name: Chrome 聊天滚动与标识层级验证
+        run: node tools/verify-chat-scroll-layer.cjs
+
+      - name: WebKit 聊天滚动与标识层级验证
+        run: MOCHI_ENGINE=webkit node tools/verify-chat-scroll-layer.cjs
+
       - name: 设置分类与说明按钮验证
         run: node tools/verify-settings-layout.cjs
 
       - name: 设置细节与遗留项清理验证
         run: node tools/verify-settings-refinement.cjs
+
+      - name: 血糖日记备份与旧记录恢复验证
+        run: node tools/verify-sugar-backup.cjs
+
+      - name: WebKit 血糖日记备份验证
+        run: MOCHI_ENGINE=webkit node tools/verify-sugar-backup.cjs
 
       - name: v4.2.6 新功能验证
         run: |

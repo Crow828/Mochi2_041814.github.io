@@ -4424,7 +4424,9 @@ else avatarBatchCache = null;
 }
 const RENDER_MAX = 200;   // 渲染窗口条数上限
 const WINDOW_MAX = 400;   // v3.10.x：增量渲染窗口硬上限（含上下缓冲，防 DOM 无限膨胀）
-const LOAD_STEP = 100;    // 向上滚动每次加载的条数
+const LOAD_STEP = 100;
+// User scrolling yields sooner; authority catch-up keeps its existing batch size.
+const SCROLL_LOAD_STEP = 32;    // 向上滚动每次加载的条数
 const TOP_THRESHOLD = 150;// scrollTop 小于此值触发向上加载（px）
 const JUMP_VIEW = 30;     // 搜索跳转时目标索引上方预留的余量
 let renderStart = 0;      // 渲染窗口起点（msgs 下标）；0 = 全量
@@ -5180,7 +5182,7 @@ if (!chatColdDone) chatColdEnsureHydrated();
 }
 if (renderStart <= 0 || renderStart >= len) return;
 }
-const newStart = Math.max(0, renderStart - LOAD_STEP);
+const newStart = Math.max(0, renderStart - SCROLL_LOAD_STEP);
 if (newStart === renderStart) return;
 const beforeTop = body.scrollTop;
 const preNum = body.children.length;
@@ -5247,7 +5249,8 @@ const len = msgs.length;
 // 滚动加载语义不变，每批 LOAD_STEP）
 const want = (typeof targetLen === 'number' && targetLen > 0) ? Math.min(targetLen, len) : len;
 if (renderEnd >= want) return;
-const newEnd = Math.min(want, renderEnd + LOAD_STEP);
+const step = (typeof targetLen === 'number' && targetLen > 0) ? LOAD_STEP : SCROLL_LOAD_STEP;
+const newEnd = Math.min(want, renderEnd + step);
 if (newEnd === renderEnd) return;
 batchRendering = true;
 let anchor = null;

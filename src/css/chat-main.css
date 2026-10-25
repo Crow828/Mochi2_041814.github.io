@@ -1928,3 +1928,6 @@ html.tablet #page-chat.cs-bg-on > #cs-bg-layer { min-height:100vh; min-height:ma
 [data-theme="dark"] .voice-rec-btn { border-color:rgba(255,255,255,.28); color:#fff; }
 
 
+
+/* Keep message badges below the header, including iOS transform:none. */
+#page-chat > .chat-body { isolation:isolate; z-index:0; }

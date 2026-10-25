@@ -1,15 +1,23 @@
 [
   {
     "path": ".github/workflows/verify.yml",
-    "sha256": "2b37da67ef48b77bb6db8f72f5a5312f34574fef59bcfbe1913c90efb789a8d8"
+    "sha256": "90907d1f0c4ad318386d7f6f9a0555d9f2f24ba5c6e9605c1976e1647713d118"
   },
   {
     "path": "build.mjs",
     "sha256": "21580e727754eb0a342498ff53cd9be06d6f8e303dba2728f9331a6729f27b5f"
   },
   {
+    "path": "docs/CHAT-SCROLL-FIX-2026-10-25.md",
+    "sha256": "fa16bad0dd86e98c80001dbcc73c44c6f1db61d0d57bed7ec06caef223bc8404"
+  },
+  {
+    "path": "docs/SUGAR-BACKUP-FIX-2026-10-25.md",
+    "sha256": "b2c32957ebb9beb935af82ba5fcfead5af0a7193ffeef8f4006fe257144c5e23"
+  },
+  {
     "path": "index.html",
-    "sha256": "ad2ca4c9aefe88c4b87bfdf2c93fe7c696f4e740bce90d9b7b36ea3fffab969e"
+    "sha256": "21506944b9af09a6ae99ca5b39349761f2ed1d30b3c6458bf8ff87e48752f8a7"
   },
   {
     "path": "js/accounting.js",
@@ -69,7 +77,7 @@
   },
   {
     "path": "js/chat.js",
-    "sha256": "0f741d41aed86fb864758a69ce8854f46a12d583840eac6649aa917d7dd24afa"
+    "sha256": "ec78b8add8268cf901870b6d60fbc008cac0ec84c9380c4b7ec314ae3ac218ec"
   },
   {
     "path": "js/chatcard.js",
@@ -89,7 +97,7 @@
   },
   {
     "path": "js/contacts.js",
-    "sha256": "3967a0e06b9875f3c73b08bbe91be47f56a265593a5744fd2c79b61592266a63"
+    "sha256": "bc42a05d13e349261555b51dfad9d676391000c2460ea666c7c41039ed1c1e0f"
   },
   {
     "path": "js/coop-mine.js",
@@ -97,7 +105,7 @@
   },
   {
     "path": "js/data-backup.js",
-    "sha256": "2c9d441ef09c10a35d76f053c2dbe97ad4dd3f1fc819d0572ecd0f8d4dbd4cb5"
+    "sha256": "73b2d6cad6672211cbb2a4d5a90b116ae0fec3d70dfc72eb3ca32237324abacc"
   },
   {
     "path": "js/dcp-master.js",
@@ -333,7 +341,7 @@
   },
   {
     "path": "js/sugar-diary.js",
-    "sha256": "59981f40418edea2b743b52e398d953b48e4a5ed60018ba8c5536703473587a9"
+    "sha256": "01d1404787325567d8da59fb95a0f57d9775e9b3a9e541927e17f994be608c73"
   },
   {
     "path": "js/ta-ask.js",
@@ -357,7 +365,7 @@
   },
   {
     "path": "js/update-notes.js",
-    "sha256": "0ceb9d3f05090160b9c6ab7f7a3d7811bccce644bc9bf14fa0fa9eb73f607e77"
+    "sha256": "79d15d9791f8ebfc64260524f84f4853a80d4b8d1b15d453b05d8b25be3db115"
   },
   {
     "path": "js/usage-days.js",
@@ -393,7 +401,7 @@
   },
   {
     "path": "src/css/chat-main.css",
-    "sha256": "81e2c1dcbf2d0bdc4437eca361df159c160b89120cdfe0d0eaa3cc1fd922b364"
+    "sha256": "d5589fa3b6ffdcf9219f0fc67b228bd5452e5fdd99c36a80ec3350b4fe3cce8e"
   },
   {
     "path": "src/css/chat-pages.css",
@@ -521,7 +529,7 @@
   },
   {
     "path": "src/js/chat.js",
-    "sha256": "0dab057af33c3d976938eff78fde753413339dfb5b812482a220b67115298c54"
+    "sha256": "65dc73a4a4e3c3e8c6492f3b9dc61d63faa651c6537c75085d43c6bbe65391b0"
   },
   {
     "path": "src/js/chatcard.js",
@@ -541,7 +549,7 @@
   },
   {
     "path": "src/js/contacts.js",
-    "sha256": "b7dc82ec49285791b3495e3266e3af209fe0b8e2af00edd35eb434ce7c7267b0"
+    "sha256": "e80b61e117dfc28982296fa66b11db68f334ea451d0b9217139731a3d345b052"
   },
   {
     "path": "src/js/coop-mine.js",
@@ -549,7 +557,7 @@
   },
   {
     "path": "src/js/data-backup.js",
-    "sha256": "91cd4fe8842a7bc0386869fc3a15d5da1c29dfc984069e3c380fd4b186746a7b"
+    "sha256": "21f8154246631824de96db59f3e88b7e029ee7ea9d1e1fb51d66ce49e7e5f15f"
   },
   {
     "path": "src/js/dcp-master.js",
@@ -801,7 +809,7 @@
   },
   {
     "path": "src/js/sugar-diary.js",
-    "sha256": "3f920cec58bc180b82b7f88e755b571d9b55aec589120de2265935023bd1c135"
+    "sha256": "42c2770d06e64dbdf0879b4465b2f53203b3bf5861b1b14de70904d7814c9575"
   },
   {
     "path": "src/js/ta-ask.js",
@@ -825,7 +833,7 @@
   },
   {
     "path": "src/js/update-notes.js",
-    "sha256": "76bcebc9b059e46b4eb5b0897302baccd96e27ceeb0d2f217f5491e1b60ffa9e"
+    "sha256": "2a2b19318ed9c806df6ea3d82336e8ede955c12cef4c02c06b9234e9ff564442"
   },
   {
     "path": "src/js/usage-days.js",
@@ -841,7 +849,11 @@
   },
   {
     "path": "sw.js",
-    "sha256": "18eee4a464056ab5cb85876fd63093b3a068bcaec6d9f3525ff6513c9bf8a14b"
+    "sha256": "b16971d663f33fec1fc6f9703d1b8e18173102b619af5c5531b3385a11085789"
+  },
+  {
+    "path": "tools/quiet-startup-fixture.cjs",
+    "sha256": "9a76638f602fca1cf73fc2183baf05e2df0c319c0c1df3f198c470879c4a7fde"
   },
   {
     "path": "tools/startup-dialog-fixture.cjs",
@@ -865,11 +877,11 @@
   },
   {
     "path": "tools/verify-card-ownership.cjs",
-    "sha256": "1f20024f055d73a69520da5605fddee2e7a2debfee872979cbf14dd343be27ef"
+    "sha256": "c43bcdcffb8a8e9c400172733ed486f838f6276e72f22b3b3525ebf4d2957ffd"
   },
   {
     "path": "tools/verify-chat-aux-font.cjs",
-    "sha256": "2bc9bfba05dbdae75187f7db1c3f581fefab8e4f5f056e1833eba1cc389bb468"
+    "sha256": "25d43ba7fa11123df47caac83f2f6a52bb83bc0e173f0717a7e9856c7eca0e7d"
   },
   {
     "path": "tools/verify-chat-date-navigation.cjs",
@@ -886,6 +898,10 @@
   {
     "path": "tools/verify-chat-merge-identity.cjs",
     "sha256": "d996865c8e8bf0c8385eb57ab34926f895ac5a5bf1a29425267534dd6dd91c58"
+  },
+  {
+    "path": "tools/verify-chat-scroll-layer.cjs",
+    "sha256": "de4930b9da16f725075b97ba0e9c9468718c1f18f19ec401f002270592f965b5"
   },
   {
     "path": "tools/verify-core-layout.cjs",
@@ -913,7 +929,7 @@
   },
   {
     "path": "tools/verify-release.cjs",
-    "sha256": "3c3c3170b8ad4c98e65dd3077d4cd4521f591b605e31a77cc88f34a1213e5d72"
+    "sha256": "b7de8d158b68004e899dae2ac65f961dd0a5ba48c138a42ea28e8f479496dead"
   },
   {
     "path": "tools/verify-settings-layout.cjs",
@@ -925,7 +941,11 @@
   },
   {
     "path": "tools/verify-startup-update.cjs",
-    "sha256": "c1ded76d7f28a15db643150523cc906706446ea36135b9ea1fdb7e597a0d0f1c"
+    "sha256": "4dc848876ed1b7f87f7d8f202a58242c23889426c3018710c89398dcffd7b05f"
+  },
+  {
+    "path": "tools/verify-sugar-backup.cjs",
+    "sha256": "7ef85f3d10e03f4b83125d8ced03dd03b318ae848f1a66c1c7845df3443b8ce6"
   },
   {
     "path": "tools/verify-sugar-diary.cjs",
@@ -933,15 +953,15 @@
   },
   {
     "path": "tools/verify-update-focus-and-input.cjs",
-    "sha256": "016dadc2add830bfce5b50490bb53e5b70ef7d89af0083b5bfe7983eb1763e4e"
+    "sha256": "b71e8d49bd8d14c8cf8e2c3a19d5e98b0d114867c5978a18e72092a8f89a3552"
   },
   {
     "path": "tools/verify-update-notes.cjs",
-    "sha256": "f8a4967a8d6650ecb3cd7b72db2bb2992a3e0651461ead1877242bff54b0285a"
+    "sha256": "9dcda7cd94255e43dcd1446e77d99935a69fbe3b831acd3179806d4bd9b74204"
   },
   {
     "path": "tools/verify-update-service-worker.cjs",
-    "sha256": "6dc5bc8352ee639ce99d196f10281c24aeee5d0d5cfcbe26841cbfdd059a4aa9"
+    "sha256": "d3c6cb0160efff62312b20f22521ee1c255c2b14033ffc3f3c605c6b51a8aaf8"
   },
   {
     "path": "tools/verify-webkit.mjs",
@@ -949,6 +969,6 @@
   },
   {
     "path": "version.json",
-    "sha256": "5df2214c36b4b07552c1bcac2b9fc2d4199a5199136289d059ad6478c0a1c3d1"
+    "sha256": "97c27cbdc6d0b93b9441f08f98f3bbfe00133c1c7879636f9fea69d98912cfb4"
   }
 ]

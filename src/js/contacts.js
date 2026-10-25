@@ -12,6 +12,8 @@
     // 旧值（用户反馈：玩 4 天桌面「已摸鱼」显示第 2 天）。fish-log-global-migrated 为
     // 合并幂等标记键，同为全局根键。二者都不随联系人隔离，绝不能迁移。
     'fish-log', 'fish-log-global-migrated',
+    // Personal health records are shared, never migrate them into a contact.
+    'sugar-diary', 'sugar-hba1c',
     // #1541：开屏/系统标记键出生即根域全局键，读取方都只认根键——此前漏排除，每次刷新
     // 被 migrateLegacy 当旧顶层业务键迁进 default 并删根键：① age-confirmed（#1475 版本化
     // 年龄确认）每次开屏都要重新勾；② storage-guide-shown（#1250 存储修复引导已送达标记，

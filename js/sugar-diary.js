@@ -7,7 +7,16 @@ const tabs=document.createElement('div');tabs.className='sugar-tabs';tabs.innerH
 const panel=document.createElement('div');panel.className='cal-scroll sugar-panel';panel.hidden=true;original.after(panel);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 let selected=today(),month=selected.slice(0,7),category='',editingId=null;const store=window.xyStore('xy-home-v2'),key='sugar-diary';
-const read=()=>{try{const a=JSON.parse(store.get(key)||'[]');return Array.isArray(a)?a:[];}catch{return [];}};
+function sharedRaw(k){
+const current=store.get(k);if(current!==null&&current!==undefined)return current;
+if(!window.__mochiDataReady)return null;
+const legacy=window.xyStore('xy-home-v2:default').get(k);if(legacy===null||legacy===undefined)return null;
+try{const data=typeof legacy==='string'?JSON.parse(legacy):legacy;
+if(k==='sugar-diary'?!Array.isArray(data):(!data||typeof data!=='object'||Array.isArray(data)))return null;
+const text=typeof legacy==='string'?legacy:JSON.stringify(legacy);store.set(k,text);return text;
+}catch{return null;}
+}
+const read=()=>{try{const a=JSON.parse(sharedRaw(key)||'[]');return Array.isArray(a)?a:[];}catch{return [];}};
 const categoryOf=x=>x.category||({'奶茶':'饮品','蛋糕':'甜品','其他甜食':'高碳水'}[x.food]||'');
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(items){store.set(key,JSON.stringify(items));}
@@ -18,7 +27,7 @@ if(!toast){toast=document.createElement('div');toast.id='sugar-saved-toast';toas
 clearTimeout(savedToastTimer);toast.hidden=false;savedToastTimer=setTimeout(()=>{toast.hidden=true;},1800);
 }
 const hbaKey='sugar-hba1c';
-function hbaRead(){try{const v=JSON.parse(store.get(hbaKey)||'{}');return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}catch{return {};}}
+function hbaRead(){try{const v=JSON.parse(sharedRaw(hbaKey)||'{}');return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}catch{return {};}}
 function renderHba(){
 const data=hbaRead(),end=new Date(today()+'T12:00:00'),start=new Date(end);start.setDate(start.getDate()-29);
 const dateKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');

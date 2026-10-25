@@ -1213,6 +1213,8 @@
   function exportCoverage() {
     // [键尾正则, 功能名, 可选解析函数(v)=>条数文本]
     const RULES = [
+      [/^xy-home-v2:(?:default:)?sugar-diary$/,  '血糖日记饮食记录', arr => arr.length + ' 条'],
+      [/^xy-home-v2:(?:default:)?sugar-hba1c$/,  '预估糖化记录', obj => Object.keys(obj).length + ' 天'],
       [/:chat-msgs$/, '聊天记录', arr => arr.length + ' 条'],
       // v3.26.x：多群聊分组——自定义群聊消息键为 xy-home-v2:gc-msgs-<gid>，一并计入「群聊记录」
       [/:group-chat-msgs$|:gc-msgs-/, '群聊记录', arr => arr.length + ' 条'],
@@ -1248,7 +1250,7 @@
         for (let i = 0; i < RULES.length; i++) {
           // 旧版 valOf 以 data.idb 优先：同一键后到的权威值必须重算覆盖，
           // 否则 LS 空快照会把「聊天记录：0 条」留在一份含几千条消息的备份上。
-          if (desc[i] !== null && from[i] !== k) continue;
+          if (desc[i] !== null && from[i] !== k && !/^xy-home-v2:sugar-(?:diary|hba1c)$/.test(k)) continue;
           if (!RULES[i][0].test(k)) continue;
           // v3.31.x：超大键（聊天记录/字卡库可达几十 MB）不为「非空判断/条数统计」整包 parse
           if (bigStr) { desc[i] = RULES[i][2] ? '✓有（数据较大）' : '✓有'; from[i] = k; continue; }
