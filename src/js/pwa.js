@@ -137,6 +137,7 @@
   const VER_DL_WAIT = 180000; // 手动通道等 PRECACHE_DONE 的上限（弱网慢路径实测 50~130s，取宽裕值）
   let _prPing = 0, _prPingN = 0; // #1047：下载通道重发循环（见 refreshNow 手动分支注释）
   function refreshNow(auto, autoTs, ackTs) {
+    if (_prBusy) return; // Guard before replacing active listener.
     const doReload = function () {
       // #279/#965：自动升级（auto=true）落地前复核——用户已操作且在前台时绝不打断会话，
       // 但也不再「放弃」（旧行为＝只弹更新条，多数用户不点＝长期旧版）：改登记待换版，
@@ -154,6 +155,14 @@
     const actEl = document.getElementById('ver-update-refresh');
     const setUi = function (txt, btn) {
       if (auto) return;
+      const dialog=document.getElementById('startup-update-dialog');
+      if(dialog){
+        if(txt) dialog.querySelector('p').textContent=txt;
+        const action=dialog.querySelector('[data-update-refresh]');
+        if(btn) action.textContent=btn;
+        action.disabled=_prBusy;
+        action.setAttribute('aria-busy',String(_prBusy));
+      }
       if (txtEl && txt) txtEl.textContent = txt;
       if (actEl && btn) actEl.textContent = btn;
     };
@@ -162,8 +171,17 @@
         let done = false;
         if (_prMsg) navigator.serviceWorker.removeEventListener('message', _prMsg);
         _prMsg = function (e) {
-          if (e.data && e.data.type === 'PRECACHE_DONE') {
+          if (e.data && e.data.type === 'PRECACHE_DONE' && !done) {
+            if(e.data.ok === false){
+              done=true;_prBusy=false;window.__mochiVerDlBusy=false;
+              if(_prPing){clearInterval(_prPing);_prPing=0;}
+              navigator.serviceWorker.removeEventListener('message',_prMsg);
+              setUi('新版下载未完成，请检查网络后重试。当前数据会保留。','重试刷新');
+              return;
+            }
             done = true; _prBusy = false;
+            navigator.serviceWorker.removeEventListener('message',_prMsg);
+            setUi('下载完成，正在刷新…','正在刷新…');
             if (_prPing) { clearInterval(_prPing); _prPing = 0; }
             try { window.__mochiVerDlBusy = false; } catch (x) {}
             // #944：新版已确认落进缓存，此刻才写 ack（下载失败不写＝本版本还会再次提醒）
@@ -179,7 +197,7 @@
           setUi('正在下载新版…网络慢时可能需要一两分钟，请保持页面打开', '正在下载…');
         }
         // PERF-PLAN 阶段 1：带上外置 js/ 清单——弱网点「刷新使用新版」时 ext 一并预取落新缓存，防旧 index 配新 ext 的混合版本（SW 侧零改动，urls 数组本就支持）
-        const prUrls = ['./index.html', './version.json'].concat(window.__mochiExtFiles || []);
+        const prUrls = ['./index.html', './version.json'].concat((window.__mochiExtFiles || []).map(function (file) { return /^(?:\.?\/)?js\//.test(file) ? file : './js/' + file; }));
         navigator.serviceWorker.controller.postMessage({ type: 'PRECACHE_NOW', urls: prUrls });
         if (!auto) {
           // #1047：「点更新没反应」根治——手动通道原来只在点击那一刻发一次 PRECACHE_NOW；
@@ -301,7 +319,7 @@
       document.head.appendChild(style);document.body.appendChild(dialog);
     }
     dialog.querySelector('[data-update-later]').onclick=()=>{dialog.close();};
-    dialog.querySelector('[data-update-refresh]').onclick=()=>{dialog.close();refreshNow(false,0,ts);};
+    dialog.querySelector('[data-update-refresh]').onclick=()=>{refreshNow(false,0,ts);};
     if(!dialog.open)dialog.showModal();
     return true;
   }

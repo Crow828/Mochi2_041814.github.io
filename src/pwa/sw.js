@@ -202,7 +202,7 @@ self.addEventListener('message', (e) => {
   // 仍可能超时回退旧缓存，用户永远卡在旧版（GitHub Pages 国内访问慢的根因场景）。
   if (data.type !== 'PRECACHE_NOW') return;
   const urls = Array.isArray(data.urls) ? data.urls : ['./index.html'];
-  caches.open(CACHE).then((c) =>
+  const download = caches.open(CACHE).then((c) =>
     Promise.allSettled(urls.map((u) =>
       // v3.26.x #157：index.html 用长超时——PRECACHE_NOW 是「刷新使用新版」的落盘通道，
       // 3.5s 对 4MB 产物必然失败 → 用户点刷新永远拿不到新版、反复刷新
@@ -213,20 +213,22 @@ self.addEventListener('message', (e) => {
           if (isIndexUrl(u)) {
             return res.clone().text().then((t) => {
               if (!isCompleteHtml(t)) return false;
-              c.put(u, res); return true;
+              return c.put(u, res).then(() => true);
             });
           }
-          c.put(u, res); return true;
+          return c.put(u, res).then(() => true);
         }
         return false;
       })
     ))
-  ).then(() => {
+  ).then((results) => {
     // 无论成功与否都回执，页面有超时兜底；网络再差也要让刷新流程能继续
-    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE' }); } catch (x) {}
+    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE', ok: results.every((r) => r.status === 'fulfilled' && r.value === true) }); } catch (x) {}
   }).catch(() => {
-    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE' }); } catch (x) {}
+    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE', ok: false }); } catch (x) {}
   });
+  e.waitUntil(download); // Keep worker alive until cache writes complete.
+
 });
 
 self.addEventListener('fetch', (e) => {

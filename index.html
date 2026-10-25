@@ -10233,7 +10233,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792873449199" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792915485299" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -21079,6 +21079,7 @@ let _prBusy = false; // 手动下载进行中（防重复点击叠监听/叠计�
 const VER_DL_WAIT = 180000; // 手动通道等 PRECACHE_DONE 的上限（弱网慢路径实测 50~130s，取宽裕值）
 let _prPing = 0, _prPingN = 0; // #1047：下载通道重发循环（见 refreshNow 手动分支注释）
 function refreshNow(auto, autoTs, ackTs) {
+if (_prBusy) return; // Guard before replacing active listener.
 const doReload = function () {
 if (auto && !autoReloadAllowed()) { armAutoReloadWhenHidden(); showVerBar(autoTs); return; }
 if (auto && bgLivenessOn()) { armAutoReloadWhenHidden(); showVerBar(autoTs); return; }
@@ -21089,6 +21090,14 @@ const txtEl = barEl ? barEl.querySelector('.vub-txt') : null;
 const actEl = document.getElementById('ver-update-refresh');
 const setUi = function (txt, btn) {
 if (auto) return;
+const dialog=document.getElementById('startup-update-dialog');
+if(dialog){
+if(txt) dialog.querySelector('p').textContent=txt;
+const action=dialog.querySelector('[data-update-refresh]');
+if(btn) action.textContent=btn;
+action.disabled=_prBusy;
+action.setAttribute('aria-busy',String(_prBusy));
+}
 if (txtEl && txt) txtEl.textContent = txt;
 if (actEl && btn) actEl.textContent = btn;
 };
@@ -21097,8 +21106,17 @@ if (navigator.serviceWorker && navigator.serviceWorker.controller) {
 let done = false;
 if (_prMsg) navigator.serviceWorker.removeEventListener('message', _prMsg);
 _prMsg = function (e) {
-if (e.data && e.data.type === 'PRECACHE_DONE') {
+if (e.data && e.data.type === 'PRECACHE_DONE' && !done) {
+if(e.data.ok === false){
+done=true;_prBusy=false;window.__mochiVerDlBusy=false;
+if(_prPing){clearInterval(_prPing);_prPing=0;}
+navigator.serviceWorker.removeEventListener('message',_prMsg);
+setUi('新版下载未完成，请检查网络后重试。当前数据会保留。','重试刷新');
+return;
+}
 done = true; _prBusy = false;
+navigator.serviceWorker.removeEventListener('message',_prMsg);
+setUi('下载完成，正在刷新…','正在刷新…');
 if (_prPing) { clearInterval(_prPing); _prPing = 0; }
 try { window.__mochiVerDlBusy = false; } catch (x) {}
 if (!auto && ackTs > 0) verMarkAck(ackTs);
@@ -21112,7 +21130,7 @@ _prBusy = true;
 try { window.__mochiVerDlBusy = true; } catch (x) {}
 setUi('正在下载新版…网络慢时可能需要一两分钟，请保持页面打开', '正在下载…');
 }
-const prUrls = ['./index.html', './version.json'].concat(window.__mochiExtFiles || []);
+const prUrls = ['./index.html', './version.json'].concat((window.__mochiExtFiles || []).map(function (file) { return /^(?:\.?\/)?js\//.test(file) ? file : './js/' + file; }));
 navigator.serviceWorker.controller.postMessage({ type: 'PRECACHE_NOW', urls: prUrls });
 if (!auto) {
 _prPingN = 0;
@@ -21200,7 +21218,7 @@ const style=document.createElement('style');style.textContent='#startup-update-d
 document.head.appendChild(style);document.body.appendChild(dialog);
 }
 dialog.querySelector('[data-update-later]').onclick=()=>{dialog.close();};
-dialog.querySelector('[data-update-refresh]').onclick=()=>{dialog.close();refreshNow(false,0,ts);};
+dialog.querySelector('[data-update-refresh]').onclick=()=>{refreshNow(false,0,ts);};
 if(!dialog.open)dialog.showModal();
 return true;
 }
@@ -21887,4 +21905,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 </body>
 </html>
 
-<!-- __MOCHI_EOF__ mvmuk73j -->
+<!-- __MOCHI_EOF__ mvnjl6cz -->

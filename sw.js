@@ -6,8 +6,8 @@
 // 会一直显示「正在安装」永不完成（WebAPK 安装要经 SW 拉 start_url/图标）。
 // 现在每个请求最多等 NETWORK_TIMEOUT 毫秒，超时立即回退缓存（没缓存则快速
 // 失败），SW 最迟约 10 秒内必然激活，安装/加载都不再无限挂起。
-const CACHE = 'mochi-mvmuk73j';
-const BUILD_INFO = 'v 4.0 · 部署于 2026-10-25 04:24';
+const CACHE = 'mochi-mvnjl6cz';
+const BUILD_INFO = 'v 4.0 · 部署于 2026-10-25 16:04';
 const PRECACHE = ["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png","./icon-180.png","./js/idb.js","./js/contacts.js","./js/applock.js","./js/card-lock.js","./js/dcp-master.js","./js/media-pool.js","./js/storage-slim.js","./js/perf-check.js","./js/energy-check.js","./js/flash-check.js","./js/img-compress.js","./js/img-ingest.js","./js/clock.js","./js/tabs.js","./js/desktop-slider.js","./js/quote-cards.js","./js/usage-days.js","./js/legacy-score-history.js","./js/personalize.js","./js/chat.js","./js/group-chat.js","./js/chatcard.js","./js/chat-settings.js","./js/reply-settings.js","./js/fav-settings.js","./js/default-cards-data.js","./js/dict-ext-data.js","./js/default-cards.js","./js/quote-spell.js","./js/dream-free.js","./js/mood-followup-data.js","./js/mood-reply-cards.js","./js/ta-mood-data.js","./js/ta-mood.js","./js/music-player.js","./js/calendar.js","./js/divination.js","./js/avatar-lib.js","./js/ta-ask.js","./js/ck-question.js","./js/incoming-requests.js","./js/ta-invite.js","./js/bg-keep.js","./js/records.js","./js/call.js","./js/mail.js","./js/feed.js","./js/loc-lib.js","./js/p2-features.js","./js/gift-shop.js","./js/memo-app.js","./js/memo-arc.js","./js/my-arc.js","./js/period.js","./js/accounting.js","./js/decision.js","./js/group-decision.js","./js/pong.js","./js/snake-game.js","./js/breakout.js","./js/connect-four.js","./js/coop-mine.js","./js/fishing.js","./js/memory-game.js","./js/gomoku.js","./js/linkup.js","./js/match3.js","./js/auction.js","./js/arcade.js","./js/mood-diary.js","./js/sfx.js","./js/fullscreen.js","./js/data-backup.js","./js/feature-data-catalog.js","./js/feature-data.js","./js/feature-hub.js","./js/settings-help.js","./js/onboarding.js","./js/page-coach.js","./js/card-audit.js","./js/storage-guide.js","./js/mobile-adapt.js","./js/chat-settings-layout.js","./js/settings-layout.js","./js/settings-refinement.js","./js/card-library-layout.js","./js/update-notes.js","./js/sugar-diary.js"];
 // v3.10.x：网络优先超时从 8000 → 3500ms。GitHub Pages 国内访问经常 >8s，
 // 原 8s 超时导致手机端 fetch 频繁超时 → 回退 SW 缓存旧 index.html → 用户永远
@@ -202,7 +202,7 @@ self.addEventListener('message', (e) => {
   // 仍可能超时回退旧缓存，用户永远卡在旧版（GitHub Pages 国内访问慢的根因场景）。
   if (data.type !== 'PRECACHE_NOW') return;
   const urls = Array.isArray(data.urls) ? data.urls : ['./index.html'];
-  caches.open(CACHE).then((c) =>
+  const download = caches.open(CACHE).then((c) =>
     Promise.allSettled(urls.map((u) =>
       // v3.26.x #157：index.html 用长超时——PRECACHE_NOW 是「刷新使用新版」的落盘通道，
       // 3.5s 对 4MB 产物必然失败 → 用户点刷新永远拿不到新版、反复刷新
@@ -213,20 +213,22 @@ self.addEventListener('message', (e) => {
           if (isIndexUrl(u)) {
             return res.clone().text().then((t) => {
               if (!isCompleteHtml(t)) return false;
-              c.put(u, res); return true;
+              return c.put(u, res).then(() => true);
             });
           }
-          c.put(u, res); return true;
+          return c.put(u, res).then(() => true);
         }
         return false;
       })
     ))
-  ).then(() => {
+  ).then((results) => {
     // 无论成功与否都回执，页面有超时兜底；网络再差也要让刷新流程能继续
-    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE' }); } catch (x) {}
+    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE', ok: results.every((r) => r.status === 'fulfilled' && r.value === true) }); } catch (x) {}
   }).catch(() => {
-    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE' }); } catch (x) {}
+    try { if (e.source && e.source.postMessage) e.source.postMessage({ type: 'PRECACHE_DONE', ok: false }); } catch (x) {}
   });
+  e.waitUntil(download); // Keep worker alive until cache writes complete.
+
 });
 
 self.addEventListener('fetch', (e) => {
