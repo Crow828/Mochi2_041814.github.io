@@ -5,11 +5,11 @@
   },
   {
     "path": "build.mjs",
-    "sha256": "714638c25a6cd5689275f38d563fdeb2ca672d9b988fe1bb6448424da17a5b80"
+    "sha256": "02324315ab009950a4aa0143ac5c26acac822029db2f30f161cd8b123eeedfd3"
   },
   {
     "path": "index.html",
-    "sha256": "84377109f1d8fa7f56a26b7fb0d1e74fb280602a79a67e6e66054fd32f91c7d9"
+    "sha256": "a9a0ea52eed0060837794c1751a1cc9f778bb08b6d1aa93659b9c0eab80450ff"
   },
   {
     "path": "js/accounting.js",
@@ -357,7 +357,7 @@
   },
   {
     "path": "js/update-notes.js",
-    "sha256": "877ee606ef050dd8adfb74e01c00123f575affa0da5fffa9f7fd9523639e75eb"
+    "sha256": "cd8ec41db47e6e13deddf1ede062cc9720052f01e798caae0297e7ed414b848f"
   },
   {
     "path": "js/usage-days.js",
@@ -753,7 +753,7 @@
   },
   {
     "path": "src/js/pwa.js",
-    "sha256": "c090e7d4de4b7a439690787be7e761e5e20a266865794563870a770c5a8010a2"
+    "sha256": "1ae74ec8854deb5d46478aef65f70513063d38a5883b1399bcb8e96ef4543748"
   },
   {
     "path": "src/js/quote-cards.js",
@@ -825,7 +825,7 @@
   },
   {
     "path": "src/js/update-notes.js",
-    "sha256": "57cd37d73245c4d6663497fd0a342b7296f20867c4fdda0945fe1fb1c66ba5c6"
+    "sha256": "b3796d373ef34489bdb7112b1bf9cd1046d53696a8afd13f73d15daf3924a21e"
   },
   {
     "path": "src/js/usage-days.js",
@@ -841,7 +841,7 @@
   },
   {
     "path": "sw.js",
-    "sha256": "2a494eef415e23b6ec1bb48d21fafbc8754ab51d6d5017cb76d31ccc52550c1a"
+    "sha256": "9b377b5854ae00efd87695304e2ffd5ea25da44354a521c4dd94531e47b7af1e"
   },
   {
     "path": "tools/verify-answered-card-feed-link.cjs",
@@ -861,7 +861,7 @@
   },
   {
     "path": "tools/verify-startup-update.cjs",
-    "sha256": "b15c8979b517d0532e2775c91ebf4888f219f46cf01890ab706e967f5a0efe9e"
+    "sha256": "70e7afa166d15e25bb267f163853b5a576c8c3eae0d64f8a1092ccc278e9822a"
   },
   {
     "path": "tools/verify-sugar-diary.cjs",
@@ -869,14 +869,14 @@
   },
   {
     "path": "tools/verify-update-notes.cjs",
-    "sha256": "e9b9164a16b01b7446f0e1c6079ea87eaa10c8f9fd062afb91579150be690aad"
+    "sha256": "3ab3cf3c442454095b00d956c95087c2c789b9e3643d47cf33bb35b9a719cee8"
   },
   {
     "path": "tools/verify-update-service-worker.cjs",
-    "sha256": "3d3e8b194284b6a4fa6ec00ae764acdc85f5a6becd088e253792283f5ae8390a"
+    "sha256": "6dc5bc8352ee639ce99d196f10281c24aeee5d0d5cfcbe26841cbfdd059a4aa9"
   },
   {
     "path": "version.json",
-    "sha256": "2eb2eafdcc45432f0dc48e49906c5620537b0802c9f7e94c263750d8d232fc9f"
+    "sha256": "2c6eeb90e04aa4f98eb2883c6d48b7cefbf648b97489ab97b2b99251da5e9246"
   }
 ]

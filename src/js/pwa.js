@@ -306,22 +306,55 @@
   // 显示更新条（版本轮询 + SW 检测共用）：跨通道一次性去重 + 已确认过本版本不再提醒
   // FIX 2026-09-07 #225v2：追加 verSeen 一版一弹（同版本不重复弹；新版本立即弹，无任何时间窗）
   let updateDialogVersion = 0;
-  function offerVersionUpdate(onlineTs) {
-    const ts=Number(onlineTs), current=Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;
-    if (!ts || (current && ts<=current)) return false;
-    if (updateDialogVersion>=ts) return true;
-    updateDialogVersion=ts;
+  function currentBuildTs(){return Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;}
+  function startupDialog(){
     let dialog=document.getElementById('startup-update-dialog');
     if(!dialog){
       dialog=document.createElement('dialog');dialog.id='startup-update-dialog';dialog.setAttribute('aria-labelledby','startup-update-title');
-      dialog.innerHTML='<h2 id="startup-update-title">发现新版本</h2><p>有新的更新可用，刷新后即可使用。</p><div><button type="button" data-update-later>稍等</button><button type="button" data-update-refresh>刷新更新</button></div>';
-      const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}';
+      dialog.innerHTML='<h2 id="startup-update-title">版本检查</h2><small data-today></small><small data-current-build></small><p role="status" aria-live="polite">正在检查网页更新…</p><div><button type="button" data-update-later>稍等</button><button type="button" data-update-refresh disabled>检查中…</button></div>';
+      const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}'+'#startup-update-dialog small{display:block;font-size:12px;line-height:1.7;color:var(--muted,#888);white-space:pre-line}#startup-update-dialog button:disabled{opacity:.55}';
       document.head.appendChild(style);document.body.appendChild(dialog);
+      const ts=currentBuildTs(), stamp=ts?new Date(ts).toLocaleString('zh-CN',{hour12:false}):'未知';
+      dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.6 刷新弹窗修复\n构建时间：'+stamp;
+      dialog.querySelector('[data-update-later]').onclick=()=>dialog.close();
     }
-    dialog.querySelector('[data-update-later]').onclick=()=>{dialog.close();};
-    dialog.querySelector('[data-update-refresh]').onclick=()=>{refreshNow(false,0,ts);};
+    dialog.querySelector('[data-today]').textContent='今日日期：'+new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+    return dialog;
+  }
+  function offerVersionUpdate(onlineTs) {
+    const ts=Number(onlineTs),current=currentBuildTs();
+    if (!ts || (current && ts<=current)) return false;
+    if(updateDialogVersion>=ts)return true;
+    updateDialogVersion=ts;
+    const dialog=startupDialog();
+    dialog.querySelector('h2').textContent='发现新版本';
+    dialog.querySelector('p').textContent='发现更新构建：'+new Date(ts).toLocaleString('zh-CN',{hour12:false})+'。刷新后即可使用。';
+    const button=dialog.querySelector('[data-update-refresh]');button.textContent='刷新更新';button.disabled=false;
+    button.onclick=()=>refreshNow(false,0,ts);
+    dialog.querySelector('[data-update-later]').textContent='稍等';
     if(!dialog.open)dialog.showModal();
     return true;
+  }
+  async function checkStartupVersion(){
+    const dialog=startupDialog(),button=dialog.querySelector('[data-update-refresh]');
+    button.disabled=true;button.textContent='检查中…';dialog.querySelector('p').textContent='正在检查网页更新…';
+    try{
+      const data=await fetchJson('./version.json?v='+Date.now(),8000),ts=Number(data&&data.ts);
+      if(!ts||!currentBuildTs())throw new Error('invalid version');
+      if(_prBusy||updateDialogVersion>0)return;
+      if(ts>currentBuildTs()){offerVersionUpdate(ts);return;}
+      dialog.querySelector('h2').textContent='版本检查';
+      dialog.querySelector('p').textContent=ts===currentBuildTs()?'已是最新版本':'当前构建比线上更新，无需刷新';
+      dialog.querySelector('[data-update-later]').textContent='进入网站';
+    }catch(e){
+      if(_prBusy||updateDialogVersion>0)return;
+      dialog.querySelector('p').textContent='暂时无法确认是否有更新，请检查网络后重试。当前版本仍可使用。';
+      dialog.querySelector('[data-update-later]').textContent='稍等';
+    }
+    button.textContent='重新检查';button.disabled=false;button.onclick=checkStartupVersion;
+  }
+  if(location.protocol!=='file:'){
+    const dialog=startupDialog();dialog.showModal();checkStartupVersion();
   }
   function showVerBar(onlineTs) {
     if (Number(onlineTs)>0 && offerVersionUpdate(onlineTs)) return;
