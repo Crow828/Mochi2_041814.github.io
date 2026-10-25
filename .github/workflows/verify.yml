@@ -33,6 +33,11 @@ jobs:
       - name: 构建
         run: node build.mjs
 
+      - name: 开屏版本检查与刷新验证
+        run: |
+          node tools/verify-startup-update.cjs
+          node tools/verify-update-service-worker.cjs
+
       - name: 二改功能验证
         run: node tools/verify-personal.cjs
 
@@ -45,7 +50,7 @@ jobs:
       - name: 设置细节与遗留项清理验证
         run: node tools/verify-settings-refinement.cjs
 
-      - name: v4.0 新功能验证
+      - name: v4.2.6 新功能验证
         run: |
           node tools/verify-card-library-layout.cjs
           node tools/verify-calendar-cleanup.cjs

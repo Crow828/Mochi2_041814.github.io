@@ -10,7 +10,7 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL
    localStorage.setItem('xy-home-v2:cc-scope-migrated','1');localStorage.setItem('xy-home-v2:cc-scope-notice-done','1');localStorage.setItem('xy-home-v2:storage-guide-shown','1250');localStorage.setItem('xy-home-v2:desk-checkin-en','0');
   });
   await page.route('**/js/card-library-layout.js',route=>route.fulfill({contentType:'application/javascript',body:`window.__libraryBefore=[...document.querySelectorAll('#page-chatcard [id]')].map(e=>({id:e.id,node:e}));window.__libraryEntries=[...document.querySelectorAll('#page-chatcard .chat-item')];\n`+fs.readFileSync(path.join(root,'js/card-library-layout.js'),'utf8')}));
-  await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiCardLibraryLayout);
+  await require('./startup-dialog-fixture.cjs')(page);await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiCardLibraryLayout);
   assert(await page.evaluate(()=>window.__libraryBefore.every(x=>document.getElementById(x.id)===x.node)&&window.__libraryEntries.every(e=>e.closest('.cc-library-group'))));
   assert.deepEqual(await page.locator('#cc-sect-custom .cc-library-group-title').allTextContents(),['聊天字卡','互动功能','日常展示','TA 的互动','数据管理']);
   assert.deepEqual(await page.locator('#cc-sect-preset .cc-library-group-title').allTextContents(),['聊天与回应','日常展示','TA 的互动']);

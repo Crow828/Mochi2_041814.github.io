@@ -1,7 +1,7 @@
 [
   {
     "path": ".github/workflows/verify.yml",
-    "sha256": "c9f6d20e623f52d05127d57f27784548817babacf6bd91df93ae93f0a1588dc0"
+    "sha256": "a2161df5ac6166e854623848ad92fefa7f5357e11c85ea96eda65149bac7dc7f"
   },
   {
     "path": "build.mjs",
@@ -844,20 +844,80 @@
     "sha256": "9b377b5854ae00efd87695304e2ffd5ea25da44354a521c4dd94531e47b7af1e"
   },
   {
+    "path": "tools/startup-dialog-fixture.cjs",
+    "sha256": "7e2e30007942bf9fb070c5c7e607e498c1cc73fa502679487a5b1c31ac5236c9"
+  },
+  {
     "path": "tools/verify-answered-card-feed-link.cjs",
-    "sha256": "6bf1302865da583dda8afba130f4c1721b6ba87bd120e44912ebf86ac3dd19e9"
+    "sha256": "f8d5285c72ba6b20912f92a4ca49f9dfa86933f43ea2a0c75f4276cc5c5b0a14"
+  },
+  {
+    "path": "tools/verify-bg-notify-retry.cjs",
+    "sha256": "1239b72425843117919069ba76a67eacf5e96ab1e4a173b1cc2f77b94a537e9e"
+  },
+  {
+    "path": "tools/verify-calendar-cleanup.cjs",
+    "sha256": "7d295a0e219b3d7d286174ecf6c7d21fd547748fdf523fb1b9ea1b4c6eaa0775"
+  },
+  {
+    "path": "tools/verify-card-library-layout.cjs",
+    "sha256": "6c429da64002bc550382e812df7bbdad3bb673767e2359bcdd6669a7e48cdc77"
+  },
+  {
+    "path": "tools/verify-chat-aux-font.cjs",
+    "sha256": "2bc9bfba05dbdae75187f7db1c3f581fefab8e4f5f056e1833eba1cc389bb468"
   },
   {
     "path": "tools/verify-chat-date-navigation.cjs",
-    "sha256": "5c6b5f922baedb1d33efb3ec328c1a9d7fde53cdacc4a23033186ac0a46f4d9f"
+    "sha256": "e7d9c3f7b9ed83ba0d417dd679bec4cf7c7c92bbf68144f86e900222a9fa05e3"
   },
   {
     "path": "tools/verify-chat-group-favorites.cjs",
-    "sha256": "85e43a7be007b0a8129b4718035c4f9c807fcc28ea19379b5d35c1fb49a69779"
+    "sha256": "e90f6b06639fb16f9a58faad10ab583acbaa6751e8070d02d61c90d1ce72a5bb"
+  },
+  {
+    "path": "tools/verify-chat-layout.cjs",
+    "sha256": "5c7f05d986928c7ad47622fdd8da09bce4679de417cfd3194aa7b508ecfbf843"
   },
   {
     "path": "tools/verify-chat-merge-identity.cjs",
     "sha256": "d996865c8e8bf0c8385eb57ab34926f895ac5a5bf1a29425267534dd6dd91c58"
+  },
+  {
+    "path": "tools/verify-core-layout.cjs",
+    "sha256": "abdf1afe16cc9edb5bd3428cc7e7de440867909db537eac884bb6eb709010f63"
+  },
+  {
+    "path": "tools/verify-custom-moods.cjs",
+    "sha256": "441cec4b526d21f6d0be5ca22c9fd079d39cc648c551b0b3705330f574c9ed01"
+  },
+  {
+    "path": "tools/verify-device-regression.mjs",
+    "sha256": "c4b1a6c50428d01b6469259936cf44c7aed435ee15a0f9b4a180cdf076212950"
+  },
+  {
+    "path": "tools/verify-favorite-identity.cjs",
+    "sha256": "70557b861afe3f582bf81b30d41683283b2bc098f6c12552789c0ca2b9fbacf1"
+  },
+  {
+    "path": "tools/verify-modal-placeholder.cjs",
+    "sha256": "07eb9c5578a719b79eeeea6b30babdf8e21084178551bd1c9857934c93fd5149"
+  },
+  {
+    "path": "tools/verify-personal.cjs",
+    "sha256": "447f542ffa649f05cf9eb9c484e93bf57f16e4804a15befe15cf866e2e072a16"
+  },
+  {
+    "path": "tools/verify-release.cjs",
+    "sha256": "a98a5dbacf3104ccdf9914fb16b7587d7469c2ebd8445c03d31226cec6b1c0bf"
+  },
+  {
+    "path": "tools/verify-settings-layout.cjs",
+    "sha256": "537663cdc03197976e8701b2939e7d5f8cc910c9f042289db145935a466bad33"
+  },
+  {
+    "path": "tools/verify-settings-refinement.cjs",
+    "sha256": "5ec1877d2f2d2ba45cd2eac07745cb6cfe84c5539779000fbd8e3433436f1c69"
   },
   {
     "path": "tools/verify-startup-update.cjs",
@@ -874,6 +934,10 @@
   {
     "path": "tools/verify-update-service-worker.cjs",
     "sha256": "6dc5bc8352ee639ce99d196f10281c24aeee5d0d5cfcbe26841cbfdd059a4aa9"
+  },
+  {
+    "path": "tools/verify-webkit.mjs",
+    "sha256": "8ec3a98ea2ca1b35ba53f2032d8b2c949f83f0708bf8706cecfc42c38d1647fa"
   },
   {
     "path": "version.json",

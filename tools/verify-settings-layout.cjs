@@ -21,7 +21,7 @@ function quiet(){
   const page=await browser.newPage({viewport:{width,height:844},serviceWorkers:'block'});const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(quiet);
   await page.route('**/js/settings-layout.js',route=>route.fulfill({contentType:'application/javascript',body:`window.__beforeSettingsMove={lock:document.getElementById('applock-en'),track:document.getElementById('sf-checkin-en'),ids:Array.from(document.querySelectorAll('#page-setting [id]')).map(x=>x.id).sort()};\n`+fs.readFileSync(path.join(root,'js/settings-layout.js'),'utf8')}));
-  await page.goto(url);await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsLayout);
+  await require('./startup-dialog-fixture.cjs')(page);await page.goto(url);await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsLayout);
   await page.evaluate(()=>document.querySelector('.tabbar [data-page="page-setting"]').click());
   const state=await page.evaluate(()=>{
    const p=document.getElementById('page-setting'),groups=[...p.querySelectorAll(':scope>.them-sec>.set-group')];
@@ -75,7 +75,7 @@ function quiet(){
  }
  const ios=await browser.newPage({viewport:{width:440,height:956},userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 27_0_1 like Mac OS X) AppleWebKit/605.1.15 Version/27.0 Mobile/15E148 Safari/604.1',isMobile:true,hasTouch:true,serviceWorkers:'block'});
  await ios.addInitScript(quiet);await ios.addInitScript(()=>Object.defineProperty(navigator,'standalone',{get:()=>true}));
- await ios.goto(url);await ios.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsLayout);
+ await require('./startup-dialog-fixture.cjs')(ios);await ios.goto(url);await ios.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsLayout);
  const safe=await ios.evaluate(()=>({isIOS:window.mochiDevice.isIOS,pwa:document.documentElement.classList.contains('ios-pwa-standalone'),topRule:[...document.querySelectorAll('style')].some(x=>x.textContent.includes('padding-top: max(env(safe-area-inset-top, 0px), var(--mochi-safe-top, 0px)) !important')),requests:window.__appFullscreenRequests}));
  // Chromium UA emulation does not emulate WebKit CSS feature support. Check the
  // preserved iOS marker/rule here; actual safe-area rendering needs the user's iPhone.

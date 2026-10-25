@@ -24,7 +24,7 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  });
  await page.addInitScript(()=>{window.__sfxContexts=0;const Base=window.AudioContext||window.webkitAudioContext;if(Base){const Wrapped=new Proxy(Base,{construct(target,args,newTarget){if(new Error().stack.includes('/js/sfx.js'))window.__sfxContexts++;return Reflect.construct(target,args,newTarget)}});if(window.AudioContext)window.AudioContext=Wrapped;if(window.webkitAudioContext)window.webkitAudioContext=Wrapped;}});
  await page.addInitScript(()=>{window.__automaticDiagTimers=0;const original=window.setInterval;window.setInterval=function(fn,ms,...args){if(fn&&fn.name==='sdTick')window.__automaticDiagTimers++;return original.call(this,fn,ms,...args);};});
- await page.goto('http://127.0.0.1:'+server.address().port+'/');
+ await require('./startup-dialog-fixture.cjs')(page);await page.goto('http://127.0.0.1:'+server.address().port+'/');
  await page.waitForFunction(()=>window.__mochiDataReady && window.dcfGet && window.mochiFeatureData,{},{timeout:30000}).catch(async()=>{await page.waitForFunction(()=>window.__mochiDataReady && window.dcfGet,{},{timeout:30000});});
  await page.waitForTimeout(700);
  await page.evaluate(()=>document.querySelector('.tabbar [data-page="page-setting"]').click());
@@ -151,7 +151,7 @@ const server=createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(r
  assert.notEqual(enabledHtml,html,'Water policy must exist in built page');
  const settingsHtml=enabledHtml;
  await restored.route(url,route=>route.fulfill({status:200,contentType:'text/html',body:settingsHtml}));
- await restored.goto(url);
+ await require('./startup-dialog-fixture.cjs')(restored);await restored.goto(url);
  await restored.waitForFunction(()=>window.__mochiDataReady && window.dcfGet);
  await restored.waitForTimeout(700);
  const enabled=await restored.evaluate(()=>({settings:['row-entry-cjian-first','row-fish-days'].every(id=>!document.getElementById(id)),data:window.mochiFeatureData.features.some(f=>f.id==='water'),icon:!!document.querySelector('.app[data-app="water"]'),value:document.getElementById('dcf-prob-water-rs-val').value,button:document.querySelector('#dcf-prob-water-rs button').disabled,errors:window.__mochiErrLoaded||[]}));

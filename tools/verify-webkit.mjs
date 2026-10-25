@@ -51,6 +51,7 @@ async function runEngine(ua, tag) {
     const page = await ctx.newPage();
     page.on('pageerror', (e) => { console.log('  [pageerror] ' + tag + ' ' + e.message); });
     await page.goto(baseUrl + '/index.html', { waitUntil: 'load', timeout: 20000 });
+    await page.locator('#startup-update-dialog [data-update-later]').click();
     // 等数据就绪 + 关开屏
     for (let i = 0; i < 40; i++) {
       if (await page.evaluate('!!window.__mochiDataReady')) break;

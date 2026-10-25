@@ -30,7 +30,7 @@ try{
    const source=fs.readFileSync(path.join(root,'js/chat-settings-layout.js'),'utf8');
    await route.fulfill({contentType:'application/javascript',body:`window.__layoutOriginalRows=Array.from(document.querySelectorAll('#page-chat-settings .set-row')).map(n=>({id:n.id,hidden:n.hidden,node:n}));\n`+source});
   });
-  await page.goto('http://127.0.0.1:'+server.address().port+'/');
+  await require('./startup-dialog-fixture.cjs')(page);await page.goto('http://127.0.0.1:'+server.address().port+'/');
   await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiChatSettingsLayout);
   await page.evaluate(()=>document.querySelector('.app[data-app="chat"]').click());
   await page.locator('#chat-settings-btn').click();

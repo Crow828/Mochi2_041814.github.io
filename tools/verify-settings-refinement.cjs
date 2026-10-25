@@ -15,7 +15,7 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL
    localStorage.setItem('xy-home-v2:storage-guide-shown','1250');
    localStorage.setItem('xy-home-v2:theme-mode','light');localStorage.setItem('xy-home-v2:desk-checkin-en','0');
   });
-  await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsRefinement);
+  await require('./startup-dialog-fixture.cjs')(page);await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.__mochiDataReady&&window.mochiSettingsRefinement);
   await page.evaluate(()=>document.querySelector('.tabbar [data-page="page-setting"]').click());
   const freq=await page.evaluate(()=>{const head=document.querySelector('#sf-desk-freq .freq-head'),info=document.getElementById('sf-desk-freq-tag');return {same:head.contains(info),right:info.getBoundingClientRect().right,head:head.getBoundingClientRect().right};});
   assert(freq.same&&Math.abs(freq.right-freq.head)<2);

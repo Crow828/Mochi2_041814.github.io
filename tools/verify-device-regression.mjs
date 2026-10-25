@@ -129,6 +129,7 @@ for (const c of CASES) {
     if (c.inject) await ctx.addInitScript(c.inject);
     const page = await ctx.newPage();
     await page.goto(baseUrl + '/index.html', { waitUntil: 'load', timeout: 20000 });
+    await page.locator('#startup-update-dialog [data-update-later]').click();
     for (let i = 0; i < 40; i++) {
       if (await page.evaluate('!!window.__mochiDataReady')) break;
       await sleep(300);
