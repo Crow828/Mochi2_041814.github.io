@@ -37,6 +37,9 @@ jobs:
         run: |
           node tools/verify-startup-update.cjs
           node tools/verify-update-service-worker.cjs
+          node tools/verify-card-ownership.cjs
+          node tools/verify-update-focus-and-input.cjs
+          MOCHI_ENGINE=webkit node tools/verify-update-focus-and-input.cjs
 
       - name: 二改功能验证
         run: node tools/verify-personal.cjs

@@ -3536,10 +3536,11 @@ const FIX_SENTINELS = [
     "needle": "if (localStorage.getItem(k) === lsVal) localStorage.removeItem(k);"
   },
   {
-    "name": "#139 专属字卡库去重预检（__big-idx 尺寸+体检标记免读大值，稳态零开销）",
+    "name": "#139 不自动删除跨公用与专属重复的字卡",
     "file": "js/chatcard.js",
-    "needle": "marks[cid][0] === pubRaw.length && marks[cid][1] === ownLen"
-  },
+    "needle": "window.storeFor(cid).remove('cc-groups')",
+    "absent": true
+},
   {
     "name": "#139 专属页导入全量备份防复制守卫（公用库兜底内容与合并结果相同不写专属键）",
     "file": "js/chatcard.js",
@@ -7373,10 +7374,11 @@ const FIX_SENTINELS = [
     "needle": "if (ccScope !== 'public') { groups = null; return; }"
   },
   {
-    "name": "#455 去重任务大库免解析预检（双侧合计>96MB 只记 mark 免读跳过；删则 90+153MB 双库整串读入+双 parse 在启动+30s 必现＝秒级长任务/OOM 复发）",
+    "name": "#455 不启动跨作用域去重任务，避免读双库及修改归属",
     "file": "js/chatcard.js",
-    "needle": "pubRaw.length + ownLen > DD_PARSE_LIMIT"
-  },
+    "needle": "function ddKick()",
+    "absent": true
+},
   {
     "name": "#455 表情包面板专属分区走令牌化池视图（删则回退每次开面板全量 parse 大库＝开面板秒级冻结/左右滑动卡复发）",
     "file": "js/chatcard.js",
@@ -19220,10 +19222,10 @@ const FIX_SENTINELS = [
     "needle": "if (ok === true) stamp();"
   },
   {
-    "name": "#1371c 字卡作用域迁移同一条三态判据（auth 才动 st.remove＝连 IDB 权威一起删那一发；没读到就整件事一件不做，下次开页再合）",
+    "name": "#1371c 保留用户字卡作用域，缺失旧标记也不自动迁移",
     "file": "js/chatcard.js",
-    "needle": "pick(local, unread === 0)"
-  },
+    "needle": "function preserveCardOwnership()"
+},
   {
     "name": "#1371d 迁移那批发不许再把读不回与库里确认没有压成同一个空值（复活＝#1359/#1360 同一把尺在最后一本迁移账上失守，用户所见「自定义字卡没了」）",
     "file": "js/chatcard.js",

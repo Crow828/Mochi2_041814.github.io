@@ -11152,6 +11152,20 @@ const moreDate = document.createElement('button'); moreDate.type='button'; moreD
 moreDate.innerHTML='<span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 11h18M8 15h2M14 15h2"/></svg></span><span>按日期查找</span>';
 const datesSearchAnchor = document.getElementById('more-search');
 if(datesSearchAnchor) datesSearchAnchor.after(moreDate);
+const moreIme=document.createElement('button');moreIme.type='button';moreIme.id='more-ime-reset';moreIme.className='more-item';moreIme.dataset.mcat='tool';
+moreIme.innerHTML='<span class="mi-ico" aria-hidden="true">↻</span><span>重新唤起输入法</span>';
+moreDate.after(moreIme);
+moreIme.addEventListener('click',e=>{
+  e.stopPropagation();if(morePanel)morePanel.hidden=true;
+  const editor=document.getElementById('chat-input');if(!editor)return;
+  // Rebuild only the native focus session, never replace draft nodes or send text.
+  editor.blur();editor.focus({preventScroll:true});
+  const selection=window.getSelection();
+  if(selection&&(!selection.anchorNode||!editor.contains(selection.anchorNode))){
+    const range=document.createRange();range.selectNodeContents(editor);range.collapse(false);selection.removeAllRanges();selection.addRange(range);
+  }
+  toast('已重新聚焦输入框，请重试中文输入');
+});
 moreDate.addEventListener('click',e=>{
   e.stopPropagation(); if(morePanel) morePanel.hidden=true; closeChatSearch(); closeIme();
   dateOwner=window.activePrefix(); datePicker.value=localDateKey(Date.now()).slice(0,7);

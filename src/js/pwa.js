@@ -306,7 +306,8 @@
   // 显示更新条（版本轮询 + SW 检测共用）：跨通道一次性去重 + 已确认过本版本不再提醒
   // FIX 2026-09-07 #225v2：追加 verSeen 一版一弹（同版本不重复弹；新版本立即弹，无任何时间窗）
   let updateDialogVersion = 0;
-  function currentBuildTs(){return Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;}
+  const pageBuildTs=Number(document.getElementById('splash-ver')?.getAttribute('data-build-ts'))||Number(window.__mochiBuildTs)||0;
+  function currentBuildTs(){return pageBuildTs;}
   function startupDialog(){
     let dialog=document.getElementById('startup-update-dialog');
     if(!dialog){
@@ -317,9 +318,19 @@
       const ts=currentBuildTs(), stamp=ts?new Date(ts).toLocaleString('zh-CN',{hour12:false}):'未知';
       dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.6 刷新弹窗修复\n构建时间：'+stamp;
       dialog.querySelector('[data-update-later]').onclick=()=>dialog.close();
+      dialog.addEventListener('close',()=>{
+        const active=document.activeElement,previous=dialog.__mochiPreviousFocus;
+        dialog.__mochiPreviousFocus=null;
+        if(active&&active===previous&&(active.isContentEditable||/^(INPUT|TEXTAREA)$/.test(active.tagName)))active.blur();
+      });
     }
     dialog.querySelector('[data-today]').textContent='今日日期：'+new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
     return dialog;
+  }
+  function showStartupDialog(dialog){
+    if(dialog.open)return;
+    dialog.__mochiPreviousFocus=document.activeElement;
+    dialog.showModal();
   }
   function offerVersionUpdate(onlineTs) {
     const ts=Number(onlineTs),current=currentBuildTs();
@@ -332,7 +343,7 @@
     const button=dialog.querySelector('[data-update-refresh]');button.textContent='刷新更新';button.disabled=false;
     button.onclick=()=>refreshNow(false,0,ts);
     dialog.querySelector('[data-update-later]').textContent='稍等';
-    if(!dialog.open)dialog.showModal();
+    showStartupDialog(dialog);
     return true;
   }
   async function checkStartupVersion(){
@@ -354,7 +365,7 @@
     button.textContent='重新检查';button.disabled=false;button.onclick=checkStartupVersion;
   }
   if(location.protocol!=='file:'){
-    const dialog=startupDialog();dialog.showModal();checkStartupVersion();
+    const dialog=startupDialog();showStartupDialog(dialog);checkStartupVersion();
   }
   function showVerBar(onlineTs) {
     if (Number(onlineTs)>0 && offerVersionUpdate(onlineTs)) return;

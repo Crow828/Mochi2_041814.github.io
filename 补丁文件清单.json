@@ -1,15 +1,15 @@
 [
   {
     "path": ".github/workflows/verify.yml",
-    "sha256": "a2161df5ac6166e854623848ad92fefa7f5357e11c85ea96eda65149bac7dc7f"
+    "sha256": "2b37da67ef48b77bb6db8f72f5a5312f34574fef59bcfbe1913c90efb789a8d8"
   },
   {
     "path": "build.mjs",
-    "sha256": "02324315ab009950a4aa0143ac5c26acac822029db2f30f161cd8b123eeedfd3"
+    "sha256": "21580e727754eb0a342498ff53cd9be06d6f8e303dba2728f9331a6729f27b5f"
   },
   {
     "path": "index.html",
-    "sha256": "a9a0ea52eed0060837794c1751a1cc9f778bb08b6d1aa93659b9c0eab80450ff"
+    "sha256": "ad2ca4c9aefe88c4b87bfdf2c93fe7c696f4e740bce90d9b7b36ea3fffab969e"
   },
   {
     "path": "js/accounting.js",
@@ -69,11 +69,11 @@
   },
   {
     "path": "js/chat.js",
-    "sha256": "4d04d88a1bb5c86334dc1f0e24623e0f09b0ac3ffe355b10ddfbca72d25b2faa"
+    "sha256": "0f741d41aed86fb864758a69ce8854f46a12d583840eac6649aa917d7dd24afa"
   },
   {
     "path": "js/chatcard.js",
-    "sha256": "fdcb87a76e1daae196e1cd3119da68a38cd83db8353fe2ba0e8e34f41507a8c4"
+    "sha256": "99587247fa6b7b1d7bfe6c0ebda29fb621219c40d345db2362e4a1d23573d290"
   },
   {
     "path": "js/ck-question.js",
@@ -357,7 +357,7 @@
   },
   {
     "path": "js/update-notes.js",
-    "sha256": "cd8ec41db47e6e13deddf1ede062cc9720052f01e798caae0297e7ed414b848f"
+    "sha256": "0ceb9d3f05090160b9c6ab7f7a3d7811bccce644bc9bf14fa0fa9eb73f607e77"
   },
   {
     "path": "js/usage-days.js",
@@ -521,11 +521,11 @@
   },
   {
     "path": "src/js/chat.js",
-    "sha256": "5f0f79e402a9053b7da99a0020e8d82ab224e58ef164e95d505301923cc93c19"
+    "sha256": "0dab057af33c3d976938eff78fde753413339dfb5b812482a220b67115298c54"
   },
   {
     "path": "src/js/chatcard.js",
-    "sha256": "d9085f7a249e85f5b1d58a443e93b20c7f972879e97aaead775a8601f128f8a3"
+    "sha256": "d15db0011f56dd8f58786eedf1a078949fb183ad7bfa815e3b03a38ca2872fe9"
   },
   {
     "path": "src/js/ck-question.js",
@@ -753,7 +753,7 @@
   },
   {
     "path": "src/js/pwa.js",
-    "sha256": "1ae74ec8854deb5d46478aef65f70513063d38a5883b1399bcb8e96ef4543748"
+    "sha256": "996a429e3947b82b005b57ab1d29c9be5272aff5d7fd650207f840975cacb241"
   },
   {
     "path": "src/js/quote-cards.js",
@@ -825,7 +825,7 @@
   },
   {
     "path": "src/js/update-notes.js",
-    "sha256": "b3796d373ef34489bdb7112b1bf9cd1046d53696a8afd13f73d15daf3924a21e"
+    "sha256": "76bcebc9b059e46b4eb5b0897302baccd96e27ceeb0d2f217f5491e1b60ffa9e"
   },
   {
     "path": "src/js/usage-days.js",
@@ -841,7 +841,7 @@
   },
   {
     "path": "sw.js",
-    "sha256": "9b377b5854ae00efd87695304e2ffd5ea25da44354a521c4dd94531e47b7af1e"
+    "sha256": "18eee4a464056ab5cb85876fd63093b3a068bcaec6d9f3525ff6513c9bf8a14b"
   },
   {
     "path": "tools/startup-dialog-fixture.cjs",
@@ -862,6 +862,10 @@
   {
     "path": "tools/verify-card-library-layout.cjs",
     "sha256": "6c429da64002bc550382e812df7bbdad3bb673767e2359bcdd6669a7e48cdc77"
+  },
+  {
+    "path": "tools/verify-card-ownership.cjs",
+    "sha256": "1f20024f055d73a69520da5605fddee2e7a2debfee872979cbf14dd343be27ef"
   },
   {
     "path": "tools/verify-chat-aux-font.cjs",
@@ -909,7 +913,7 @@
   },
   {
     "path": "tools/verify-release.cjs",
-    "sha256": "a98a5dbacf3104ccdf9914fb16b7587d7469c2ebd8445c03d31226cec6b1c0bf"
+    "sha256": "3c3c3170b8ad4c98e65dd3077d4cd4521f591b605e31a77cc88f34a1213e5d72"
   },
   {
     "path": "tools/verify-settings-layout.cjs",
@@ -921,15 +925,19 @@
   },
   {
     "path": "tools/verify-startup-update.cjs",
-    "sha256": "70e7afa166d15e25bb267f163853b5a576c8c3eae0d64f8a1092ccc278e9822a"
+    "sha256": "c1ded76d7f28a15db643150523cc906706446ea36135b9ea1fdb7e597a0d0f1c"
   },
   {
     "path": "tools/verify-sugar-diary.cjs",
     "sha256": "829755a73b945cd79e631d5834f9f4fb3b918714097c9c031a46a51492d58ee8"
   },
   {
+    "path": "tools/verify-update-focus-and-input.cjs",
+    "sha256": "016dadc2add830bfce5b50490bb53e5b70ef7d89af0083b5bfe7983eb1763e4e"
+  },
+  {
     "path": "tools/verify-update-notes.cjs",
-    "sha256": "3ab3cf3c442454095b00d956c95087c2c789b9e3643d47cf33bb35b9a719cee8"
+    "sha256": "f8a4967a8d6650ecb3cd7b72db2bb2992a3e0651461ead1877242bff54b0285a"
   },
   {
     "path": "tools/verify-update-service-worker.cjs",
@@ -941,6 +949,6 @@
   },
   {
     "path": "version.json",
-    "sha256": "2c6eeb90e04aa4f98eb2883c6d48b7cefbf648b97489ab97b2b99251da5e9246"
+    "sha256": "5df2214c36b4b07552c1bcac2b9fc2d4199a5199136289d059ad6478c0a1c3d1"
   }
 ]
