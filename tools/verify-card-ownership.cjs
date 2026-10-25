@@ -12,7 +12,7 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL
    if(mode==='shared-content')localStorage.setItem('xy-home-v2:cc-scope-migrated','1');
    for(const pre of ['xy-home-v2','xy-home-v2:default']){localStorage.setItem(pre+':checkin-en','0');localStorage.setItem(pre+':reply-as-en','0');for(const k of ['ta-ask','ta-choose','ta-curious','ta-roast','ta-invite','ta-ask-card'])localStorage.setItem(pre+':'+k,JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));}
   },{own,pub,mode});
-  await require('./startup-dialog-fixture.cjs')(p);await p.goto('http://127.0.0.1:'+server.address().port+'/');await p.waitForFunction(()=>window.__mochiDataReady&&typeof window.storeFor==='function');await p.waitForTimeout(1000);
+  await require('./startup-dialog-fixture.cjs')(p);await require('./quiet-startup-fixture.cjs')(p);await p.goto('http://127.0.0.1:'+server.address().port+'/');await p.waitForFunction(()=>window.__mochiDataReady&&typeof window.storeFor==='function');await p.waitForTimeout(1000);
   assert.equal(await p.evaluate(()=>window.storeFor('default').get('cc-groups')),own);assert.equal(await p.evaluate(()=>window.xyStore('xy-home-v2').get('cc-groups-public')),pub);
   await p.evaluate(async({own,pub})=>{window.storeFor('default').set('cc-groups',own);window.xyStore('xy-home-v2').set('cc-groups-public',pub);await window.idbSet('xy-home-v2:default:cc-groups',own);await window.idbSet('xy-home-v2:cc-groups-public',pub);},{own,pub});
   if(mode==='shared-content')await p.waitForTimeout(31000);

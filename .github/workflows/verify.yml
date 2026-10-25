@@ -33,13 +33,20 @@ jobs:
       - name: 构建
         run: node build.mjs
 
-      - name: 开屏版本检查与刷新验证
-        run: |
-          node tools/verify-startup-update.cjs
-          node tools/verify-update-service-worker.cjs
-          node tools/verify-card-ownership.cjs
-          node tools/verify-update-focus-and-input.cjs
-          MOCHI_ENGINE=webkit node tools/verify-update-focus-and-input.cjs
+      - name: 开屏版本检查
+        run: node tools/verify-startup-update.cjs
+
+      - name: 更新缓存与失败重试验证
+        run: node tools/verify-update-service-worker.cjs
+
+      - name: 公用与专属字卡归属验证
+        run: node tools/verify-card-ownership.cjs
+
+      - name: Chrome 弹窗焦点与聊天输入验证（慢启动）
+        run: MOCHI_STARTUP_DELAY=6500 node tools/verify-update-focus-and-input.cjs
+
+      - name: WebKit 弹窗焦点与聊天输入验证（慢启动）
+        run: MOCHI_ENGINE=webkit MOCHI_STARTUP_DELAY=6500 node tools/verify-update-focus-and-input.cjs
 
       - name: 二改功能验证
         run: node tools/verify-personal.cjs
