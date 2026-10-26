@@ -111,43 +111,17 @@ const server = createServer((req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const baseUrl = 'http://127.0.0.1:' + server.address().port;
 
-const cdpPort = Number(process.env.MOCHI_CDP_PORT) || (10260 + Math.floor(Math.random() * 40));
-const chrome = spawn(chromePath, [
-  '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
-  '--user-data-dir=' + join(process.env.TEMP || '/tmp', 'mochi-660v-' + Date.now()),
-  '--remote-debugging-port=' + cdpPort, 'about:blank'
-], { stdio: 'ignore' });
-
-let ws = null, msgId = 0;
-const pend = new Map();
-const jsErrors = [];
-async function cdpConnect() {
-  for (let i = 0; i < 60; i++) {
-    try {
-      const list = await (await fetch('http://127.0.0.1:' + cdpPort + '/json')).json();
-      const page = list.find((t) => t.type === 'page');
-      if (page) {
-        ws = new WebSocket(page.webSocketDebuggerUrl);
-        await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
-        ws.onmessage = (ev) => {
-          const m = JSON.parse(ev.data);
-          if (m.method === 'Runtime.exceptionThrown') {
-            const d = m.params && m.params.exceptionDetails;
-            jsErrors.push((d && d.exception && d.exception.description || d && d.text || 'js error').slice(0, 200));
-          }
-          if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result); pend.delete(m.id); }
-        };
-        return;
-      }
-    } catch (e) {}
-    await sleep(150);
-  }
-  throw new Error('无法连接无头浏览器');
+let ws=null,pwBrowser=null,pwSession=null;
+const jsErrors=[];
+async function cdpConnect(){
+ const {chromium}=await import('playwright');
+ pwBrowser=await chromium.launch({headless:true,executablePath:chromePath});
+ const context=await pwBrowser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
+ const page=await context.newPage();await page.addInitScript(()=>{localStorage.setItem('xy-home-v2:storage-guide-shown','1250');localStorage.setItem('xy-home-v2:cc-scope-migrated','1');localStorage.setItem('xy-home-v2:cc-scope-notice-done','1');});page.on('dialog',d=>d.accept());
+ pwSession=await context.newCDPSession(page);
+ pwSession.on('Runtime.exceptionThrown',m=>{const d=m.exceptionDetails;jsErrors.push((d?.exception?.description||d?.text||'js error').slice(0,200));});
 }
-function cdp(method, params = {}) {
-  const id = ++msgId;
-  return new Promise((res) => { pend.set(id, res); ws.send(JSON.stringify({ id, method, params })); });
-}
+function cdp(method,params={}){return pwSession.send(method,params);}
 async function evalJs(expr) {
   try {
     const r = await cdp('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
@@ -159,6 +133,7 @@ async function evalJs(expr) {
   } catch (e) { return null; }
 }
 async function bootToReady() {
+  await evalJs("(()=>{const b=document.querySelector('#startup-update-dialog [data-update-later]');if(b)b.click();for(const p of ['xy-home-v2','xy-home-v2:default'])for(const k of ['__last-backup','__last-backup-remind'])localStorage.setItem(p+':'+k,String(Date.now()));return 1;})()");
   for (let i = 0; i < 50; i++) { if (await evalJs('!!window.__mochiDataReady')) break; await sleep(300); }
   await evalJs("(function(){var s=document.getElementById('splash');if(s&&!s.classList.contains('hide'))s.click();return 1;})()");
   await sleep(500);
@@ -228,13 +203,13 @@ try {
   await bootToReady();
   await openChat();
 
-  const DEF = ['mic', 'continue', 'more', 'emoji', 'input', 'img', 'batch'];
+  const DEF = ['continue', 'more', 'input', 'emoji', 'img', 'batch', 'mic'];
   let b = await evalJs(VISUAL);
   let o = null; try { o = JSON.parse(b); } catch (e) {}
   check('B1 默认排序值写在每个令牌上（10 起递增，发送 999 恒最后）',
     !!o && o.orderAttr === orderAttrOf(DEF) && o.sendLast, b);
-  check('B2 默认可见顺序（三个开关未开时）= 更多→表情→输入框→图片，发送在最后',
-    !!o && o.visible === 'more,emoji,input,img' && o.sendLast, b);
+  check('B2 默认可见顺序（三个开关未开时）= 更多→输入框→表情→图片，发送在最后',
+    !!o && o.visible === 'more,input,emoji,img' && o.sendLast, b);
   check('B2b 群聊输入栏默认就拿到同一份顺序（两排共用）', !!o && o.gcOrder === o.orderAttr, b);
 
   // B3 打开三个开关（走真实开关 UI）→ 语音/继续说/批量发送按默认位置现身
@@ -278,7 +253,7 @@ try {
     await evalJs(`(function(){var r=document.querySelector('#io-order-drawer [data-io-row="img"] [data-io-move="-1"]'); if(r){r.click(); return 1;} return 0;})()`);
     await sleep(150);
   }
-  const AFTER_IMG = ['mic', 'continue', 'img', 'more', 'emoji', 'input', 'batch'];
+  const AFTER_IMG = ['continue', 'img', 'more', 'input', 'emoji', 'batch', 'mic'];
   let b6 = await evalJs(`(function(){
     var p=document.getElementById('io-order-drawer');
     return JSON.stringify({
@@ -294,13 +269,13 @@ try {
 
   // B7 把「麦克风」右移 6 次到最右 → 位置管理连开关型按钮一起管
   for (let i = 0; i < 6; i++) {
-    await evalJs(`(function(){var r=document.querySelector('#io-order-drawer [data-io-row="mic"] [data-io-move="1"]'); if(r){r.click(); return 1;} return 0;})()`);
+    await evalJs(`(function(){var r=document.querySelector('#io-order-drawer [data-io-row="mic"] [data-io-move="-1"]'); if(r){r.click(); return 1;} return 0;})()`);
     await sleep(150);
   }
-  const AFTER_MIC = ['continue', 'img', 'more', 'emoji', 'input', 'batch', 'mic'];
+  const AFTER_MIC = ['mic', 'continue', 'img', 'more', 'input', 'emoji', 'batch'];
   const b7 = await evalJs(`localStorage.getItem('xy-home-v2:default:cs-input-order')`);
   saved = null; try { saved = JSON.parse(b7); } catch (e) {}
-  check('B7 麦克风右移 6 次到最右（开关型按钮同样可管）',
+  check('B7 麦克风左移 6 次到最左（开关型按钮同样可管）',
     !!(saved && saved.join(',') === AFTER_MIC.join(',')), b7);
 
   // B8 关面板回聊天页 → 那排真的换位、发送仍在最后、群聊同步
@@ -308,7 +283,7 @@ try {
   await backToChat();
   b = await evalJs(VISUAL);
   o = null; try { o = JSON.parse(b); } catch (e) {}
-  check('B8 聊天页那排真的换位（麦克风在最右）且发送仍在最后',
+  check('B8 聊天页那排真的换位（麦克风在最左）且发送仍在最后',
     !!o && o.visible === AFTER_MIC.join(',') && o.sendLast, b);
   check('B8b 群聊输入栏同步换位', !!o && o.gcOrder === orderAttrOf(AFTER_MIC), b);
   const lockAfterClose = await evalJs(`(function(){
@@ -334,18 +309,18 @@ try {
   check('B10 [#660附] 开关开着的「继续说」按钮冷启动后仍可见（旧产物此处恒隐藏，要切联系人才出现）',
     !!o && o.continueBtn === 'shown', b);
 
-  // B11 位置与开关互不影响：关掉「录音」→ 只少了它、其余相对位置不变；再打开 → 回到保存的最右位
+  // B11 位置与开关互不影响：关掉「录音」→ 只少了它、其余相对位置不变；再打开 → 回到保存的最左位
   await evalJs("(function(){var v=document.getElementById('cs-voice-send'); if(v && v.checked) v.click(); return 1;})()");
   await sleep(400);
   b = await evalJs(VISUAL);
   o = null; try { o = JSON.parse(b); } catch (e) {}
   check('B11 关掉「录音」开关：只少了麦克风，其余按钮位置纹丝不动',
-    !!o && o.visible === ['continue', 'img', 'more', 'emoji', 'input', 'batch'].join(','), b);
+    !!o && o.visible === AFTER_MIC.filter(t=>t!=='mic').join(','), b);
   await evalJs("(function(){var v=document.getElementById('cs-voice-send'); if(v && !v.checked) v.click(); return 1;})()");
   await sleep(400);
   b = await evalJs(VISUAL);
   o = null; try { o = JSON.parse(b); } catch (e) {}
-  check('B12 再打开开关：麦克风回到保存的最右位（不是回原位＝位置与显隐两套配置互不覆盖）',
+  check('B12 再打开开关：麦克风回到保存的最左位（不是回原位＝位置与显隐两套配置互不覆盖）',
     !!o && o.visible === AFTER_MIC.join(','), b);
 
   // B13 恢复默认 → 存档键被清掉 + 设置行回显 + 两排回默认
@@ -443,18 +418,19 @@ try {
   })()`);
   await sleep(300);
   o = null; try { o = JSON.parse(b18b); } catch (e) {}
-  // 期望值按 chat.js 的 10+下标*10 现算：默认序里 img 在下标 5＝60，左移一次与输入框换位
-  // → img 下标 4＝50、more 仍下标 2＝30。（这条原先写死 '20'，是 #660 早期口径；A15 长期挂红
+  // 期望值按 chat.js 的 10+下标*10 现算：默认序里 img 在下标 4＝50，左移一次与表情换位
+  // → img 下标 3＝40、more 仍下标 1＝20。（这条原先写死 '20'，是 #660 早期口径；A15 长期挂红
   //  把 B 轴整段 gate 掉了，所以一直没人看见它也对不上。）
   check('B18b 在群聊侧面板里移一次：群聊输入栏立刻换位 + 行内回显转「已自定义」',
-    !!o && o.img === '50' && o.more === '30' && o.val === '已自定义', b18b);
+    !!o && o.img === '40' && o.more === '20' && o.val === '已自定义', b18b);
   await evalJs("(function(){var m=document.getElementById('io-order-drawer'); if(m){ var bs=m.querySelectorAll('button'); for(var i=0;i<bs.length;i++){ if(bs[i].textContent==='恢复默认排列'){ bs[i].click(); break; } } m.hidden=true; m.style.display='none'; } return 1;})()");
   await sleep(250);
 } catch (e) {
   check('B 轴执行异常：' + (e && e.message), false);
 } finally {
   try { ws && ws.close(); } catch (e) {}
-  try { chrome.kill(); } catch (e) {}
+  try { if(pwBrowser)await pwBrowser.close(); } catch(e) {}
+
   try { server.close(); } catch (e) {}
 }
 

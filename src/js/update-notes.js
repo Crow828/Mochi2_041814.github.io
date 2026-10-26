@@ -4,7 +4,7 @@
   const settings = document.getElementById('page-setting');
   const basic = settings?.querySelector('.them-sec[data-sec="basic"]');
   if (!basic || document.getElementById('row-update-notes')) return;
-  const entries = [{date:'2026-10-25',items:[
+  const entries = [{date:'2026-10-26',items:[['v4.2.7 · 自定义心情管理','新增管理入口，可修改自定义 emoji、心情名称和程度，或删除选项；保留已保存的日记。'],['聊天底栏调整','默认顺序调整：表情包在照片左侧，语音在发送键左侧；保留原有按钮功能及自定义排序入口。']]},{date:'2026-10-25',items:[
 ['聊天历史合并','修复历史排序后按旧位置回填卡片状态的问题，改为按消息身份匹配，避免覆盖其他消息及造成日期错位。'],
 ['历史问题卡片','点击问题卡片时按消息身份定位，减少历史下标变化造成的无法展开选择与回答。'],
 ['版本重试修复','开屏关闭后仍保留本页构建号，重新检查不再因开屏元素移除而误报网络失败。'],

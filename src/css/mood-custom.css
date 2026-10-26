@@ -12,3 +12,8 @@
 .mood-custom-actions button { flex:1; padding:11px; border:0; border-radius:11px; font:inherit; font-size:14px; cursor:pointer; background:var(--static-bg,#eee); color:var(--ink,#111); }
 #mood-custom-confirm { background:var(--ink,#111); color:var(--card-bg,#fff); }
 .mood-custom-dialog { margin:auto; }
+
+.mood-manage-list { max-height:45vh; overflow-y:auto; }
+.mood-manage-row { display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(128,128,128,.15); }
+.mood-manage-row > span { flex:1;min-width:0;overflow-wrap:anywhere; }
+.mood-manage-row > button { padding:8px 10px;border:0;border-radius:12px;background:var(--static-bg,#eee);color:var(--ink,#111);font:inherit;font-size:13px;flex-shrink:0;cursor:pointer; }

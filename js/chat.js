@@ -12763,7 +12763,7 @@ syncBatchBtn();
 document.addEventListener('batch-send-changed', syncBatchBtn);
 syncBatchBtn();
 const INPUT_IO_TOKENS = ['mic', 'continue', 'more', 'emoji', 'input', 'img', 'batch'];
-const INPUT_IO_DEFAULT = INPUT_IO_TOKENS.slice();
+const INPUT_IO_DEFAULT = ['continue', 'more', 'input', 'emoji', 'img', 'batch', 'mic'];
 const INPUT_IO_ORDER_BASE = 10;  // [data-io] 起始序，依次 +10；发送按钮固定 999＝恒在最后
 const INPUT_IO_SEND_ORDER = 999;
 function inputIoNormalize(raw) {
@@ -12771,7 +12771,7 @@ const out = [];
 (Array.isArray(raw) ? raw : []).forEach((t) => {
 if (INPUT_IO_TOKENS.indexOf(t) >= 0 && out.indexOf(t) < 0) out.push(t);
 });
-INPUT_IO_TOKENS.forEach((t) => { if (out.indexOf(t) < 0) out.push(t); });
+INPUT_IO_DEFAULT.forEach((t) => { if (out.indexOf(t) < 0) out.push(t); });
 return out;
 }
 function inputIoRead() {

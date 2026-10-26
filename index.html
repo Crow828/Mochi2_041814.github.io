@@ -9633,6 +9633,10 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .mood-custom-actions button { flex:1; padding:11px; border:0; border-radius:11px; font:inherit; font-size:14px; cursor:pointer; background:var(--static-bg,#eee); color:var(--ink,#111); }
 #mood-custom-confirm { background:var(--ink,#111); color:var(--card-bg,#fff); }
 .mood-custom-dialog { margin:auto; }
+.mood-manage-list { max-height:45vh; overflow-y:auto; }
+.mood-manage-row { display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(128,128,128,.15); }
+.mood-manage-row > span { flex:1;min-width:0;overflow-wrap:anywhere; }
+.mood-manage-row > button { padding:8px 10px;border:0;border-radius:12px;background:var(--static-bg,#eee);color:var(--ink,#111);font:inherit;font-size:13px;flex-shrink:0;cursor:pointer; }
 #chat-fav-selection {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--card-bg,#fff);border-top:1px solid var(--line,#ddd);flex-shrink:0;}
 #chat-fav-selection[hidden] {display:none!important;}
 #chat-fav-selection button {padding:10px 12px;border-radius:12px;background:var(--static-bg,#f1f1f1);color:var(--ink,#111);font-size:13px;}
@@ -10234,7 +10238,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792942013046" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1793009737070" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -21216,7 +21220,7 @@ dialog.innerHTML='<h2 id="startup-update-title">版本检查</h2><small data-tod
 const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}'+'#startup-update-dialog small{display:block;font-size:12px;line-height:1.7;color:var(--muted,#888);white-space:pre-line}#startup-update-dialog button:disabled{opacity:.55}';
 document.head.appendChild(style);document.body.appendChild(dialog);
 const ts=currentBuildTs(), stamp=ts?new Date(ts).toLocaleString('zh-CN',{hour12:false}):'未知';
-dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.6 刷新弹窗修复\n构建时间：'+stamp;
+dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.7\n构建时间：'+stamp;
 dialog.querySelector('[data-update-later]').onclick=()=>dialog.close();
 dialog.addEventListener('close',()=>{
 const active=document.activeElement,previous=dialog.__mochiPreviousFocus;
@@ -21950,4 +21954,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 </body>
 </html>
 
-<!-- __MOCHI_EOF__ mvnzdrau -->
+<!-- __MOCHI_EOF__ mvp3pbhq -->

@@ -44,7 +44,7 @@
     try { const list=JSON.parse(store().get(CUSTOM_KEY)||'[]');return Array.isArray(list)?list.filter(m=>m&&typeof m.e==='string'&&m.e&&typeof m.n==='string'&&m.n&&!MOODS.some(b=>b.e===m.e)).map(m=>({e:m.e,n:m.n,s:Math.max(1,Math.min(5,Number(m.s)||3))})):[]; }catch(e){return [];}
   }
   function moodByEmoji(e,record) {
-    return MOODS.find(m=>m.e===e)||customMoods().find(m=>m.e===e)||(e?{e:e,n:record&&record.label||'自定义心情',s:Math.max(1,Math.min(5,Number(record&&record.score)||3))}:null);
+    return MOODS.find(m=>m.e===e)||(record&&record.label?{e:e,n:record.label,s:Math.max(1,Math.min(5,Number(record.score)||3))}:null)||customMoods().find(m=>m.e===e)||(e?{e:e,n:record&&record.label||'自定义心情',s:Math.max(1,Math.min(5,Number(record&&record.score)||3))}:null);
   }
   function renderEmojiGrid() {
     const grid=document.getElementById('mood-emoji-grid');if(!grid)return;
@@ -55,14 +55,16 @@
       const name=document.createElement('span');name.className='mood-emoji-name';name.textContent=m.n;b.append(face,name);
       b.addEventListener('click',()=>{selMood=selMood===m.e?'':m.e;grid.querySelectorAll('.mood-emoji-item').forEach(x=>{x.classList.toggle('sel',x.dataset.mood===selMood);x.setAttribute('aria-pressed',String(x.dataset.mood===selMood));});});grid.appendChild(b);
     });
-    const add=document.createElement('button');add.type='button';add.id='mood-custom-add';add.className='mood-emoji-item mood-custom-add';add.innerHTML='<span class="mood-emoji-face" aria-hidden="true">＋</span><span class="mood-emoji-name">添加心情</span>';add.addEventListener('click',openCustomMood);grid.appendChild(add);
+    const add=document.createElement('button');add.type='button';add.id='mood-custom-add';add.className='mood-emoji-item mood-custom-add';add.innerHTML='<span class="mood-emoji-face" aria-hidden="true">＋</span><span class="mood-emoji-name">添加心情</span>';add.addEventListener('click',()=>openCustomMood());grid.appendChild(add);
+    if(customMoods().length){const manage=document.createElement('button');manage.type='button';manage.id='mood-custom-manage';manage.className='mood-emoji-item mood-custom-add';manage.innerHTML='<span class="mood-emoji-face" aria-hidden="true">⚙</span><span class="mood-emoji-name">管理心情</span>';manage.onclick=openMoodManager;grid.appendChild(manage);}
   }
-  function openCustomMood() {
+  function openCustomMood(edit) {
     const owner=window.activePrefix();
     let dialog=document.getElementById('mood-custom-dialog');if(dialog)dialog.remove();
     dialog=document.createElement('dialog');dialog.id='mood-custom-dialog';dialog.className='mood-custom-dialog';dialog.setAttribute('aria-labelledby','mood-custom-title');
     dialog.innerHTML='<h3 id="mood-custom-title">添加自定义心情</h3><label for="mood-custom-emoji">Emoji</label><input id="mood-custom-emoji" type="text" maxlength="32" placeholder="例如：🌻" autocomplete="off" aria-label="自定义心情 Emoji"><label for="mood-custom-name">心情名称</label><input id="mood-custom-name" type="text" maxlength="12" placeholder="例如：充满期待" autocomplete="off" aria-label="自定义心情名称"><label for="mood-custom-score">心情程度<span class="mood-custom-hint">用于月度曲线</span></label><select id="mood-custom-score"><option value="1">1 · 很低落</option><option value="2">2 · 偏低</option><option value="3" selected>3 · 一般</option><option value="4">4 · 不错</option><option value="5">5 · 很好</option></select><p id="mood-custom-error" role="status" aria-live="polite"></p><div class="mood-custom-actions"><button type="button" id="mood-custom-cancel">取消</button><button type="button" id="mood-custom-confirm">添加</button></div>';
     document.body.appendChild(dialog);
+    if(edit){dialog.querySelector('#mood-custom-title').textContent='修改自定义心情';dialog.querySelector('#mood-custom-emoji').value=edit.e;dialog.querySelector('#mood-custom-name').value=edit.n;dialog.querySelector('#mood-custom-score').value=String(edit.s);dialog.querySelector('#mood-custom-confirm').textContent='保存修改';}
     dialog.querySelector('#mood-custom-cancel').addEventListener('click',()=>dialog.close());
     const fail=text=>{dialog.querySelector('#mood-custom-error').textContent=text;};
     dialog.querySelector('#mood-custom-confirm').addEventListener('click',()=>{
@@ -73,16 +75,26 @@
       const count=typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(emoji)].length:1;
       if(!isEmoji||count!==1||emoji.length>32){fail('请填写一个 emoji 表情');return;}
       if(!name||name.length>12){fail('请填写 1～12 个字的心情名称');return;}
-      const list=customMoods();if(MOODS.concat(list).some(m=>m.e===emoji)){fail('这个 emoji 已有对应心情，请选择其他表情');return;}
-      if(list.length>=50){fail('最多可添加 50 个自定义心情');return;}
-      list.push({e:emoji,n:name,s:Number(dialog.querySelector('#mood-custom-score').value)||3});
+      const list=customMoods();if(MOODS.some(m=>m.e===emoji)||list.some(m=>m.e===emoji&&(!edit||m.e!==edit.e))){fail('这个 emoji 已有对应心情，请选择其他表情');return;}
+      if(!edit&&list.length>=50){fail('最多可添加 50 个自定义心情');return;}
+      const item={e:emoji,n:name,s:Number(dialog.querySelector('#mood-custom-score').value)||3};
+      if(edit){const at=list.findIndex(m=>m.e===edit.e);if(at<0){fail('这项心情已不存在，请重新打开管理');return;}list[at]=item;}else list.push(item);
       try{store().set(CUSTOM_KEY,JSON.stringify(list));}catch(e){fail('保存未完成，请稍后重试');return;}
-      selMood=emoji;renderEmojiGrid();dialog.close();toast('已添加「'+name+'」，点击「记下今天」即可记录');
+      if(!edit||selMood===edit.e)selMood=emoji;renderEmojiGrid();dialog.close();toast(edit?'已修改心情，历史日记保持原样':'已添加「'+name+'」，点击「记下今天」即可记录');
     });
     dialog.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229&&event.target.tagName!=='SELECT'){event.preventDefault();dialog.querySelector('#mood-custom-confirm').click();}});
     dialog.addEventListener('input',()=>fail(''));
     dialog.addEventListener('change',()=>fail(''));
     dialog.showModal();
+  }
+
+  function openMoodManager(){
+    const owner=window.activePrefix();let dialog=document.getElementById('mood-custom-manager');if(dialog)dialog.remove();
+    dialog=document.createElement('dialog');dialog.id='mood-custom-manager';dialog.className='mood-custom-dialog';dialog.setAttribute('aria-labelledby','mood-manage-title');
+    dialog.innerHTML='<h3 id="mood-manage-title">管理自定义心情</h3><p class="mood-custom-hint">修改或删除选项不会删除已保存的日记。</p><div class="mood-manage-list"></div><div class="mood-custom-actions"><button type="button" id="mood-manage-close">完成</button></div>';
+    const ready=()=>{if(window.activePrefix()!==owner){dialog.close();toast('桌面已切换，请重新打开管理');return false;}if(window.mochiDataPending&&window.mochiDataPending()){toast('心情数据还在读取，请稍后再操作');return false;}return true;};
+    const draw=()=>{const box=dialog.querySelector('.mood-manage-list');box.replaceChildren();const list=customMoods();if(!list.length){box.textContent='暂无自定义心情';return;}list.forEach(m=>{const row=document.createElement('div');row.className='mood-manage-row';const name=document.createElement('span');name.textContent=m.e+' '+m.n;const edit=document.createElement('button');edit.type='button';edit.textContent='修改';edit.setAttribute('aria-label','修改'+m.n);edit.dataset.editMood=m.e;edit.onclick=()=>{if(!ready())return;dialog.close();openCustomMood(m);};const del=document.createElement('button');del.type='button';del.textContent='删除';del.setAttribute('aria-label','删除'+m.n);del.dataset.deleteMood=m.e;del.onclick=()=>{if(!ready()||!confirm('删除「'+m.n+'」这个心情选项？已保存的日记会保留。')||!ready())return;try{store().set(CUSTOM_KEY,JSON.stringify(customMoods().filter(x=>x.e!==m.e)));if(selMood===m.e)selMood='';renderEmojiGrid();draw();toast('已删除心情选项');}catch(e){toast('删除未完成，请稍后重试');}};row.append(name,edit,del);box.appendChild(row);});};
+    document.body.appendChild(dialog);dialog.querySelector('#mood-manage-close').onclick=()=>dialog.close();draw();dialog.showModal();
   }
 
   // FIX 2026-09-28 #1353e：日记包多一条 `days`（记下「这些天真有过聊天互动」），TA 心情与日历那句改读它。

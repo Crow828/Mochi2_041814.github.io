@@ -16043,7 +16043,7 @@ syncBatchBtn();
 // 视觉层、随时可逆。聊天页与群聊输入栏共用同一份顺序（两处同名 data-io 令牌一批处理）。
 // 保存键 cs-input-order（JSON 数组、每联系人独立，与 cs-voice-send/cs-batch-send 同域）。
 const INPUT_IO_TOKENS = ['mic', 'continue', 'more', 'emoji', 'input', 'img', 'batch'];
-const INPUT_IO_DEFAULT = INPUT_IO_TOKENS.slice();
+const INPUT_IO_DEFAULT = ['continue', 'more', 'input', 'emoji', 'img', 'batch', 'mic'];
 const INPUT_IO_ORDER_BASE = 10;  // [data-io] 起始序，依次 +10；发送按钮固定 999＝恒在最后
 const INPUT_IO_SEND_ORDER = 999;
 // 归一化：只认已知令牌、去重，缺失的按默认顺序补齐——存档被改坏或版本增删令牌，
@@ -16053,7 +16053,7 @@ const out = [];
 (Array.isArray(raw) ? raw : []).forEach((t) => {
 if (INPUT_IO_TOKENS.indexOf(t) >= 0 && out.indexOf(t) < 0) out.push(t);
 });
-INPUT_IO_TOKENS.forEach((t) => { if (out.indexOf(t) < 0) out.push(t); });
+INPUT_IO_DEFAULT.forEach((t) => { if (out.indexOf(t) < 0) out.push(t); });
 return out;
 }
 function inputIoRead() {
