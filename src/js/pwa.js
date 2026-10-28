@@ -316,7 +316,7 @@
       const style=document.createElement('style');style.textContent='#startup-update-dialog{position:fixed;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;width:min(340px,calc(100vw - 40px));border:0;border-radius:24px;padding:26px;background:var(--card,#fff);color:var(--text,#111);box-shadow:0 12px 44px #0002}#startup-update-dialog::backdrop{background:#0005}#startup-update-dialog h2{font-size:20px;margin:0 0 12px}#startup-update-dialog p{font-size:14px;color:#888;line-height:1.7}#startup-update-dialog>div{display:flex;gap:10px;margin-top:22px}#startup-update-dialog button{flex:1;border:0;border-radius:14px;font:inherit;font-size:14px;padding:13px;background:#eee;color:#555}#startup-update-dialog [data-update-refresh]{background:#111;color:white}'+'#startup-update-dialog small{display:block;font-size:12px;line-height:1.7;color:var(--muted,#888);white-space:pre-line}#startup-update-dialog button:disabled{opacity:.55}';
       document.head.appendChild(style);document.body.appendChild(dialog);
       const ts=currentBuildTs(), stamp=ts?new Date(ts).toLocaleString('zh-CN',{hour12:false}):'未知';
-      dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.7\n构建时间：'+stamp;
+      dialog.querySelector('[data-current-build]').textContent='当前版本：v4.2.8\n构建时间：'+stamp;
       dialog.querySelector('[data-update-later]').onclick=()=>dialog.close();
       dialog.addEventListener('close',()=>{
         const active=document.activeElement,previous=dialog.__mochiPreviousFocus;

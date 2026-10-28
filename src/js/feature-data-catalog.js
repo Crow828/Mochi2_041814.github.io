@@ -231,7 +231,7 @@
       // 真正该有人管而一直没人管的三格补上：深浅色 theme-mode / 强调色 accent-color（personalize.js:4910 注释
       // 「全局设置，不按联系人隔离」的顶层键）、后台保活与通知 bg-keepalive / bg-notify（bg-keep.js:1150/1557 走
       // gSet 顶层；从「桌面布局与美化」那行搬来）、版本更新提示开关 ver-update-notify（pwa.js:193）。
-      res: [/^sfx-/, /^notice-/, /^onboarding/, /^guide-/, /^splash-/, /^backup-/, /^last-export$/, /^install-/, /^theme-mode$/, /^accent-color$/, /^bg-keep/, /^bg-notify/, /^ver-update-notify$/] }
+      res: [/^sfx-/, /^notice-/, /^onboarding/, /^guide-/, /^splash-/, /^backup-/, /^last-export$/, /^install-/, /^theme-mode$/, /^theme-palette$/, /^theme-icon-follow$/, /^accent-color$/, /^bg-keep/, /^bg-notify/, /^ver-update-notify$/] }
   ];
 
   // ================= #679 各功能页内数据卡的挂点 =================

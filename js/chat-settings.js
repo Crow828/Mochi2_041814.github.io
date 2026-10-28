@@ -319,6 +319,7 @@ setVar(chatPage, '--' + item.key, item.unit === '%' ? v / 100 : v + 'px');
 [['in', inBg], ['out', outBg]].forEach(([side, color]) => {
 const rgb = _csHexRgb(color);
 setVar(chatPage, '--cs-' + side + '-surface', rgb ? 'rgba(' + rgb.join(',') + ',' + values[2] / 100 + ')' : color);
+setVar(root, '--fav-chat-' + side + '-bg', rgb ? 'rgba(' + rgb.join(',') + ',' + values[2] / 100 + ')' : color);
 });
 const labels = {
 'cs-bar-op-val': '顶 ' + values[0] + '% / 底 ' + values[1] + '%',
@@ -411,6 +412,24 @@ if (bg.length > 12 * 1024 * 1024) { try { store.remove('cs-bg'); } catch (e) {} 
 bg = null;
 }
 const bgLayer = csBgLayer();
+const solidBg = store.get('cs-bg-color') || '';
+if (chatPage) {
+if (/^#[0-9a-f]{6}$/i.test(solidBg)) setVar(chatPage, 'background-color', solidBg);
+else delVar(chatPage, 'background-color');
+}
+set('cs-bg-color-val', solidBg || '跟随主题');
+const rgb = hex => /^#[0-9a-f]{6}$/i.test(hex || '') ? [1,3,5].map(i => parseInt(hex.slice(i,i+2),16)) : null;
+const paletteBase = rgb(solidBg) || rgb(root.style.getPropertyValue('--palette-bg').trim());
+const hasPalette = root.hasAttribute('data-soft-palette') && root.getAttribute('data-theme') !== 'dark';
+if (hasPalette && paletteBase) setVar(chatPage, '--cs-theme-bar-rgb', paletteBase.map(n => Math.round(n * .94)).join(','));
+else delVar(chatPage, '--cs-theme-bar-rgb');
+for (const part of ['head','input']) {
+const chosen = store.get('cs-' + part + '-color');
+const channels = rgb(chosen);
+if (channels) setVar(chatPage, '--cs-custom-' + part + '-rgb', channels.join(','));
+else delVar(chatPage, '--cs-custom-' + part + '-rgb');
+set('cs-' + part + '-color-val', channels ? chosen : '跟随主题');
+}
 if (bg && bgLayer) {
 const fit = csBgFit();
 const adj = csBgAdj();
@@ -1077,6 +1096,38 @@ swatches: swatches
 });
 });
 }
+const solidBgRow = row('cs-bg-color');
+if (solidBgRow) solidBgRow.addEventListener('click', () => {
+if (!window.openModal) return;
+const owner = window.activePrefix();
+window.openModal('聊天背景颜色', '', value => {
+if (window.activePrefix() !== owner) return;
+const colors = ['#FAF6F7', '#F8F5F3', '#F8F4EE', '#FFFFFF', '#F2F4F7', '#EDE6EA'];
+const color = typeof value === 'number' ? colors[value] : value;
+if (color !== 'theme' && !/^#[0-9a-f]{6}$/i.test(color || '')) return;
+store.set('cs-bg-color', color === 'theme' ? '' : color);
+applySettings();
+}, { noInput: true, colorPicker: true, color: store.get('cs-bg-color') || '#FAF6F7',
+swatches: ['#FAF6F7', '#F8F5F3', '#F8F4EE', '#FFFFFF', '#F2F4F7', '#EDE6EA'].map(color => ({color, label:color})),
+pills: [{label:'跟随主题', value:'theme'}] });
+});
+function bindBarColor(part, title) {
+const el = row('cs-' + part + '-color');
+if (!el) return;
+el.addEventListener('click', () => {
+if (!window.openModal) return;
+const owner = window.activePrefix(), colors = ['#EBE4E7','#E9E1E1','#E9E1D7','#FFFFFF','#F2F4F7','#DCE5ED'];
+window.openModal(title, '', value => {
+if (window.activePrefix() !== owner) return;
+const color = typeof value === 'number' ? colors[value] : value;
+if (color !== 'theme' && !/^#[0-9a-f]{6}$/i.test(color || '')) return;
+store.set('cs-' + part + '-color', color === 'theme' ? '' : color);
+applySettings();
+}, {noInput:true,colorPicker:true,color:store.get('cs-' + part + '-color') || colors[0],swatches:colors.map(color=>({color,label:color})),pills:[{label:'跟随主题',value:'theme'}]});
+});
+}
+bindBarColor('head', '聊天顶部栏颜色');
+bindBarColor('input', '聊天底部栏颜色');
 function editChatSurface(index) {
 if (!window.openModal) return;
 const item = CHAT_SURFACE_SETTINGS[index];
@@ -1564,7 +1615,7 @@ applyCss();
 const gStoreChat = window.xyStore('xy-home-v2');
 const CHAT_SCHEMES_KEY = 'chat-beauty-schemes';
 const CHAT_BEAUTY_KEYS = [
-'cs-bg', 'cs-bubble-css', 'cs-font', 'cs-font-size', 'cs-time-font-size', 'cs-notice-font-size', 'cs-bubble-size',
+'cs-bg', 'cs-bg-color', 'cs-head-color', 'cs-input-color', 'cs-bubble-css', 'cs-font', 'cs-font-size', 'cs-time-font-size', 'cs-notice-font-size', 'cs-bubble-size',
 'cs-bubble-radius', 'cs-av-shape', 'cs-time-style', 'cs-time-ink', 'cs-typing-ink',
 'cs-out-bg', 'cs-out-ink', 'cs-in-bg', 'cs-in-ink',
 'cs-send-bg', 'cs-send-ink', 'cs-send-show',

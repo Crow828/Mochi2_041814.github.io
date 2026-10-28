@@ -81,7 +81,13 @@ jobs:
       - name: WebKit 聊天底栏验证
         run: MOCHI_ENGINE=webkit node tools/verify-v427-input-layout.cjs
 
-      - name: v4.2.7 新功能验证
+      - name: Chrome 主题配色与独立外观设置验证
+        run: node tools/verify-theme-palettes.cjs
+
+      - name: WebKit 主题配色与独立外观设置验证
+        run: MOCHI_ENGINE=webkit node tools/verify-theme-palettes.cjs
+
+      - name: v4.2.8 功能回归验证
         run: |
           node tools/verify-card-library-layout.cjs
           node tools/verify-calendar-cleanup.cjs

@@ -4945,3 +4945,7 @@ select.mochi-custom-select-native { display:none; }
 .au-ed-foot { display:flex; align-items:center; justify-content:center; gap:10px; padding-bottom:2px; }
 .au-ed-foot .pong-overlay-btn { min-width:0; flex:1; }
 .au-ed-del { color:#ff8f8f !important; }
+
+/* Check-in history only: date headings lead, records indent beneath each date. */
+#ck-history .dc-h-more-body .dc-h-day-label {padding-left:4px;}
+#ck-history .dc-h-more-body .ck-location {padding-left:20px;padding-right:8px;}

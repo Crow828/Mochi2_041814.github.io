@@ -35,3 +35,186 @@
 [data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab { color:rgba(255,255,255,.38); }
 [data-theme="dark"] #page-reply-settings > .fav-tabs > .fav-tab.sel { color:#fff; border-bottom-color:#fff; }
 
+/* Optional flat palettes; removing the attribute restores all existing styles. */
+html[data-soft-palette]:not([data-theme="dark"]) {
+ --ink:var(--palette-ink)!important;--soft-ink:var(--palette-ink)!important;--muted:#71666b!important;
+ --page-bg:var(--palette-bg)!important;--page-bg-grad:var(--palette-bg)!important;
+ --bg-a:var(--palette-bg)!important;--bg-b:var(--palette-bg)!important;
+ --phone-bg-a:var(--palette-bg)!important;--phone-bg-b:var(--palette-bg)!important;
+ --card-bg:var(--palette-paper)!important;--card-bg-97:var(--palette-paper)!important;
+ --glass-bg:var(--palette-paper)!important;--widget-bg:var(--palette-paper)!important;
+ --input-bg:var(--palette-paper)!important;--btn-bg:var(--palette-accent)!important;--btn-ink:#fff!important;
+ --widget-btn:var(--palette-accent)!important;--widget-btn-text:#fff!important;
+}
+html[data-soft-palette]:not([data-theme="dark"]) .glass { background:var(--palette-paper)!important; }
+html[data-soft-palette]:not([data-theme="dark"]) .chat-send { background:var(--palette-accent)!important;color:#fff!important; }
+html[data-soft-palette]:not([data-theme="dark"]) #page-chat .msg-in .msg-bubble,
+html[data-soft-palette]:not([data-theme="dark"]) #page-group-chat .msg-in .msg-bubble { background:var(--palette-paper)!important;color:var(--palette-ink)!important; }
+html[data-soft-palette]:not([data-theme="dark"]) #page-chat .msg-out .msg-bubble,
+html[data-soft-palette]:not([data-theme="dark"]) #page-group-chat .msg-out .msg-bubble { background:var(--palette-bubble)!important;color:var(--palette-ink)!important; }
+.theme-palette-panel { padding:16px;scroll-margin-top:116px; }
+.theme-palette-intro { color:var(--soft-ink);font-size:12px;line-height:1.7;margin:0 0 14px; }
+.theme-palette-choices { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+.theme-palette-choice { min-width:0;text-align:left;border:1px solid var(--line);border-radius:14px;padding:10px 8px;background:var(--card-bg);color:var(--ink);font:inherit;cursor:pointer; }
+.theme-palette-choice[aria-pressed="true"] { border-color:var(--palette-accent);box-shadow:0 0 0 1px var(--palette-accent); }
+.theme-palette-choice strong { display:block;font-size:13px;margin-top:9px; }
+.theme-palette-choice small { display:block;font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5; }
+.theme-palette-swatches { display:flex;height:30px;overflow:hidden;border-radius:7px; }
+.theme-palette-swatches i { flex:1; }
+#theme-palette-status { font-size:12px;color:var(--soft-ink);line-height:1.6;margin:14px 0; }
+.theme-palette-demo { padding:16px;background:var(--sample-bg);color:var(--sample-ink);border-radius:16px;display:flex;flex-direction:column;gap:12px; }
+.theme-palette-demo-title { font-size:12px; }
+.theme-palette-demo-in,.theme-palette-demo-out { width:fit-content;max-width:90%;padding:10px 12px;font-size:13px;line-height:1.6;border-radius:13px;background:var(--sample-paper); }
+.theme-palette-demo-out { align-self:flex-end;background:var(--sample-bubble); }
+.theme-palette-demo-send { align-self:flex-end;padding:8px 18px;border-radius:20px;background:var(--sample-accent);color:#fff;font-size:12px; }
+#theme-palette-reset { width:100%;border:1px solid var(--line);border-radius:12px;background:var(--static-bg);color:var(--ink);font:inherit;font-size:13px;padding:12px;margin-top:14px;cursor:pointer; }
+.theme-palette-entry { width:100%;text-align:left;font:inherit;background:transparent;border:0;color:var(--ink); }
+.theme-palette-entry .val { flex-shrink:0; }
+@media(max-width:360px) { .theme-palette-panel { padding:12px; }.theme-palette-choices { gap:6px; }.theme-palette-choice { padding:9px 6px; } }
+
+
+/* Theme primary actions; semantic danger/status colors remain independent. */
+html[data-soft-palette]:not([data-theme="dark"]) .more-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .inv-g-batch.on,
+html[data-soft-palette]:not([data-theme="dark"]) .emoji-g-chip.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .rp-side.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .rp-amt.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .rp-send,
+html[data-soft-palette]:not([data-theme="dark"]) .cc-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .cc-modal-top-ok,
+html[data-soft-palette]:not([data-theme="dark"]) .cc-g-chip.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .eat-send,
+html[data-soft-palette]:not([data-theme="dark"]) .eat-menu-save,
+html[data-soft-palette]:not([data-theme="dark"]) .eat-chip.on,
+html[data-soft-palette]:not([data-theme="dark"]) .piggy-reply-send,
+html[data-soft-palette]:not([data-theme="dark"]) .gc-inter-pill.on,
+html[data-soft-palette]:not([data-theme="dark"]) .desk-lib-tab.on,
+html[data-soft-palette]:not([data-theme="dark"]) .desk-lib-item .dl-btn,
+html[data-soft-palette]:not([data-theme="dark"]) .msg-gift-claim,
+html[data-soft-palette]:not([data-theme="dark"]) .msg-wish-buy,
+html[data-soft-palette]:not([data-theme="dark"]) .gift-cat.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .gb-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .gb-ok,
+html[data-soft-palette]:not([data-theme="dark"]) .wish-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .wish-act,
+html[data-soft-palette]:not([data-theme="dark"]) .memo-add,
+html[data-soft-palette]:not([data-theme="dark"]) .sugar-save,
+html[data-soft-palette]:not([data-theme="dark"]) #mood-custom-confirm,
+html[data-soft-palette]:not([data-theme="dark"]) #chat-fav-selection [data-cfs="save"],
+html[data-soft-palette]:not([data-theme="dark"]) .chat-fav-check[aria-checked="true"],
+html[data-soft-palette]:not([data-theme="dark"]) .toggle input:checked + .tk,
+html[data-soft-palette]:not([data-theme="dark"]) .div-switch input:checked + .div-switch-knob,
+html[data-soft-palette]:not([data-theme="dark"]) .loc-switch input:checked + .loc-switch-tk {background:var(--palette-accent)!important;color:#fff!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .them-tab.active {color:var(--palette-accent)!important;border-bottom-color:var(--palette-accent)!important;}
+
+html[data-soft-palette]:not([data-theme="dark"]) .sfx-preset.on {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .fav-tab.sel {color:var(--palette-accent)!important;border-bottom-color:var(--palette-accent)!important;}
+
+/* Retained: independently selected chat bar colors and existing opacity controls. */
+#page-chat > .chat-head {background:rgba(var(--cs-custom-head-rgb,var(--cs-theme-bar-rgb,var(--cs-bar-rgb))),var(--cs-head-opacity-ink,var(--cs-head-opacity,.92)))!important;}
+#page-chat > .chat-input-row {background:rgba(var(--cs-custom-input-rgb,var(--cs-theme-bar-rgb,var(--cs-bar-rgb))),var(--cs-input-opacity-ink,var(--cs-input-opacity,.92)))!important;}
+
+/* Targeted palette corrections: preserve existing shapes and page interactions. */
+html[data-soft-palette]:not([data-theme="dark"]) .poke-tabs-row .poke-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .poke-tabs-row .poke-tab.poke-tab-ta.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .poke-tabs-row .poke-tab.poke-tab-mine.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .poke-tabs-row .poke-tab.poke-tab-pub.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .poke-big,
+html[data-soft-palette]:not([data-theme="dark"]) .poke-input-go,
+html[data-soft-palette]:not([data-theme="dark"]) .avlib-tab.active,
+html[data-soft-palette]:not([data-theme="dark"]) .avlib-kind.active,
+html[data-soft-palette]:not([data-theme="dark"]) .ta-add-btn,
+html[data-soft-palette]:not([data-theme="dark"]) .dc-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .dc-set-tab.active,
+html[data-soft-palette]:not([data-theme="dark"]) .gd-member.on,
+html[data-soft-palette]:not([data-theme="dark"]) .qa-send,
+html[data-soft-palette]:not([data-theme="dark"]) .chat-ask-type-btn.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .chat-search-go,
+html[data-soft-palette]:not([data-theme="dark"]) .div-mode.sel,
+html[data-soft-palette]:not([data-theme="dark"]) #chat-divine-body .div-mode.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .div-draw,
+html[data-soft-palette]:not([data-theme="dark"]) .div-send-btn,
+html[data-soft-palette]:not([data-theme="dark"]) .divf-tab.sel,
+html[data-soft-palette]:not([data-theme="dark"]) .divf-io-btn,
+html[data-soft-palette]:not([data-theme="dark"]) .loc-ask-btn,
+html[data-soft-palette]:not([data-theme="dark"]) .feed-comment-send {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-setting,
+html[data-soft-palette]:not([data-theme="dark"]) #page-chatcard,
+html[data-soft-palette]:not([data-theme="dark"]) #page-dict-cards,
+html[data-soft-palette]:not([data-theme="dark"]) #page-dict-cards > .chat-head {background:var(--palette-bg)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .fav-tab.sel, html[data-soft-palette]:not([data-theme="dark"]) #page-fav #fav-tabs > .fav-tab.sel, html[data-soft-palette]:not([data-theme="dark"]) .mem-type-pill.sel, html[data-soft-palette]:not([data-theme="dark"]) .mem-cal-cell.sel {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .mem-add-ok {background:var(--palette-accent)!important;color:#666!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .mem-add, html[data-soft-palette]:not([data-theme="dark"]) .mem-date-btn {background:var(--palette-bubble)!important;color:#666!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .chat-date-controls button, html[data-soft-palette]:not([data-theme="dark"]) .chat-date-grid button.chat-date-today {background:var(--palette-bubble)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .sugar-tabs button[aria-pressed="true"] {color:var(--palette-accent)!important;border-bottom-color:var(--palette-accent)!important;}
+
+html[data-soft-palette]:not([data-theme="dark"]) .market-hero, html[data-soft-palette]:not([data-theme="dark"]) .market-mine-add {background:#fff!important;color:var(--ink)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .market-hero::after {background-image:radial-gradient(circle,rgba(0,0,0,.08) 1px,transparent 1.5px)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .market-balance, html[data-soft-palette]:not([data-theme="dark"]) .market-mine-ico {background:var(--palette-bubble)!important;color:var(--ink)!important;border-color:var(--line,rgba(0,0,0,.1))!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .market-cat .market-cat-ico {background:#fff!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .market-cat.sel .market-cat-ico {background:var(--palette-accent)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .market-cat.sel .market-cat-name {color:var(--palette-accent)!important;}
+#page-fav .msg-in .msg-bubble {background:var(--fav-chat-in-bg,var(--msg-in-bg,#fff));color:var(--msg-in-ink,#111);}
+#page-fav .msg-out .msg-bubble {background:var(--fav-chat-out-bg,var(--msg-out-bg,#111));color:var(--msg-out-ink,#fff);}
+html[data-soft-palette]:not([data-theme="dark"]) #page-fav .msg-in .msg-bubble {background:var(--palette-paper)!important;color:var(--palette-ink)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-fav .msg-out .msg-bubble {background:var(--palette-bubble)!important;color:var(--palette-ink)!important;}
+
+/* Selected navigation labels and the favorites-only segmented control. */
+html[data-soft-palette]:not([data-theme="dark"]) .feed-range-pill.on {background:var(--palette-accent)!important;border-color:var(--palette-accent)!important;color:#fff!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-loc-cards, html[data-soft-palette]:not([data-theme="dark"]) #page-loc-cards > .chat-head {background:var(--palette-bg)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-fav #fav-tabs > .fav-tab {background:transparent!important;color:var(--muted,#888)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-fav #fav-tabs > .fav-tab.sel {background:var(--palette-accent)!important;color:#fff!important;}
+
+/* Music-only text navigation and playlist filter colors. */
+#page-music > .fav-tabs {gap:24px;padding:4px 18px 0;border-bottom:1px solid var(--line,#eee);}
+#page-music > .fav-tabs > .fav-tab {padding:12px 4px;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0;box-shadow:none;color:#999!important;}
+#page-music > .fav-tabs > .fav-tab.sel {background:transparent!important;color:var(--btn-bg)!important;border-bottom-color:var(--btn-bg)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-music > .fav-tabs > .fav-tab.sel {color:var(--palette-accent)!important;border-bottom-color:var(--palette-accent)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) .mlf-chip.sel {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+
+/* Music floating-player preference sits between navigation and the content card. */
+#page-music > .sm-float-row {margin:12px 18px;padding:12px 14px;border:1px solid var(--card-border,rgba(0,0,0,.1));border-radius:16px;background:var(--card-bg,#fff);color:var(--ink);font-size:13px;gap:12px;flex-shrink:0;box-sizing:border-box;}
+#page-music > .sm-float-row .toggle {flex-shrink:0;}
+
+html[data-soft-palette]:not([data-theme="dark"]) #page-music .sm-his-subtab.sel {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+
+/* Question history uses the same underline navigation as music. */
+#page-interact > .fav-tabs {gap:24px;padding:4px 18px 0;border-bottom:1px solid var(--line,#eee);}
+#page-interact > .fav-tabs > .fav-tab {padding:12px 4px;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0;box-shadow:none;color:#999!important;}
+#page-interact > .fav-tabs > .fav-tab.sel {background:transparent!important;color:var(--btn-bg)!important;border-bottom-color:var(--btn-bg)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-interact > .fav-tabs > .fav-tab.sel {color:var(--palette-accent)!important;border-bottom-color:var(--palette-accent)!important;}
+
+/* Card-library spacing: inset only the requested filters; retain wrapping and lower-section spacing. */
+:is(#dc-tabs,#dc-groups-bar,#fc-tabs,#fc-groups-bar,#mc-type-bar,#mc-groups-bar,#rc-groups-bar) {padding-left:16px;padding-right:16px;box-sizing:border-box;}
+:is(#d2-dict-groups-bar,#fc-tabs,#mc-type-bar,#dk-tabs) {margin-top:12px;}
+:is(#page-mood-cards,#page-ta-mood,#page-reply-cards) > .chat-head + .dc-toggle {margin-top:14px;}
+:is(#page-checkin-cards,#page-quote-cards,#page-loc-cards,#page-ta-ask,#page-ta-choose,#page-ta-curious,#page-ta-roast,#page-ta-checkin,#page-ta-invite) > .gs-scroll {padding-top:14px;}
+html[data-soft-palette]:not([data-theme="dark"]) :is(#page-ta-mood,#page-deskcheck),
+html[data-soft-palette]:not([data-theme="dark"]) :is(#page-ta-mood,#page-deskcheck) > .chat-head {background:var(--palette-bg)!important;}
+
+/* Separate the default-card setting tabs from the category row without changing its lower spacing. */
+#page-default-cards #dc-tabs {margin-top:12px;}
+html[data-soft-palette]:not([data-theme="dark"]) :is(#page-ta-ask,#page-ta-choose,#page-ta-curious,#page-ta-roast) .tc-range {accent-color:var(--palette-accent);}
+
+/* Shared custom-card page: all four public/private entry modes retain their controls and lower spacing. */
+#page-custom-cards #cc-tabs {margin-top:12px;}
+#page-custom-cards > .cc-toolbar, #page-custom-cards #cc-groups-bar {padding-left:16px;padding-right:16px;box-sizing:border-box;}
+
+#page-custom-cards #cc-import-hint {padding-left:12px;box-sizing:border-box;}
+
+/* Desktop music controls and seek track follow the selected palette. */
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-btn, html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-heart:not(.liked) {color:var(--palette-accent);}
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-play {background:var(--palette-accent);color:#fff;border-color:var(--palette-accent);}
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-play svg {fill:#fff;}
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-bar {background:var(--palette-bubble);}
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-fill, html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-knob {background:var(--palette-accent);}
+html[data-soft-palette]:not([data-theme="dark"]) #music-widget .mw-bars {fill:var(--palette-accent);}
+
+html[data-soft-palette]:not([data-theme="dark"]) .week-card .week-day.today {background:var(--palette-accent);color:#fff;}
+html[data-soft-palette]:not([data-theme="dark"]) .week-card .week-day.today b {color:#fff;}
+
+.theme-icon-follow-row {display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;margin:0 0 14px;border-top:1px solid var(--card-border,rgba(0,0,0,.1));border-bottom:1px solid var(--card-border,rgba(0,0,0,.1));color:var(--ink);font-size:13px;line-height:1.6;}
+.theme-icon-follow-row .txt {min-width:0;}
+.theme-icon-follow-row .toggle {flex-shrink:0;}
+html[data-theme-icon-follow="1"] #page-phone .app .app-ico svg {color:var(--btn-bg);stroke:var(--btn-bg);}
+html[data-theme-icon-follow="1"] #page-phone .app .app-ico svg [stroke]:not([stroke="none"]) {stroke:var(--btn-bg);}

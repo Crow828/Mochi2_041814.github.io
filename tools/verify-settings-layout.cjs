@@ -38,7 +38,7 @@ function quiet(){
     flags:['fs-active','fs-css-active','ios-fs-active'].filter(x=>document.documentElement.classList.contains(x)),requests:window.__appFullscreenRequests,
     errors:window.__mochiErrLoaded||[]};
   });
-  assert.deepEqual(state.ids,state.before.concat(['row-update-notes','settings-update-group']).sort());assert(state.same);assert.equal(state.lock,'tools');assert.equal(state.track,'basic');assert.equal(state.divine,'basic');
+  assert.deepEqual(state.ids,state.before.concat(['row-update-notes','settings-update-group','row-color-palette','theme-palette-value']).sort());assert(state.same);assert.equal(state.lock,'tools');assert.equal(state.track,'basic');assert.equal(state.divine,'basic');
   assert(state.headings.length>10&&state.headings.every(Boolean));assert.equal(state.backup,'数据备份与恢复');assert.equal(state.oldHelp,0);assert(state.infos.length>20&&state.infos.every(x=>x.text==='i'&&x.label));
   assert.deepEqual(state.full,[]);assert.deepEqual(state.flags,[]);assert.equal(state.requests,0);assert.equal(state.errors.length,0);
   if(process.env.MOCHI_SCREENSHOT_DIR){fs.mkdirSync(process.env.MOCHI_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.MOCHI_SCREENSHOT_DIR,'settings-general-'+width+'.png')});}

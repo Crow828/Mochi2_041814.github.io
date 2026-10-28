@@ -8506,7 +8506,7 @@ moreDate.innerHTML='<span class="mi-ico"><svg viewBox="0 0 24 24" fill="none" st
 const datesSearchAnchor = document.getElementById('more-search');
 if(datesSearchAnchor) datesSearchAnchor.after(moreDate);
 const moreIme=document.createElement('button');moreIme.type='button';moreIme.id='more-ime-reset';moreIme.className='more-item';moreIme.dataset.mcat='tool';
-moreIme.innerHTML='<span class="mi-ico" aria-hidden="true">↻</span><span>重新唤起输入法</span>';
+moreIme.innerHTML='<span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="4"/><path d="M7 10h.01M10 10h.01M14 10h.01M17 10h.01M7 13h.01M10 13h.01M14 13h.01M17 13h.01M8 16h8M9 3l3-2 3 2"/></svg></span><span>重新唤起输入法</span>';
 moreDate.after(moreIme);
 moreIme.addEventListener('click',e=>{
 e.stopPropagation();if(morePanel)morePanel.hidden=true;

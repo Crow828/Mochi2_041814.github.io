@@ -4,7 +4,7 @@
 // 归属：系统/全局（AI-B 域），须最先于功能模块加载（build.mjs 中放在 idb.js 之后）。
 (function () {
   const G = 'xy-home-v2';
-  const EXCLUDE = ['contacts', 'active-contact', 'feed-posts', 'migrated-v1', 'js-errors', 'theme-mode', 'accent-color',
+  const EXCLUDE = ['contacts', 'active-contact', 'feed-posts', 'migrated-v1', 'js-errors', 'theme-mode', 'theme-palette', 'theme-icon-follow', 'accent-color',
     // v3.16.x：摸鱼天数 fish-log 是全局根键（v3.9.x 起跨所有联系人按自然日去重累计，
     // personalize.js logFish 走 gStore / migrateFishLogGlobal 从各联系人合并进全局）。
     // 此前漏排除，migrateLegacy 每次刷新把全局 fish-log 迁进 default 并删全局键——
