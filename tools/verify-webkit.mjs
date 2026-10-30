@@ -67,20 +67,24 @@ async function runEngine(ua, tag) {
     check(tag + ' mochiDevice.isMobile=true', devJson.isMobile === true, String(devJson.isMobile));
     check(tag + ' mochiDevice.isIOS 与 UA 一致', devJson.isIOS === /iphone/i.test(ua), 'iOS=' + devJson.isIOS + ' UA含iphone=' + /iphone/i.test(ua));
 
-    // 2) 布局核心检查（与 verify.mjs 等价）
+    // 2) Check desktop geometry on the desktop, even when startup opens chat.
+    await page.waitForFunction(() => window.__mochiDataReady && typeof window.enterChat === 'function');
+    await page.evaluate(() => document.querySelector('.tab[data-page="page-phone"]').click());
+    await page.waitForFunction(() => !document.getElementById('page-phone').hidden);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     const home = JSON.parse(await page.evaluate("(function(){var ph=document.querySelector('.phone');var pr=ph.getBoundingClientRect();var st=document.querySelector('.statusbar');return JSON.stringify({zoom:getComputedStyle(ph).zoom,statusbar:getComputedStyle(st).display,phoneW:Math.round(pr.width),innerW:innerWidth});})()") || '{}');
     check(tag + ' 无整页缩放（zoom=1）', home.zoom === '1', String(home.zoom));
     check(tag + ' 状态栏正常显示', home.statusbar === 'flex', home.statusbar);
     check(tag + ' 手机屏占满视口（宽）', home.phoneW >= home.innerW - 20, home.phoneW + ' vs ' + home.innerW);
 
-    await page.evaluate("(function(){document.querySelectorAll('.page').forEach(function(p){p.hidden=(p.id!=='page-chat');});})()");
+    await page.evaluate(() => window.enterChat());
     await sleep(400);
     const chat = JSON.parse(await page.evaluate("(function(){var ph=document.querySelector('.phone');var pr=ph.getBoundingClientRect();var pg=document.getElementById('page-chat');var ch=pg.querySelector('.chat-head');var ir=pg.querySelector('.chat-input-row');if(!ch||!ir)return '{}';return JSON.stringify({head:true,inputBottom:Math.round(ir.getBoundingClientRect().bottom-pr.top),phoneH:Math.round(pr.height)});})()") || '{}');
     check(tag + ' 聊天页顶栏存在', chat.head === true);
     if (chat.head === true) check(tag + ' 聊天输入栏贴底', chat.inputBottom >= chat.phoneH - 5, chat.inputBottom + ' vs ' + chat.phoneH);
 
     // 3) 设置页「复制诊断信息」入口存在且能弹出诊断弹窗
-    await page.evaluate("(function(){document.querySelectorAll('.page').forEach(function(p){p.hidden=(p.id!=='page-setting');});})()");
+    await page.evaluate(() => document.querySelector('.tab[data-page="page-setting"]').click());
     await sleep(300);
     const rowExists = await page.evaluate("!!document.getElementById('row-diagnostics')");
     check(tag + ' 设置页诊断入口存在', rowExists === true);
