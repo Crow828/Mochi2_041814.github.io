@@ -101,6 +101,12 @@ jobs:
           node tools/verify-answered-card-feed-link.cjs
           node tools/verify-update-notes.cjs
 
+      - name: v4.2.9 启动、输入与回信验证
+        run: node tools/verify-v429.cjs
+
+      - name: WebKit v4.2.9 启动、输入与回信验证
+        run: MOCHI_ENGINE=webkit node tools/verify-v429.cjs
+
       - name: Chrome 布局验证
         run: node tools/verify-core-layout.cjs
 

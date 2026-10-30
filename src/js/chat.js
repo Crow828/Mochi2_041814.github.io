@@ -3857,7 +3857,7 @@ const done =
 (d.type === 'roast' && rec.roastStatus === 'answered') ||
 (d.type === 'ask' && rec.askStatus === 'answered');
 if (done) { delete inplaceDrafts[k]; return; }
-if (!expandCardInPlace(idx, d.type)) { delete inplaceDrafts[k]; return; }
+if (!expandCardInPlace(idx, d.type, false)) { delete inplaceDrafts[k]; return; }
 const inp = body.querySelector('.msg-ask[data-idx="' + idx + '"] .msg-inplace input.ip-input');
 if (inp) {
 inp.value = d.value;
@@ -3888,7 +3888,7 @@ if (type && !inplaceAnswered(rec)) try { expandCardInPlace(idx, type); } catch (
 }
 }
 }
-function expandCardInPlace(idx, type) {
+function expandCardInPlace(idx, type, focusEditor = true) {
 const el = body.querySelector('.msg-ask[data-idx="' + idx + '"]');
 if (!el) return false;
 const rec = msgs[idx];
@@ -4040,10 +4040,19 @@ const inp = document.createElement('input');
 inp.className = 'ip-input';
 inp.type = 'text';
 inp.placeholder = type === 'roast' ? (window.taFit ? window.taFit('回 TA 一句…') : '回 TA 一句…') : '输入你的回答…';
+inp.setAttribute('lang', 'zh-CN');
+let composingAnswer = false;
+inp.addEventListener('compositionstart', () => { composingAnswer = true; });
+inp.addEventListener('compositionend', () => { composingAnswer = false; });
 const send = document.createElement('button');
 send.className = 'ip-send';
 send.textContent = type === 'roast' ? (window.taFit ? window.taFit('回TA') : '回TA') : '回答';
 const doSend = () => {
+if (composingAnswer) return;
+// A deferred normalization can shift array indices; submit against this card's identity.
+const liveIndex = msgs.findIndex(m => m === rec || (rec.uid && m.uid === rec.uid) || (!rec.uid && m.ts === rec.ts && inplaceTypeOf(m) === type && m.text === rec.text));
+if (liveIndex < 0) { toast('这张问题卡片已变化，请重新打开后回答'); return; }
+idx = liveIndex;
 const v = (inp.value || '').trim();
 if (!v) return;
 // FIX 2026-09-30 #1462：提交前先收键盘（口径同 #512 askDismissIme／#542 弹窗 close——blur 先行）。
@@ -4094,7 +4103,7 @@ inplaceDrafts[idx] = { type: type, value: inp.value || '' };
 }
 card.appendChild(wrap);
 const fi = wrap.querySelector('input.ip-input');
-if (fi) setTimeout(() => { try { fi.focus(); } catch (e) {} }, 60);
+if (fi && focusEditor) setTimeout(() => { try { if (fi.isConnected) fi.focus(); } catch (e) {} }, 60);
 return true;
 }
 if (body) {
@@ -4666,7 +4675,28 @@ try { p.rescue(); } catch (e) {} // rescue 内部逐条已有 try/catch，这里
 return true;
 }
 window.__chatPumpDiag = function () { return { flying: batchRendering, stalled: chatPumpStalled(), sinceMs: chatPump ? Date.now() - chatPump.at : -1, incidents: (window.__chatRenderIncidents || []).slice(-3) }; }; // 只观测不改写：供 verify 脚本与真机诊断回读
+// Keep the native inline editor attached while its keyboard session is active.
+// Recreating and refocusing an iOS input can leave pinyin without candidate text.
+let inplaceRenderPending = null;
+function deferInplaceRender() {
+const ae = document.activeElement;
+if (!chatVisible() || windowRenderedPrefix !== window.activePrefix() || !ae || !body.contains(ae) || !ae.closest('.msg-inplace')) return false;
+inplaceRenderPending = window.activePrefix();
+return true;
+}
+body.addEventListener('focusout', () => {
+setTimeout(() => {
+if (!inplaceRenderPending) return;
+const owner = inplaceRenderPending;
+if (owner !== window.activePrefix()) { inplaceRenderPending = null; return; }
+const ae = document.activeElement;
+if (ae && body.contains(ae) && ae.closest('.msg-inplace')) return;
+inplaceRenderPending = null;
+if (chatVisible()) renderWindow(true);
+}, 0);
+});
 function renderWindow(keepScroll, clampTop, forceSync) {
+if (deferInplaceRender()) { chatRebuilding = false; updateChatLoading(); return; }
 
   try { if (!keepScroll && window.__mochiPhase) window.__mochiPhase('chat-renderWindow'); } catch (e0) {}const len = msgs.length;
 chatRebuilding = false; // #841e：新一轮渲染先复位空窗标志（被作废的旧分帧轮不得把进度条留在屏上）
@@ -4873,6 +4903,7 @@ renderWindow(true, false);
 // loadNewerIncremental 尾部增量追加（已有节点零重建），屏上比权威多（数据回滚/裁剪）
 // 仍整窗兜底。#220 原同窗路径（grown===0）行为逐字节不变。
 function inplacePatchIfSameWindow() {
+if (deferInplaceRender()) return true;
 const len = msgs.length;
 if (!len) return false;
 if (batchRendering) return false; // #951h 分帧构建在飞＝屏上是空/半截列表，「同窗同貌」不成立（#951 隐藏态预渲让这条通道变成常遇：点的那一刻构建还没跑完，若判成已画好会就地收掉进度条并把在飞的换装链晾在半路＝闪白无提示；返回 false 让调用方走 renderWindow，旧链由 _rwToken 作废）
@@ -5007,6 +5038,7 @@ return true;
 // 高度差补偿与 #245 liteUpgrade 同口径：原在底部→贴底跟随；不在底部→scrollTop 按高度差
 // 平移，视口内内容不动。返回 true=已原位补丁（或屏上无命中无需动）；false=整窗兜底。
 function patchChangedInPlace(changedIdxs, start) {
+if (deferInplaceRender()) return true;
 // 诊断钩子（__mochiProf 同族）：记录每次收尾补丁的判定路径，供真机/无头排查
 const __plog = function (tag) { try { (window.__patch402Log = window.__patch402Log || []).push(tag); } catch (e) {} };
 if (!Array.isArray(changedIdxs) || !changedIdxs.length) { __plog('noop-empty'); return true; }
@@ -5070,6 +5102,7 @@ return true;
 // 图片不重新解码、视口不弹。删除只让相邻间距变大＝既有时间分隔线判定不会失效，仅可能
 // 出现两枚胶囊相邻/尾悬——同批顺手去堆叠。任一守卫不满足返回 false，调用方整窗兜底。
 function patchNormRemovalsInPlace(removedRecs) {
+if (deferInplaceRender()) return true;
 if (!removedRecs || !removedRecs.length) return true; // 无删除＝无需动 DOM
 if (!normOrigIdx) return false;
 // 归一化运行期间可能有新消息追加（addRec 尾部 append，data-idx 已是新下标系）——以快照尾
@@ -10028,9 +10061,10 @@ return true;
 }
 function pokeAllCards() {
 const out = [];
+const allowMine = store.get('poke-ta-use-mine') !== '0';
 (POKE_PRESETS.ta || []).forEach(x => out.push(x));
-(POKE_PRESETS.mine || []).forEach(x => out.push(x));
-['ta', 'mine'].forEach(kind => {
+if (allowMine) (POKE_PRESETS.mine || []).forEach(x => out.push(x));
+(allowMine ? ['ta', 'mine'] : ['ta']).forEach(kind => {
 (pokeUserGroups[kind] || []).forEach(g => {
 if (Array.isArray(g) && Array.isArray(g[1])) g[1].forEach(x => { if (pokeTextOnly(x)) out.push(x); });
 });
@@ -10041,6 +10075,16 @@ return out;
 let pokeMode = 'ta';            // 当前 tab：public=公用 / ta=联系人昵称的拍一拍 / mine=我的拍一拍
 let pokeCurGroup = '__preset';  // 当前选中分组（'__preset' = 预设）
 const pokeTabsRow = document.createElement('div');
+const pokeMineRow = document.createElement('label');
+pokeMineRow.className = 'poke-mine-setting';
+pokeMineRow.innerHTML = '<span>允许 TA 使用我的拍一拍</span><input type="checkbox" id="poke-ta-use-mine">';
+const pokeMineToggle = pokeMineRow.querySelector('input');
+const syncPokeMineToggle = () => { pokeMineToggle.checked = store.get('poke-ta-use-mine') !== '0'; };
+syncPokeMineToggle();
+pokeMineToggle.addEventListener('change', () => { store.set('poke-ta-use-mine', pokeMineToggle.checked ? '1' : '0'); });
+pokeCard.querySelector('.poke-card-head').after(pokeMineRow);
+document.addEventListener('contact-switched', syncPokeMineToggle);
+document.addEventListener('mochi-restore-done', syncPokeMineToggle);
 pokeTabsRow.className = 'poke-tabs-row';
 const pokeTabPub = document.createElement('button');
 pokeTabPub.className = 'poke-tab poke-tab-pub';
@@ -14147,6 +14191,11 @@ let html = '<div class="mail-paper fav-mail-paper">' +
 (f.title ? '<div class="mail-paper-title">' + escTxt(f.title) + '</div>' : '') +
 '<div class="mail-paper-body">' + favTextHtml(f.text) + '</div>' +
 '</div>';
+const liveLetter = window.resolveFavoriteMail ? window.resolveFavoriteMail(f) : f;
+for (const [key, label] of [['myReply', '我的回信'], ['partnerReply', 'TA 的回信']]) {
+const reply = liveLetter[key] || f[key];
+if (reply && reply.content) html += '<div class="mail-paper fav-mail-paper"><div class="mail-paper-title">' + label + '</div><div class="mail-paper-body">' + favTextHtml(reply.content) + '</div></div>';
+}
 // v3.26.x：信件收藏不显示头像——不再复用聊天行的 .msg-av 头像槽（时间保留），纯卡片观感
 m.innerHTML = html;
 } else if (kind === 'feed') {

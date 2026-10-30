@@ -326,6 +326,10 @@ if (!cid) mailPending = null; // #1469q 内存这一份照旧作废——销账�
 writeSnap(list, cid);
 }
 function mailIsUnread(l) { return l.type === 'received' && !l.read && !l.myReply; }
+window.resolveFavoriteMail = function (favorite) {
+const letter = load().find(l => favorite.mailId ? String(l.id) === String(favorite.mailId) : Number(l.tm) === Number(favorite.ts) && l.content === favorite.text);
+return letter || favorite;
+};
 function updateBadge() {
 const badge = document.getElementById('mail-badge');
 if (!badge && !window.setDeskBadge) return;
@@ -472,7 +476,7 @@ const favBtn = document.getElementById('mail-fav-btn');
 if (favBtn) favBtn.addEventListener('click', () => {
 if (window.addMyFavItem) {
 const own = !!l.fromMe || l.type === 'sent';
-const ok = window.addMyFavItem({ kind: 'mail', mailType: own ? 'sent' : 'received', senderRole: own ? 'me' : 'ta', senderName: own ? myName : name, title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
+const ok = window.addMyFavItem({ kind: 'mail', mailId: l.id, myReply: l.myReply || null, partnerReply: l.partnerReply || null, mailType: own ? 'sent' : 'received', senderRole: own ? 'me' : 'ta', senderName: own ? myName : name, title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
 toast(ok ? '已收藏到我的收藏' : '这封来信已收藏过');
 if (ok) favBtn.textContent = '已收藏';
 }

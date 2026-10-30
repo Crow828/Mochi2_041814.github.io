@@ -218,3 +218,15 @@ html[data-soft-palette]:not([data-theme="dark"]) .week-card .week-day.today b {c
 .theme-icon-follow-row .toggle {flex-shrink:0;}
 html[data-theme-icon-follow="1"] #page-phone .app .app-ico svg {color:var(--btn-bg);stroke:var(--btn-bg);}
 html[data-theme-icon-follow="1"] #page-phone .app .app-ico svg [stroke]:not([stroke="none"]) {stroke:var(--btn-bg);}
+
+/* October 30 requested selected controls. */
+html[data-soft-palette]:not([data-theme="dark"]) :is(.emoji-tab.sel,.rps-tab.sel,.ip-send,.mail-actions .cc-tool:not(.cc-tool-danger)) {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+#page-reply-settings > .fav-tabs > .fav-tab {font-size:24.5px;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0;color:var(--muted)!important;}
+#page-reply-settings > .fav-tabs > .fav-tab.sel {background:transparent!important;color:var(--btn-bg)!important;border-bottom-color:var(--btn-bg)!important;}
+html[data-soft-palette]:not([data-theme="dark"]) #page-update-notes,html[data-soft-palette]:not([data-theme="dark"]) #page-update-notes > .chat-head {background:var(--palette-bg)!important;}
+.giftbox-list > details {grid-column:1 / -1;background:#fff;}
+html[data-soft-palette]:not([data-theme="dark"]) #emoji-panel .emoji-cat-chip.sel {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
+#giftbox-list > .dc-h-more {grid-column:1 / -1;align-self:start;background:#fff;}
+#giftbox-list .giftbox-card .hist-del {background:#c94753!important;color:#fff!important;opacity:1!important;border-radius:999px;padding:4px 10px!important;margin-right:12px!important;line-height:1.4;}
+.poke-mine-setting {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 16px 12px;font-size:13px;}
+.poke-mine-setting input {width:18px;height:18px;accent-color:var(--btn-bg);}

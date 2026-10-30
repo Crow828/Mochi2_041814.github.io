@@ -1,11 +1,11 @@
 [
   {
     "path": ".github/workflows/verify.yml",
-    "sha256": "5ee76a8046217f7c3ad3ebcf1613949d54c6c01ac606bdd457806d891db73968"
+    "sha256": "08fccf148329c1d564b1e8002bd49247921812d4d3a0605fdee9dd37bac7d65b"
   },
   {
     "path": "build.mjs",
-    "sha256": "11648d55fee3c56f87d9e359b14b60d395aaf119b3eea3f2a0fb002f37f39205"
+    "sha256": "b1f70aff57321eb16427236506aa8ce14cca8af9963f8f7d2e321efbbc745056"
   },
   {
     "path": "docs/CHAT-SCROLL-FIX-2026-10-25.md",
@@ -24,8 +24,16 @@
     "sha256": "f91fd78302385c8ad21fbf7a90398ff10dc82015ba51ba91272ca76501bdf527"
   },
   {
+    "path": "docs/V429-UPDATE-2026-10-31.md",
+    "sha256": "599b28ca1b02b360872c14f68e2931f0a4bf331a0566ddf116242c8aefe45b7b"
+  },
+  {
+    "path": "docs/V429-VALIDATION.md",
+    "sha256": "8ceab0b276e0919a28e9b4495876c9e9531d044e9e2bcf1c72cff3a265ba7945"
+  },
+  {
     "path": "index.html",
-    "sha256": "a84c2ee611fc6ac41d717578ba57b522e6b25fa3526a376eeb7d04a3ec30c74e"
+    "sha256": "5da75a0a6f15218a0238187766979097bd432605d279a6645ca6fd5d7d30e0b5"
   },
   {
     "path": "js/accounting.js",
@@ -85,7 +93,7 @@
   },
   {
     "path": "js/chat.js",
-    "sha256": "23abcd2eb9a487d5245e2e91e5bd030fe0fb80c92f010cbd4af22d6541924e89"
+    "sha256": "2945e60b07905824846ae311cc5818b3c4a1bc8f3f113c0fcc7a06f15bce2162"
   },
   {
     "path": "js/chatcard.js",
@@ -229,7 +237,7 @@
   },
   {
     "path": "js/mail.js",
-    "sha256": "ce506a3716e77e00217bbce75a8f59ad1f835078c8693c6e3b030701b1f07174"
+    "sha256": "b14a595f941b1ec4bf6f5c84b5e712e0470a5d3be2490ebf80b751f82d1b07dc"
   },
   {
     "path": "js/match3.js",
@@ -329,7 +337,7 @@
   },
   {
     "path": "js/settings-refinement.js",
-    "sha256": "e77a8a8cd29c8a42a61c65a905f90e4189c787e1efe68c6470d5d4963ea95b52"
+    "sha256": "228b058c674ea0161c9d3dbd85a7a7927019566bfa44d69711c7ae2a37adc7de"
   },
   {
     "path": "js/sfx.js",
@@ -373,7 +381,7 @@
   },
   {
     "path": "js/update-notes.js",
-    "sha256": "371baa856d96a68615855be7435f1fb5c3b9753b989f1beb96feae546295b383"
+    "sha256": "e59c18434885c87b5077036fcec733e45474ae8c74c452bf82ce31b1faa7ffdd"
   },
   {
     "path": "js/usage-days.js",
@@ -465,7 +473,7 @@
   },
   {
     "path": "src/css/settings-refinement.css",
-    "sha256": "8223b21b6e8de164283cba7ab38a45a3ef19ac1618e0fbc6ee120927fda1f018"
+    "sha256": "5d7c59dfeafa636efde8e096be0e6a9756973465f567f4c62e90449dea0c40b2"
   },
   {
     "path": "src/css/sugar-diary.css",
@@ -537,7 +545,7 @@
   },
   {
     "path": "src/js/chat.js",
-    "sha256": "4ff9817c006747dc10db968dd2be6e3fa787488643351743a1e54062fed1c4c7"
+    "sha256": "80d2b8e948777acc929bb4345b534ed79d552b3580f98ed708e1cf2fc706a089"
   },
   {
     "path": "src/js/chatcard.js",
@@ -693,7 +701,7 @@
   },
   {
     "path": "src/js/mail.js",
-    "sha256": "008d61bb4e4438dc8e9c891402844c3c4ee5f458f60e8c2d356c314fff7f1ffc"
+    "sha256": "275cd69bbbdac653925c31df36585560b81a9f92e7ccf3a797092f529d8fad2a"
   },
   {
     "path": "src/js/match3.js",
@@ -769,7 +777,7 @@
   },
   {
     "path": "src/js/pwa.js",
-    "sha256": "cf57b7b545cf9f5b220da25edb9ceb307bd081110ea24cdd7d59ebd35eb54233"
+    "sha256": "c860a6f8a37e4d69528275a188da2b59f43c570ec1bce5597b220326eda86d6e"
   },
   {
     "path": "src/js/quote-cards.js",
@@ -797,7 +805,7 @@
   },
   {
     "path": "src/js/settings-refinement.js",
-    "sha256": "70d6a436c8f9fac678e177cb8d33d768f8bc770ccef2961d4783bc86bbaf5af8"
+    "sha256": "697412e580a45041c7bd29effad29461bec464fab243dcbf57f2a887d1933179"
   },
   {
     "path": "src/js/sfx.js",
@@ -841,7 +849,7 @@
   },
   {
     "path": "src/js/update-notes.js",
-    "sha256": "71a469af5c5cfefa76a27cd1c6650fd7a9d51c771d4c601266a76b815e60ce41"
+    "sha256": "a4339789f8ab88a830c360a25d1e542c5fdea0921958682a946b9cbdfcc1d6b5"
   },
   {
     "path": "src/js/usage-days.js",
@@ -857,7 +865,7 @@
   },
   {
     "path": "sw.js",
-    "sha256": "6b610cc22805ed81e08191c087f1ba7b32d0ba140e248ba01df954ba47978423"
+    "sha256": "ce1cbfcc6d1b8b6b3c3c7f1e9fa6dacbddaf9d2dbb905920c358351448c10ab7"
   },
   {
     "path": "tools/quiet-startup-fixture.cjs",
@@ -909,11 +917,11 @@
   },
   {
     "path": "tools/verify-chat-scroll-layer.cjs",
-    "sha256": "de4930b9da16f725075b97ba0e9c9468718c1f18f19ec401f002270592f965b5"
+    "sha256": "763e3f38d9c6124e03ede039539542b91049584724263d755500909293c21a31"
   },
   {
     "path": "tools/verify-core-layout.cjs",
-    "sha256": "abdf1afe16cc9edb5bd3428cc7e7de440867909db537eac884bb6eb709010f63"
+    "sha256": "79c2c3f131db5b9b70a11157b9ecf7283d4984a8cac3b03abd04b771eafdd529"
   },
   {
     "path": "tools/verify-custom-moods.cjs",
@@ -941,7 +949,7 @@
   },
   {
     "path": "tools/verify-release.cjs",
-    "sha256": "f149e177ddc892ba61c4bdb1cca31b0159365d843fbb3218ce026eda76e5adae"
+    "sha256": "12a42279e4b14838d0ee1877ea542ddd7b8b570bf73b9189772bef7ea3b7d867"
   },
   {
     "path": "tools/verify-settings-layout.cjs",
@@ -953,7 +961,7 @@
   },
   {
     "path": "tools/verify-startup-update.cjs",
-    "sha256": "03f43becca96203c73609520891f19fca8fb707903fb0efa1f45a3b08ed3bbcc"
+    "sha256": "dcf158a1b2d73ecad2fbe999a4a74641888fac010bfe3495ba2aa7f0f0d75c38"
   },
   {
     "path": "tools/verify-sugar-backup.cjs",
@@ -973,7 +981,7 @@
   },
   {
     "path": "tools/verify-update-notes.cjs",
-    "sha256": "a88f8dd3a0f5c89ff334b3eb588d6746a8f21d18f7bee7c37a6f56fa1ba5ebf7"
+    "sha256": "860a429bd0de96a1af511d2af151fe9414508b47b5f0348ccbe7394a6b68b782"
   },
   {
     "path": "tools/verify-update-service-worker.cjs",
@@ -984,11 +992,15 @@
     "sha256": "391d752caf7630cabbac247417641caab86217ad86f8053a777db2c23d621bc7"
   },
   {
+    "path": "tools/verify-v429.cjs",
+    "sha256": "c1a348bfc5f2204c414aeefe8df6e36d1ef794122d3cc240573a038847d9121a"
+  },
+  {
     "path": "tools/verify-webkit.mjs",
     "sha256": "8ec3a98ea2ca1b35ba53f2032d8b2c949f83f0708bf8706cecfc42c38d1647fa"
   },
   {
     "path": "version.json",
-    "sha256": "66d0a8e5e489ae841002a512a54b9cc09efa1271968068e1daf274d322d712db"
+    "sha256": "e513979a610f7d5c4d872196c32ea1aefed27638ed81b901320bb9dbcb43b8df"
   }
 ]

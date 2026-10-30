@@ -86,7 +86,7 @@ document.addEventListener('mochi-restore-done',apply);document.addEventListener(
 new MutationObserver(apply).observe(root,{attributes:true,attributeFilter:['data-theme']});
 apply();
 const previewParams=new URLSearchParams(location.search);
-const previewChat=previewParams.get('preview')==='chat';
+const previewChat=previewParams.get('preview')==='chat'||(!previewParams.has('preview')&&previewParams.get('show-palettes')!=='1');
 if(previewChat||previewParams.get('show-palettes')==='1'){
 const open=()=>requestAnimationFrame(()=>{if(previewChat){if(window.enterChat)window.enterChat();}else show();});if(window.__mochiDataReady)open();else document.addEventListener('mochi-restore-done',open,{once:true});
 }

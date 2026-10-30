@@ -2785,7 +2785,7 @@ const done =
 (d.type === 'roast' && rec.roastStatus === 'answered') ||
 (d.type === 'ask' && rec.askStatus === 'answered');
 if (done) { delete inplaceDrafts[k]; return; }
-if (!expandCardInPlace(idx, d.type)) { delete inplaceDrafts[k]; return; }
+if (!expandCardInPlace(idx, d.type, false)) { delete inplaceDrafts[k]; return; }
 const inp = body.querySelector('.msg-ask[data-idx="' + idx + '"] .msg-inplace input.ip-input');
 if (inp) {
 inp.value = d.value;
@@ -2813,7 +2813,7 @@ if (type && !inplaceAnswered(rec)) try { expandCardInPlace(idx, type); } catch (
 }
 }
 }
-function expandCardInPlace(idx, type) {
+function expandCardInPlace(idx, type, focusEditor = true) {
 const el = body.querySelector('.msg-ask[data-idx="' + idx + '"]');
 if (!el) return false;
 const rec = msgs[idx];
@@ -2956,10 +2956,18 @@ const inp = document.createElement('input');
 inp.className = 'ip-input';
 inp.type = 'text';
 inp.placeholder = type === 'roast' ? (window.taFit ? window.taFit('回 TA 一句…') : '回 TA 一句…') : '输入你的回答…';
+inp.setAttribute('lang', 'zh-CN');
+let composingAnswer = false;
+inp.addEventListener('compositionstart', () => { composingAnswer = true; });
+inp.addEventListener('compositionend', () => { composingAnswer = false; });
 const send = document.createElement('button');
 send.className = 'ip-send';
 send.textContent = type === 'roast' ? (window.taFit ? window.taFit('回TA') : '回TA') : '回答';
 const doSend = () => {
+if (composingAnswer) return;
+const liveIndex = msgs.findIndex(m => m === rec || (rec.uid && m.uid === rec.uid) || (!rec.uid && m.ts === rec.ts && inplaceTypeOf(m) === type && m.text === rec.text));
+if (liveIndex < 0) { toast('这张问题卡片已变化，请重新打开后回答'); return; }
+idx = liveIndex;
 const v = (inp.value || '').trim();
 if (!v) return;
 try { inp.blur(); } catch (eKb) {}
@@ -2999,7 +3007,7 @@ inplaceDrafts[idx] = { type: type, value: inp.value || '' };
 }
 card.appendChild(wrap);
 const fi = wrap.querySelector('input.ip-input');
-if (fi) setTimeout(() => { try { fi.focus(); } catch (e) {} }, 60);
+if (fi && focusEditor) setTimeout(() => { try { if (fi.isConnected) fi.focus(); } catch (e) {} }, 60);
 return true;
 }
 if (body) {
@@ -3394,7 +3402,26 @@ try { p.rescue(); } catch (e) {} // rescue 内部逐条已有 try/catch，这里
 return true;
 }
 window.__chatPumpDiag = function () { return { flying: batchRendering, stalled: chatPumpStalled(), sinceMs: chatPump ? Date.now() - chatPump.at : -1, incidents: (window.__chatRenderIncidents || []).slice(-3) }; }; // 只观测不改写：供 verify 脚本与真机诊断回读
+let inplaceRenderPending = null;
+function deferInplaceRender() {
+const ae = document.activeElement;
+if (!chatVisible() || windowRenderedPrefix !== window.activePrefix() || !ae || !body.contains(ae) || !ae.closest('.msg-inplace')) return false;
+inplaceRenderPending = window.activePrefix();
+return true;
+}
+body.addEventListener('focusout', () => {
+setTimeout(() => {
+if (!inplaceRenderPending) return;
+const owner = inplaceRenderPending;
+if (owner !== window.activePrefix()) { inplaceRenderPending = null; return; }
+const ae = document.activeElement;
+if (ae && body.contains(ae) && ae.closest('.msg-inplace')) return;
+inplaceRenderPending = null;
+if (chatVisible()) renderWindow(true);
+}, 0);
+});
 function renderWindow(keepScroll, clampTop, forceSync) {
+if (deferInplaceRender()) { chatRebuilding = false; updateChatLoading(); return; }
 try { if (!keepScroll && window.__mochiPhase) window.__mochiPhase('chat-renderWindow'); } catch (e0) {}const len = msgs.length;
 chatRebuilding = false; // #841e：新一轮渲染先复位空窗标志（被作废的旧分帧轮不得把进度条留在屏上）
 const prevTop = keepScroll ? body.scrollTop : 0;
@@ -3535,6 +3562,7 @@ if (chatPage.hidden || !body.children.length) return;
 renderWindow(true, false);
 };
 function inplacePatchIfSameWindow() {
+if (deferInplaceRender()) return true;
 const len = msgs.length;
 if (!len) return false;
 if (batchRendering) return false; // #951h 分帧构建在飞＝屏上是空/半截列表，「同窗同貌」不成立（#951 隐藏态预渲让这条通道变成常遇：点的那一刻构建还没跑完，若判成已画好会就地收掉进度条并把在飞的换装链晾在半路＝闪白无提示；返回 false 让调用方走 renderWindow，旧链由 _rwToken 作废）
@@ -3630,6 +3658,7 @@ windowRenderedN = len; // 凭据随增量补齐——loadNewerIncremental 只更
 return true;
 }
 function patchChangedInPlace(changedIdxs, start) {
+if (deferInplaceRender()) return true;
 const __plog = function (tag) { try { (window.__patch402Log = window.__patch402Log || []).push(tag); } catch (e) {} };
 if (!Array.isArray(changedIdxs) || !changedIdxs.length) { __plog('noop-empty'); return true; }
 let n = start;
@@ -3677,6 +3706,7 @@ if (chatPinnedBottom) chatEntrySettle(); // #841d：归一化原位换节点后�
 return true;
 }
 function patchNormRemovalsInPlace(removedRecs) {
+if (deferInplaceRender()) return true;
 if (!removedRecs || !removedRecs.length) return true; // 无删除＝无需动 DOM
 if (!normOrigIdx) return false;
 const tailEl = normSnapTail;
@@ -7453,9 +7483,10 @@ return true;
 }
 function pokeAllCards() {
 const out = [];
+const allowMine = store.get('poke-ta-use-mine') !== '0';
 (POKE_PRESETS.ta || []).forEach(x => out.push(x));
-(POKE_PRESETS.mine || []).forEach(x => out.push(x));
-['ta', 'mine'].forEach(kind => {
+if (allowMine) (POKE_PRESETS.mine || []).forEach(x => out.push(x));
+(allowMine ? ['ta', 'mine'] : ['ta']).forEach(kind => {
 (pokeUserGroups[kind] || []).forEach(g => {
 if (Array.isArray(g) && Array.isArray(g[1])) g[1].forEach(x => { if (pokeTextOnly(x)) out.push(x); });
 });
@@ -7466,6 +7497,16 @@ return out;
 let pokeMode = 'ta';            // 当前 tab：public=公用 / ta=联系人昵称的拍一拍 / mine=我的拍一拍
 let pokeCurGroup = '__preset';  // 当前选中分组（'__preset' = 预设）
 const pokeTabsRow = document.createElement('div');
+const pokeMineRow = document.createElement('label');
+pokeMineRow.className = 'poke-mine-setting';
+pokeMineRow.innerHTML = '<span>允许 TA 使用我的拍一拍</span><input type="checkbox" id="poke-ta-use-mine">';
+const pokeMineToggle = pokeMineRow.querySelector('input');
+const syncPokeMineToggle = () => { pokeMineToggle.checked = store.get('poke-ta-use-mine') !== '0'; };
+syncPokeMineToggle();
+pokeMineToggle.addEventListener('change', () => { store.set('poke-ta-use-mine', pokeMineToggle.checked ? '1' : '0'); });
+pokeCard.querySelector('.poke-card-head').after(pokeMineRow);
+document.addEventListener('contact-switched', syncPokeMineToggle);
+document.addEventListener('mochi-restore-done', syncPokeMineToggle);
 pokeTabsRow.className = 'poke-tabs-row';
 const pokeTabPub = document.createElement('button');
 pokeTabPub.className = 'poke-tab poke-tab-pub';
@@ -11156,6 +11197,11 @@ let html = '<div class="mail-paper fav-mail-paper">' +
 (f.title ? '<div class="mail-paper-title">' + escTxt(f.title) + '</div>' : '') +
 '<div class="mail-paper-body">' + favTextHtml(f.text) + '</div>' +
 '</div>';
+const liveLetter = window.resolveFavoriteMail ? window.resolveFavoriteMail(f) : f;
+for (const [key, label] of [['myReply', '我的回信'], ['partnerReply', 'TA 的回信']]) {
+const reply = liveLetter[key] || f[key];
+if (reply && reply.content) html += '<div class="mail-paper fav-mail-paper"><div class="mail-paper-title">' + label + '</div><div class="mail-paper-body">' + favTextHtml(reply.content) + '</div></div>';
+}
 m.innerHTML = html;
 } else if (kind === 'feed') {
 const sourceAuthor = !f.authorRole && resolveFeedAuthor ? resolveFeedAuthor(f) : null;

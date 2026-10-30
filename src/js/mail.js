@@ -533,6 +533,11 @@
   // #1402 信箱「未读」的唯一口径：徽标数与列表顶部常驻区必须同进同退（常驻区条数 === 徽标数），
   // 否则折叠之后红点亮着、列表里却找不到那封信。
   function mailIsUnread(l) { return l.type === 'received' && !l.read && !l.myReply; }
+  // Resolve old snapshots by timestamp/content too; never attach another letter's reply.
+  window.resolveFavoriteMail = function (favorite) {
+    const letter = load().find(l => favorite.mailId ? String(l.id) === String(favorite.mailId) : Number(l.tm) === Number(favorite.ts) && l.content === favorite.text);
+    return letter || favorite;
+  };
   // v3.5.99：桌面「信箱」图标未读角标——有新来信（未读）时显示数字，进入信箱或打开信件后清除
   function updateBadge() {
     const badge = document.getElementById('mail-badge');
@@ -735,7 +740,7 @@
     if (favBtn) favBtn.addEventListener('click', () => {
       if (window.addMyFavItem) {
         const own = !!l.fromMe || l.type === 'sent';
-        const ok = window.addMyFavItem({ kind: 'mail', mailType: own ? 'sent' : 'received', senderRole: own ? 'me' : 'ta', senderName: own ? myName : name, title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
+        const ok = window.addMyFavItem({ kind: 'mail', mailId: l.id, myReply: l.myReply || null, partnerReply: l.partnerReply || null, mailType: own ? 'sent' : 'received', senderRole: own ? 'me' : 'ta', senderName: own ? myName : name, title: l.tt || '', text: l.content || '', ts: l.tm || Date.now() });
         toast(ok ? '已收藏到我的收藏' : '这封来信已收藏过');
         if (ok) favBtn.textContent = '已收藏';
       }

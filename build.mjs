@@ -69,7 +69,7 @@ if (!CHECK_SENTINELS && !process.argv.includes('--allow-revert') && !process.env
 // ===== 构建信息（开屏显示 + sw 缓存版本号，v3.5.54） =====
 const buildTime = new Date();
 const pad = (n) => (n < 10 ? '0' + n : '' + n);
-const buildInfo = 'v4.2.8 · 部署于 ' + buildTime.getFullYear() + '-' + pad(buildTime.getMonth() + 1) + '-' + pad(buildTime.getDate()) +
+const buildInfo = 'v4.2.9 · 部署于 ' + buildTime.getFullYear() + '-' + pad(buildTime.getMonth() + 1) + '-' + pad(buildTime.getDate()) +
   ' ' + pad(buildTime.getHours()) + ':' + pad(buildTime.getMinutes());
 const buildStamp = buildTime.getTime().toString(36); // sw 缓存名版本号（每次构建必变）
 // 应用版本号（设置页底部与开屏共用）
@@ -358,7 +358,7 @@ console.log('已生成 index.html（' + html.length + ' 字节，' + (html.split
 // v3.6.x：生成版本文件 version.json（部署到站点根目录）——
 // 手机端靠它检测新版本（fetch 对比时间戳），不依赖 Service Worker 更新机制
 //（sw 只在页面加载/导航时检查、iOS Safari 检测不可靠，开着旧页面永远收不到提醒）。
-const versionJson = JSON.stringify({ ts: buildTime.getTime(), info: buildInfo, release: 'v4.2.8' });
+const versionJson = JSON.stringify({ ts: buildTime.getTime(), info: buildInfo, release: 'v4.2.9' });
 writeFileSync(join(root, 'version.json'), versionJson);
 console.log('已生成 version.json（' + versionJson + '）');
 
