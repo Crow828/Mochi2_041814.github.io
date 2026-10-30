@@ -10,3 +10,7 @@
 - 安装包逐文件 SHA256、ZIP CRC 和脚本资源完整性另经打包脚本检查。
 
 本地日志：`work/v429-chrome-regression.log`、`work/v429-chrome-regression-rest.log`、`work/v429-final-build.log`、`work/v429-final-chrome.log`、`work/v429-final-webkit.log`。
+
+## 补丁1复核
+
+旧构建在同一任务内打开问题、填写草稿并切到主输入框时，可复现截图的焦点断言失败。新增保护取消旧的延迟聚焦操作，保留原断言，并验证正常打开卡片仍能自动聚焦。补丁1构建的 Chromium/WebKit 三宽度专项、两个内核的主输入焦点与中文组合输入检查，以及版本弹窗和更新说明检查均通过。构建哨兵仍为4279/4279与16/16。日志前缀：`work/v429-focus-fix1-*`。

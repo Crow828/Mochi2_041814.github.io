@@ -3787,6 +3787,17 @@ let inplaceDrafts = {};
 // 用 document focusin/focusout 跟踪（contenteditable `.ce-box` 上 activeElement 常为 body，
 // 单看 activeElement 不可靠；focusin 能命中 ceBox，故以此为权威）。
 let inplaceFocusIdx = -1;
+let inplaceFocusSerial = 0;
+document.addEventListener('focusin', () => { inplaceFocusSerial++; }, true);
+document.addEventListener('pointerdown', () => { inplaceFocusSerial++; }, true);
+function scheduleInplaceFocus(editor, delay) {
+const serial = inplaceFocusSerial, owner = window.activePrefix();
+setTimeout(() => {
+if (!editor.isConnected || !chatVisible() || window.activePrefix() !== owner || inplaceFocusSerial !== serial) return;
+if (document.activeElement === editor || document.activeElement === editor.__ceBox) return;
+try { editor.focus(); } catch (e) {}
+}, delay);
+}
 document.addEventListener('focusin', (e) => {
   const t = e.target;
   if (!t || t.nodeType !== 1 || !t.closest) return;
@@ -3872,7 +3883,7 @@ s.addRange(r);
 } catch (e) {}
 // v3.28.x：重建后若正是重渲染前聚焦的那张卡片，回补焦点，让输入法保持弹出、不被收起
 if (inplaceFocusIdx === idx) {
-setTimeout(() => { try { inp.focus(); } catch (e) {} }, 0);
+scheduleInplaceFocus(inp, 0);
 }
 }
 });
@@ -4103,7 +4114,7 @@ inplaceDrafts[idx] = { type: type, value: inp.value || '' };
 }
 card.appendChild(wrap);
 const fi = wrap.querySelector('input.ip-input');
-if (fi && focusEditor) setTimeout(() => { try { if (fi.isConnected) fi.focus(); } catch (e) {} }, 60);
+if (fi && focusEditor) scheduleInplaceFocus(fi, 60);
 return true;
 }
 if (body) {
