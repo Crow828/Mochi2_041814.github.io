@@ -221,7 +221,7 @@ html[data-theme-icon-follow="1"] #page-phone .app .app-ico svg [stroke]:not([str
 
 /* October 30 requested selected controls. */
 html[data-soft-palette]:not([data-theme="dark"]) :is(.emoji-tab.sel,.rps-tab.sel,.ip-send,.mail-actions .cc-tool:not(.cc-tool-danger)) {background:var(--palette-accent)!important;color:#fff!important;border-color:var(--palette-accent)!important;}
-#page-reply-settings > .fav-tabs > .fav-tab {font-size:24.5px;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0;color:var(--muted)!important;}
+#page-reply-settings > .fav-tabs > .fav-tab {font-size:12.5px;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0;color:var(--muted)!important;}
 #page-reply-settings > .fav-tabs > .fav-tab.sel {background:transparent!important;color:var(--btn-bg)!important;border-bottom-color:var(--btn-bg)!important;}
 html[data-soft-palette]:not([data-theme="dark"]) #page-update-notes,html[data-soft-palette]:not([data-theme="dark"]) #page-update-notes > .chat-head {background:var(--palette-bg)!important;}
 .giftbox-list > details {grid-column:1 / -1;background:#fff;}

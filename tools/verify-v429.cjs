@@ -7,6 +7,8 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL
  const p=await browser.newPage({viewport:{width,height:844},userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',isMobile:true,hasTouch:true,serviceWorkers:'block'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  await require('./quiet-startup-fixture.cjs')(p);await require('./startup-dialog-fixture.cjs')(p);
  await p.addInitScript(()=>{for(const pre of ['xy-home-v2','xy-home-v2:default']){for(const k of ['reply-as-en','checkin-en','reply-ml-write-en'])localStorage.setItem(pre+':'+k,'0');localStorage.setItem(pre+':cs-rp-ask-prob','0');for(const k of ['ta-ask','ta-choose','ta-curious','ta-roast','ta-invite','ta-ask-card'])localStorage.setItem(pre+':'+k,JSON.stringify({settings:{enabled:false,prob:0,popupProb:0}}));}localStorage.setItem('xy-home-v2:theme-palette','wine');});
+ // Layout checks use the checked-in notice, independent of the upstream site's CORS/network state.
+ await p.route('https://ling233330-star.github.io/mochi/notice.json*',r=>r.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:fs.readFileSync(path.join(root,'notice.json'),'utf8')}));
  await p.goto('http://127.0.0.1:'+server.address().port+'/');
  await p.waitForFunction(()=>window.__mochiDataReady&&!document.getElementById('page-chat').hidden);
  await p.waitForFunction(()=>window.__chatDbReady&&window.__chatDbReady());
@@ -27,7 +29,7 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL
  assert.equal(await p.evaluate(()=>document.activeElement.id),'chat-input','restoring an unfocused answer draft must not steal keyboard focus');
  assert.equal(await p.locator('#chat-body .ip-input').last().inputValue(),'保留草稿');
  await p.evaluate(()=>{document.querySelectorAll('.page').forEach(e=>e.hidden=true);document.getElementById('page-reply-settings').hidden=false;});
- const nav=await p.locator('#page-reply-settings > .fav-tabs > .fav-tab.sel').evaluate(e=>{const s=getComputedStyle(e);return {size:s.fontSize,bg:s.backgroundColor,underline:s.borderBottomColor,color:s.color};});assert.equal(nav.size,'24.5px');assert.equal(nav.underline,nav.color);assert.equal(nav.bg,'rgba(0, 0, 0, 0)');
+ const nav=await p.locator('#page-reply-settings > .fav-tabs > .fav-tab.sel').evaluate(e=>{const s=getComputedStyle(e);return {size:s.fontSize,bg:s.backgroundColor,underline:s.borderBottomColor,color:s.color};});assert.equal(nav.size,'12.5px');assert.equal(nav.underline,nav.color);assert.equal(nav.bg,'rgba(0, 0, 0, 0)');
  const subnav=await p.locator('#page-reply-settings .rps-tab.sel').evaluate(e=>({bg:getComputedStyle(e).backgroundColor,ink:getComputedStyle(e).color}));assert.equal(subnav.bg,'rgb(133, 60, 74)');assert.equal(subnav.ink,'rgb(255, 255, 255)');
  await p.evaluate(()=>{const s=window.activeStore();const letter={id:'test-letter',type:'received',content:'原信',tm:123456,myReply:{content:'我的回信',tm:123457},partnerReply:{content:'TA后来的回信',tm:123458}};s.set('mail-letters',JSON.stringify([letter]));window.addMyFavItem({kind:'mail',text:'原信',ts:123456,mailType:'received'});document.querySelectorAll('.page').forEach(e=>e.hidden=true);document.getElementById('page-fav').hidden=false;window.renderFav();});
  await p.waitForFunction(()=>document.getElementById('fav-list').textContent.includes('TA后来的回信'));assert((await p.locator('#fav-list').textContent()).includes('我的回信'));

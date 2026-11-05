@@ -37,6 +37,7 @@
 #fav-list .fav-mail-heading > span {font-size:10px;color:var(--muted,#888);white-space:nowrap;flex-shrink:0;}
 #fav-list .fav-feed-author {margin-bottom:10px;}
 #fav-list .fav-mail-paper {width:100%;min-width:0;margin:0;box-shadow:none;}
+#fav-list .fav-entry-message:has(> .fav-mail-paper) {flex-direction:column;align-items:stretch;gap:12px;}
 #fav-list .fav-mail-paper .fav-mail-heading {padding:12px 14px;margin:0;}
 #fav-list .fav-mail-paper .mail-paper-title {font-size:14px;font-weight:700;padding:12px 14px 2px;}
 #fav-list .fav-mail-paper .mail-paper-body {font-size:13px;line-height:24px;padding:8px 14px 14px;}
