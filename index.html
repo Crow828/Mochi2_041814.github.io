@@ -9778,6 +9778,10 @@ html[data-soft-palette]:not([data-theme="dark"]) #emoji-panel .emoji-cat-chip.se
 #giftbox-list .giftbox-card .hist-del {background:#c94753!important;color:#fff!important;opacity:1!important;border-radius:999px;padding:4px 10px!important;margin-right:12px!important;line-height:1.4;}
 .poke-mine-setting {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 16px 12px;font-size:13px;}
 .poke-mine-setting input {width:18px;height:18px;accent-color:var(--btn-bg);}
+html[data-soft-palette]:not([data-theme="dark"]) #cal-grid .cal-cell:is(.today, .sel) {
+background: var(--palette-accent);
+color: #fff;
+}
 #page-chatcard .cc-library-group { margin:12px; padding:0 12px 8px; border:1px solid var(--card-border,#e7e7e7); border-radius:18px; background:var(--card-bg,#fff); }
 #page-chatcard .cc-library-group-title { margin:0; padding:15px 0 5px; color:var(--muted,#888); font-size:12px; font-weight:600; line-height:1.5; }
 #page-chatcard .cc-library-group > .chat-item { margin:0; border:0; border-bottom:1px solid var(--card-border,#e7e7e7); border-radius:0; background:transparent; box-shadow:none; }
@@ -10404,7 +10408,7 @@ html[data-soft-palette]:not([data-theme="dark"]) #emoji-panel .emoji-cat-chip.se
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1793891896262" data-version="v8.56">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1794748299037" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -22127,4 +22131,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 </body>
 </html>
 
-<!-- __MOCHI_EOF__ mw3ox1vq -->
+<!-- __MOCHI_EOF__ mwhusqhp -->

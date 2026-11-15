@@ -277,17 +277,24 @@ const k = y + '-' + pad(mo) + '-' + pad(i);
 let s = null;
 if (which === 'me') { const rec = data[k]; if (rec) { const m = moodByEmoji(rec.m,rec); if (m) s = m.s; } }
 else { const m = taMoodFor(k); if (m) s = m.s; }
-if (s == null) { if (seg.length > 1) segs.push(seg); seg = []; }
+if (s == null) { if (seg.length) segs.push(seg); seg = []; }
 else seg.push([cxf(i - 1), cyf(s)]);
 }
-if (seg.length > 1) segs.push(seg);
-return segs.map(g => '<polyline points="' + g.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="none" stroke="' + (which === 'me' ? '#ff6b9d' : '#6ba7ff') + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>').join('');
+if (seg.length) segs.push(seg);
+return segs.map(points => {
+const coordinates = points.map(([x, y]) => [x.toFixed(1), y.toFixed(1)]);
+if (coordinates.length === 1) {
+const [[x, y]] = coordinates;
+return '<circle cx="' + x + '" cy="' + y + '" r="2.6" fill="currentColor"/>';
+}
+return '<polyline points="' + coordinates.join(' ') + '" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+}).join('');
 }
 let marks = '';
 for (let i = 1; i <= days; i += 5) marks += '<text x="' + cxf(i - 1).toFixed(1) + '" y="' + (H - 6) + '" font-size="9" fill="#999" text-anchor="middle">' + i + '</text>';
 curve.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block">' +
 '<line x1="' + L + '" y1="' + cyf(3) + '" x2="' + (W - R) + '" y2="' + cyf(3) + '" stroke="rgba(0,0,0,.08)" stroke-dasharray="3 4"/>' +
-poly('ta') + poly('me') + marks + '</svg>' +
+'<g class="ml-ta">' + poly('ta') + '</g><g class="ml-me">' + poly('me') + '</g>' + marks + '</svg>' +
 '<div class="mood-legend"><span class="ml-me">— 我</span><span class="ml-ta">— ' + esc(store().get('lbl-partner') || 'TA') + '</span></div>';
 const firstDow = new Date(y, mo - 1, 1).getDay();
 let gh = '';

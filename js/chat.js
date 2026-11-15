@@ -4409,7 +4409,7 @@ m.className = 'msg-poke' + (rec.mailNotice ? ' mail-notice' : '');
 m.innerHTML = '<span>' + (rec.nickKeep ? escTxt(rec.text) : pokeIconHtml(pokePersonMap(rec.text, __taNm, __meNm))) + '</span>' +
 (rec.img ? '<img class="msg-poke-img" src="' + attrEsc(rec.img) + '" alt="新头像">' : '');
 if (rec.mailNotice) {
-m.addEventListener('click', () => { if (window.openMailPage) window.openMailPage(); });
+m.addEventListener('click', () => { if (window.openMailPage) window.openMailPage(true); });
 }
 if(rec.feedPostId || /发布了一条朋友圈动态/.test(String(rec.text || ''))) {
 m.classList.add('feed-notice'); m.setAttribute('role','button'); m.tabIndex=0;

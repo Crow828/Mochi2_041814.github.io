@@ -564,7 +564,9 @@
   }
   // 打开信箱页（渲染 + 清角标），供信箱图标点击与弹窗点击共用
   // v3.10.x：暴露给 chat.js——聊天里的信件通知（写了一封信/给你回了信等）可点击直达
-  function openMailPage() {
+  let mailEntryFromChat = false;
+  function openMailPage(fromChat = false) {
+    mailEntryFromChat = fromChat === true;
     // v3.27.x 性能：先显示 page-mail 再补查/渲染——render() 现在只在信箱页可见时干活
     //（后台落地路径不再白建列表 DOM），进页这一刻按需渲染；红米 K80「先可见再写入」
     // 防御口径同 submitReply/sendLetter。
@@ -1581,6 +1583,12 @@ window.showDeskPopup({ name: '信箱', notifyKind: 'mail', text: mailPlainDesc('
   }
   const mailBack = document.getElementById('mail-back');
   if (mailBack) mailBack.addEventListener('click', () => {
+    const returnToChat = mailEntryFromChat;
+    mailEntryFromChat = false;
+    if (returnToChat && typeof window.enterChat === 'function') {
+      window.enterChat();
+      return;
+    }
     document.querySelectorAll('.page').forEach(p => p.hidden = true);
     const phone = document.getElementById('page-phone');
     if (phone) phone.hidden = false;

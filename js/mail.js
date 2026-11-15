@@ -351,7 +351,9 @@ const el = document.getElementById(id);
 return el && !el.hidden;
 });
 }
-function openMailPage() {
+let mailEntryFromChat = false;
+function openMailPage(fromChat = false) {
+mailEntryFromChat = fromChat === true;
 document.querySelectorAll('.page').forEach(p => p.hidden = true);
 const mp = document.getElementById('page-mail');
 if (mp) mp.hidden = false;
@@ -1066,6 +1068,12 @@ openMailPage();
 }
 const mailBack = document.getElementById('mail-back');
 if (mailBack) mailBack.addEventListener('click', () => {
+const returnToChat = mailEntryFromChat;
+mailEntryFromChat = false;
+if (returnToChat && typeof window.enterChat === 'function') {
+window.enterChat();
+return;
+}
 document.querySelectorAll('.page').forEach(p => p.hidden = true);
 const phone = document.getElementById('page-phone');
 if (phone) phone.hidden = false;

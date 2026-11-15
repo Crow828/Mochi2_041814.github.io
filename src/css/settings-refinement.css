@@ -230,3 +230,7 @@ html[data-soft-palette]:not([data-theme="dark"]) #emoji-panel .emoji-cat-chip.se
 #giftbox-list .giftbox-card .hist-del {background:#c94753!important;color:#fff!important;opacity:1!important;border-radius:999px;padding:4px 10px!important;margin-right:12px!important;line-height:1.4;}
 .poke-mine-setting {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 16px 12px;font-size:13px;}
 .poke-mine-setting input {width:18px;height:18px;accent-color:var(--btn-bg);}
+html[data-soft-palette]:not([data-theme="dark"]) #cal-grid .cal-cell:is(.today, .sel) {
+  background: var(--palette-accent);
+  color: #fff;
+}
